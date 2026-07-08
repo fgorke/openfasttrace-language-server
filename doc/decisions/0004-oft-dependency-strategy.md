@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# OFT Dependency Strategy: Individual Modules, Pinned to 4.3.0
+# OFT Dependency Strategy: Individual Modules, Pinned to 4.5.0
 
 ## Context and Problem Statement
 
@@ -17,7 +17,9 @@ OpenFastTrace ships on Maven Central two ways. There is an uber-JAR (`org.itsall
 
 ## Decision Outcome
 
-Chosen option: **individual modules, pinned to 4.3.0**. This keeps unneeded exporters and reporters off the classpath. It shrinks the fat JAR. It makes clear exactly what is used.
+Chosen option: **individual modules, pinned to 4.5.0**. This keeps unneeded exporters and reporters off the classpath. It shrinks the fat JAR. It makes clear exactly what is used.
+
+Updated from 4.3.0 to 4.5.0 on 2026-07-08.
 
 Modules included:
 
