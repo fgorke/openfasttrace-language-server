@@ -42,6 +42,7 @@ public class WorkspaceIndexer {
         return new OftWorkspaceIndex(items);
     }
 
+    @SuppressWarnings("NullableProblems")
     private static List<Path> collectInputs(final Path workspaceRoot) {
         final List<Path> files = new ArrayList<>();
         try {
