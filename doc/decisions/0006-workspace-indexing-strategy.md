@@ -24,10 +24,14 @@ A `didChange` (keystroke-level) event does **not** trigger a re-import. Only sav
 
 This decision covers only the **OFT workspace index**: spec items and coverage links across the whole project. That is what `Oft.importItems()` rebuilds. It is genuinely expensive to redo on every keystroke. It does **not** mean the server ignores unsaved edits. The current text of every open document is still tracked in memory. It is updated on every `didChange` (`req~live-document-buffer~1`). So requests that only need the text of the file being edited see live content. That covers hover, definition, semantic tokens and especially completion, which almost always runs on text the user has not saved yet. Only cross-file concerns that depend on the *index* lag behind until the next save. An example is whether a given ID still exists workspace-wide.
 
+**Excluding build output** Handing the workspace root straight to `Oft.importItems()` also indexed build output. The indexer now does its own file walk. It prunes hidden directories and the common build output names `target`, `build`, `out`, `dist` and `node_modules`, then hands the surviving files to OFT. Files without a matching importer are skipped by OFT itself, so passing single files is safe.
+
 ### Consequences
 
 * Good, because the index always matches the saved state of the workspace.
-* Good, because the implementation is simple. It calls `Oft.importItems()` on the full workspace path and rebuilds the internal maps.
+* Good, because the implementation is simple.
+* Good, because build output stays out of the index. Copied specification files no longer show up as duplicates in completion and navigation.
+* Bad, because the exclude list is currently fixed.
 * Good, because separating "live document text" from "workspace index" keeps the expensive part save-gated while the cheap part stays live. Completion would be unusable if it only saw saved content.
 * Neutral, because the *index* lags behind unsaved edits. A newly typed spec item ID does not resolve workspace-wide until saved. That matches most build-tool-backed language servers.
 * Bad, because a large workspace re-imports everything on every save, not just the changed file. Worth revisiting if profiling later shows this is too slow.
@@ -35,7 +39,7 @@ This decision covers only the **OFT workspace index**: spec items and coverage l
 
 ### Confirmation
 
-Integration tests verify that after a file save, the next definition request returns the updated location.
+Integration tests verify that after a file save, the next definition request returns the updated location. A further integration test builds a workspace with a specification copy under `target/` and checks that only the original ends up in the index.
 
 ## More Information
 

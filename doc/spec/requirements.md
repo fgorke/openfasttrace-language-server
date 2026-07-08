@@ -63,7 +63,7 @@ Needs: impl, utest
 ## Workspace Indexing on Startup
 req~index-on-startup~1
 
-On the `initialized` notification, the server imports all OFT-traceable files in the workspace. It builds an internal index from them.
+On the `initialized` notification, the server imports all OFT-traceable files in the workspace. It builds an internal index from them. Hidden directories and build output directories (`target`, `build`, `out`, `dist`, `node_modules`) are skipped, so copied specification files do not appear twice.
 
 Needs: impl, utest, itest
 
