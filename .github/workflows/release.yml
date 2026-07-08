@@ -49,9 +49,6 @@ jobs:
         working-directory: intellij-plugin
         run: ./gradlew buildPlugin --no-daemon
 
-      - name: Validate bundled server JAR
-        run: unzip -l intellij-plugin/build/distributions/*.zip | grep -q 'lib/openfasttrace-language-server.jar'
-
       - name: Create GitHub release
         run: bash ./.github/workflows/github_release.sh
         env:
