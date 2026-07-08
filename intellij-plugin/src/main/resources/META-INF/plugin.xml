@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>org.itsallcode.openfasttrace.lsp</id>
+    <name>OpenFastTrace Language Server</name>
+    <vendor>Felix Gorke</vendor>
+    <description><![CDATA[
+        Integrates the <a href="https://github.com/itsallcode/openfasttrace">OpenFastTrace</a>
+        (OFT) language server into the IDE via the built-in LSP client. The server understands
+        OFT specification items and coverage tags and provides:
+        <ul>
+            <li><b>Hover documentation</b>: title and description of the referenced specification item</li>
+            <li><b>Go to Definition</b>: from a coverage tag to the specification item and from an item to all its covering tags</li>
+            <li><b>Find References</b>: all coverage tags in the workspace that cover a specification item</li>
+            <li><b>Diagnostics and quick fix</b>: warnings for outdated coverage tag revisions with a one-click version update</li>
+            <li><b>Syntax highlighting</b>: specification item definitions, section keywords and coverage tags via semantic tokens</li>
+            <li><b>Code completion</b>: specification item IDs in <code>Covers:</code> sections and coverage tag targets</li>
+            <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers
+                <code>[impl->...]</code>, <code>[utest->...]</code>, <code>[itest->...]</code> and <code>[stest->...]</code></li>
+        </ul>
+    ]]></description>
+    <change-notes><![CDATA[
+        <ul>
+            <li>0.1: initial release with navigation, hover, diagnostics, quick fix,
+                semantic highlighting and completion backed by the OFT language server</li>
+        </ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.ultimate</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <platform.lsp.serverSupportProvider
+                implementation="org.itsallcode.openfasttrace.lsp.intellij.OftLspServerSupportProvider"/>
+        <completion.confidence language="any" order="first"
+                implementationClass="org.itsallcode.openfasttrace.lsp.intellij.OftCompletionConfidence"/>
+    </extensions>
+</idea-plugin>
