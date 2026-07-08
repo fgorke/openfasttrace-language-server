@@ -8,10 +8,25 @@ The OpenFastTrace Language Server brings OFT support into code editors through t
 
 You can learn more about requirement tracing and the OFT format in the [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md).
 
+## Quickstart
+
+The easiest way to get started with the OpenFastTrace Language Server is to install the pre-built IntelliJ IDEA plugin from the releases.
+
+1. Download the latest plugin ZIP from the [Releases](../../releases) page.
+2. Open IntelliJ IDEA Ultimate.
+3. Go to **Settings → Plugins**.
+4. Click the gear icon and select **Install Plugin from Disk**.
+5. Select the downloaded ZIP file.
+6. Restart IntelliJ IDEA when prompted.
+
+The plugin starts the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
+
+For building the plugin yourself or running the language server standalone, see the development instructions below.
+
 ## Project Information
 
 * Bachelor thesis project, work in progress
-* Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.3.0
+* Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.5.0
 * License: [GPL-3.0-or-later](LICENSE)
 * Requirements: [doc/spec/](doc/spec/), architecture decisions: [doc/decisions/](doc/decisions/)
 
@@ -65,7 +80,7 @@ java -jar target/openfasttrace-language-server-*-standalone.jar
 
 The server speaks LSP over stdio. Any editor with an LSP client can launch it this way.
 
-### IntelliJ IDEA Plugin
+### IntelliJ IDEA Plugin (Development)
 
 The `intellij-plugin/` module wraps the server for IntelliJ IDEA Ultimate.
 
@@ -85,9 +100,9 @@ cd intellij-plugin
 ./gradlew buildPlugin
 ```
 
-The ZIP lands in `intellij-plugin/build/distributions/`. Install it via **Settings, Plugins, gear icon, Install Plugin from Disk**. The Gradle build bundles the server JAR from `../target/` into the plugin, so always run `mvn package` first.
+The ZIP lands in `intellij-plugin/build/distributions/`.
 
-The plugin starts the server automatically when a supported file is opened. No manual setup is needed. `intellij-plugin/gradle.properties` controls the IntelliJ version used for the sandbox (`intellijVersion`) and the minimum supported build (`pluginSinceBuild`).
+The Gradle build bundles the server JAR from `../target/`, so always run `mvn package` first.
 
 ## Requirement Tracing
 
@@ -111,4 +126,4 @@ mvn test
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-See [LICENSE](LICENSE) for the full text. OpenFastTrace is licensed under GPL-3.0. This project links OFT on the classpath, so it is GPL-3.0-or-later as well (see [ADR-0005](doc/decisions/0005-license.md)).
+See [LICENSE](LICENSE) for the full text. OpenFastTrace is licensed under GPL-3.0-or-later. This project links OFT on the classpath, so it is GPL-3.0-or-later as well (see [ADR-0005](doc/decisions/0005-license.md)).
