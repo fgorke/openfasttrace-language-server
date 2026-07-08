@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fail if not running on main branch
+        if: ${{ github.ref != 'refs/heads/main' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.setFailed('This workflow must run on main. Current ref: ${{ github.ref }}')
+
+      - name: Set up JDK 17 for Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build standalone server JAR
+        run: mvn --batch-mode -DskipTests package
+
+      - name: Set up JDK 17 for Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Build plugin distribution
+        working-directory: intellij-plugin
+        run: ./gradlew buildPlugin --no-daemon
+
+      - name: Validate bundled server JAR
+        run: unzip -l intellij-plugin/build/distributions/*.zip | grep -q 'lib/openfasttrace-language-server.jar'
+
+      - name: Create GitHub release
+        run: bash ./.github/workflows/github_release.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+
