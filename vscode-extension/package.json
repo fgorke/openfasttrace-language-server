@@ -41,6 +41,7 @@
       }
     },
     "configurationDefaults": {
+      "editor.semanticHighlighting.enabled": true,
       "[markdown]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
       "[java]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
       "[kotlin]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
