@@ -19,6 +19,7 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
+            <li>0.2: released new VS Code extension</li>
             <li>0.1: initial release with navigation, hover, diagnostics, quick fix,
                 semantic highlighting and completion backed by the OFT language server</li>
         </ul>
