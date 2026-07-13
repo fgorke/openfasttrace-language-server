@@ -49,7 +49,14 @@ if [[ -z "$server_jar" ]]; then
     exit 1
 fi
 
-echo "Calculate sha256sum for plugin archive and server JAR"
+vscode_extension=$(find "$base_dir/vscode-extension" -maxdepth 1 -type f -name '*.vsix' | sort | head -n 1)
+readonly vscode_extension
+if [[ -z "$vscode_extension" ]]; then
+    echo "Could not find VS Code extension package in $base_dir/vscode-extension" >&2
+    exit 1
+fi
+
+echo "Calculate sha256sum for plugin archive, server JAR and VS Code extension"
 
 # checksum for plugin
 file_dir="$(dirname "$artifact_path")"
@@ -69,6 +76,15 @@ sha256sum "$server_name" > "$checksum_server_name"
 checksum_server_path="$server_dir/$checksum_server_name"
 cd "$base_dir"
 
+# checksum for VS Code extension
+vscode_dir="$(dirname "$vscode_extension")"
+vscode_name="$(basename "$vscode_extension")"
+cd "$vscode_dir"
+checksum_vscode_name="${vscode_name}.sha256"
+sha256sum "$vscode_name" > "$checksum_vscode_name"
+checksum_vscode_path="$vscode_dir/$checksum_vscode_name"
+cd "$base_dir"
+
 readonly title="Release $project_version"
 readonly tag="$project_version"
 echo "Creating release:"
@@ -79,9 +95,12 @@ echo "Plugin file  : $artifact_path"
 echo "Plugin sha256: $checksum_plugin_path"
 echo "Server JAR   : $server_jar"
 echo "Server sha256: $checksum_server_path"
+echo "VS Code ext. : $vscode_extension"
+echo "VS Code sha256: $checksum_vscode_path"
 
 release_url=$(gh release create --latest --title "$title" --notes-file "$changes_file" --target main "$tag" \
-    "$artifact_path" "$checksum_plugin_path" "$server_jar" "$checksum_server_path")
+    "$artifact_path" "$checksum_plugin_path" "$server_jar" "$checksum_server_path" \
+    "$vscode_extension" "$checksum_vscode_path")
 readonly release_url
 echo "Release URL: $release_url"
 

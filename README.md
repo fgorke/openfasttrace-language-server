@@ -4,13 +4,15 @@
 
 [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (short OFT) is a requirement tracing suite. It keeps track of whether you actually implemented everything you planned to in your specifications.
 
-The OpenFastTrace Language Server brings OFT support into code editors through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP). One server process understands OFT specification items and coverage tags. Any LSP-capable editor can connect to it. An IntelliJ IDEA plugin that does exactly that ships in this repository.
+The OpenFastTrace Language Server brings OFT support into code editors through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP). One server process understands OFT specification items and coverage tags. Any LSP-capable editor can connect to it. This repository ships two clients that do exactly that: an IntelliJ IDEA plugin and a VS Code extension.
 
 You can learn more about requirement tracing and the OFT format in the [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md).
 
 ## Quickstart
 
-The easiest way to get started with the OpenFastTrace Language Server is to install the pre-built IntelliJ IDEA plugin from the releases.
+The easiest way to get started with the OpenFastTrace Language Server is to install a pre-built client from the releases.
+
+### IntelliJ IDEA
 
 1. Download the latest plugin ZIP from the [Releases](../../releases) page.
 2. Open IntelliJ IDEA Ultimate.
@@ -19,9 +21,14 @@ The easiest way to get started with the OpenFastTrace Language Server is to inst
 5. Select the downloaded ZIP file.
 6. Restart IntelliJ IDEA when prompted.
 
-The plugin starts the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
+### VS Code
 
-For building the plugin yourself or running the language server standalone, see the development instructions below.
+1. Download the latest `.vsix` from the [Releases](../../releases) page.
+2. Run `code --install-extension <downloaded-file>.vsix`, or open the Extensions view, click the `...` menu and choose **Install from VSIX...**.
+
+Both clients start the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
+
+For building a client yourself or running the language server standalone, see the development instructions below.
 
 ## Project Information
 
@@ -45,7 +52,7 @@ The server provides these features to any connected editor:
 ## Getting the Project
 
 ```bash
-git clone <this repository>
+git clone https://github.com/fgorke/openfasttrace-language-server.git
 ```
 
 ## Installation
@@ -54,11 +61,13 @@ git clone <this repository>
 
 * Java 17 or later
 * For the IntelliJ plugin: IntelliJ IDEA Ultimate (the LSP client API is not part of the Community edition)
+* For the VS Code extension: VS Code 1.82 or later
 
 ### Build Dependencies
 
 * Maven 3.6 or later for the server
 * Gradle is bundled as a wrapper in `intellij-plugin/`
+* Node.js and npm for the VS Code extension in `vscode-extension/`
 
 ## Building
 
@@ -102,7 +111,31 @@ cd intellij-plugin
 
 The ZIP lands in `intellij-plugin/build/distributions/`.
 
-The Gradle build bundles the server JAR from `../target/`, so always run `mvn package` first.
+### VS Code Extension (Development)
+
+The `vscode-extension/` module wraps the server for VS Code.
+
+Run an Extension Development Host during development:
+
+```bash
+mvn package
+cd vscode-extension
+npm install
+npm run watch
+```
+
+Then press F5 in VS Code (with `vscode-extension/` open as the workspace) to launch it.
+
+Build an installable package:
+
+```bash
+mvn package
+cd vscode-extension
+npm install
+npx vsce package
+```
+
+The `.vsix` lands in `vscode-extension/`.
 
 ## Requirement Tracing
 
