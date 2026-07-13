@@ -1,8 +1,8 @@
 {
   "name": "openfasttrace-lsp",
   "displayName": "OpenFastTrace Language Server",
-  "description": "Connects VS Code to the OpenFastTrace Language Server for requirement tracing.",
-  "version": "0.1.0",
+  "description": "Integrates the OpenFastTrace (OFT) language server into VS Code via the Language Server Protocol.",
+  "version": "0.2.0",
   "publisher": "felixgorke",
   "license": "GPL-3.0-or-later",
   "engines": {

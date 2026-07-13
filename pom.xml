@@ -6,12 +6,12 @@
 
     <groupId>org.itsallcode.openfasttrace</groupId>
     <artifactId>openfasttrace-language-server</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>OpenFastTrace Language Server</name>
     <description>LSP server providing IDE navigation, hover documentation, and quick fixes for OpenFastTrace requirement tracing.</description>
-    <url>https://github.com/felixgorke/openfasttrace-language-server</url>
+    <url>https://github.com/fgorke/openfasttrace-language-server</url>
     <inceptionYear>2026</inceptionYear>
 
     <licenses>
