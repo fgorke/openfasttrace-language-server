@@ -49,6 +49,17 @@ jobs:
         working-directory: intellij-plugin
         run: ./gradlew buildPlugin --no-daemon
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build VS Code extension package
+        working-directory: vscode-extension
+        run: |
+          npm ci
+          npx vsce package
+
       - name: Create GitHub release
         run: bash ./.github/workflows/github_release.sh
         env:
