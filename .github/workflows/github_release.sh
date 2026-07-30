@@ -35,26 +35,33 @@ if [[ ! -f "$changes_file" ]]; then
     exit 1
 fi
 
-artifact_path=$(find "$base_dir/intellij-plugin/build/distributions" -maxdepth 1 -type f -name '*.zip' | sort | head -n 1)
+find_single_artifact() {
+    local description="$1" directory="$2" pattern="$3"
+    local matches
+    matches=$(find "$directory" -maxdepth 1 -type f -name "$pattern" -printf '%T@ %p\n' 2>/dev/null \
+        | sort -rn | cut -d' ' -f2-)
+    if [[ -z "$matches" ]]; then
+        echo "Could not find $description in $directory" >&2
+        return 1
+    fi
+    if [[ $(echo "$matches" | wc -l) -gt 1 ]]; then
+        echo "Found several candidates for $description, using the newest:" >&2
+        echo "$matches" >&2
+    fi
+    echo "$matches" | head -n 1
+}
+
+artifact_path=$(find_single_artifact "plugin distribution archive" \
+    "$base_dir/intellij-plugin/build/distributions" "openfasttrace-lsp-intellij-plugin-${project_version}.zip")
 readonly artifact_path
-if [[ -z "$artifact_path" ]]; then
-    echo "Could not find plugin distribution archive in $base_dir/intellij-plugin/build/distributions" >&2
-    exit 1
-fi
 
-server_jar=$(find "$base_dir/target" -maxdepth 1 -type f -name '*-standalone.jar' | sort | head -n 1)
+server_jar=$(find_single_artifact "standalone server JAR" \
+    "$base_dir/target" "openfasttrace-language-server-${project_version}-standalone.jar")
 readonly server_jar
-if [[ -z "$server_jar" ]]; then
-    echo "Could not find standalone server JAR in $base_dir/target" >&2
-    exit 1
-fi
 
-vscode_extension=$(find "$base_dir/vscode-extension" -maxdepth 1 -type f -name '*.vsix' | sort | head -n 1)
+vscode_extension=$(find_single_artifact "VS Code extension package" \
+    "$base_dir/vscode-extension" '*.vsix')
 readonly vscode_extension
-if [[ -z "$vscode_extension" ]]; then
-    echo "Could not find VS Code extension package in $base_dir/vscode-extension" >&2
-    exit 1
-fi
 
 echo "Calculate sha256sum for plugin archive, server JAR and VS Code extension"
 
