@@ -56,15 +56,36 @@ internal class OftLspServerDescriptor(project: Project) :
         )
 
         private val SUPPORTED_EXTENSIONS = setOf(
-            "md",
-            "java", "kt", "kts",
-            "c", "cpp", "cc", "cxx", "h", "hpp",
+            "md", "markdown",
+            "ads", "adb",
+            "bat",
+            "c", "cc", "cpp", "c++", "h", "hh", "hpp", "h++",
+            "c#", "cs",
+            "cfg", "conf", "ini",
+            "feature",
+            "go",
+            "groovy",
+            "htm", "html", "xhtml", "json", "yaml", "yml", "toml",
+            "java", "clj", "kt", "scala",
+            "js", "mjs", "cjs", "ejs", "ts",
+            "lua",
+            "m", "mm",
+            "php",
+            "pl", "pm",
+            "proto",
+            "pu", "puml", "plantuml",
             "py",
-            "js", "ts",
-            "rb", "go", "rs", "cs",
+            "r",
+            "robot",
+            "rs",
+            "sh", "bash", "zsh",
+            "sv", "v", "inc",
+            "swift",
+            "tf", "tfvars",
+            "sql", "pls",
         )
 
         fun isSupportedFile(file: VirtualFile): Boolean =
-            file.extension in SUPPORTED_EXTENSIONS
+            file.extension?.lowercase() in SUPPORTED_EXTENSIONS
     }
 }
