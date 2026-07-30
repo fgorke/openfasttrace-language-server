@@ -30,6 +30,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <platform.lsp.serverSupportProvider
                 implementation="org.itsallcode.openfasttrace.lsp.intellij.OftLspServerSupportProvider"/>
+        <postStartupActivity
+                implementation="org.itsallcode.openfasttrace.lsp.intellij.OftLspStartupActivity"/>
         <completion.confidence language="any" order="first"
                 implementationClass="org.itsallcode.openfasttrace.lsp.intellij.OftCompletionConfidence"/>
     </extensions>
