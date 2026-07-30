@@ -28,9 +28,9 @@ internal class OftLspServerDescriptor(project: Project) :
         val targetDir = projectDir.resolve("target")
         val jarInTarget = targetDir
             .listFiles { f -> f.name.matches(SERVER_JAR_PATTERN) }
-            ?.firstOrNull()
+            ?.maxByOrNull { it.lastModified() }
         if (jarInTarget != null && jarInTarget.exists()) {
-            LOG.debug("Using JAR from Maven target: ${jarInTarget.absolutePath}")
+            LOG.info("Using JAR from Maven target: ${jarInTarget.absolutePath}")
             return jarInTarget.absolutePath
         }
 
