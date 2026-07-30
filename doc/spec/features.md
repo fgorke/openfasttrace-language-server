@@ -41,3 +41,10 @@ feat~code-completion~1
 The language server suggests existing specification item IDs while the user types. It works in a `Covers:` entry or a coverage tag target. IDs then do not have to be typed out or looked up by hand.
 
 Needs: req
+
+## Symbol Search
+feat~symbol-search~1
+
+The language server reports specification items as symbols. The user finds them through the editor's symbol search across the whole workspace, without knowing which file they live in.
+
+Needs: req

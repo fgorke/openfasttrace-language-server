@@ -63,6 +63,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setDefinitionProvider(true);
         capabilities.setReferencesProvider(true);
         capabilities.setCodeActionProvider(true);
+        capabilities.setWorkspaceSymbolProvider(true);
         capabilities.setCompletionProvider(new CompletionOptions(false, List.of("~", ">")));
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));
@@ -103,6 +104,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         final Path workspaceRoot = Path.of(URI.create(rootUri));
         final OftWorkspaceIndex index = indexer.buildIndex(workspaceRoot);
         textDocumentService.updateIndex(index);
+        workspaceService.updateIndex(index);
         Logger.info("Workspace index ready: " + index.specItemCount() + " item(s)");
     }
 

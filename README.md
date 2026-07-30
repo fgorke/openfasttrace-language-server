@@ -47,6 +47,7 @@ The server provides these features to any connected editor:
 * **Diagnostics with quick fix.** Coverage tags that reference an outdated revision get a warning. The quick fix updates the version number to the current revision.
 * **Syntax highlighting.** Specification item definitions, section keywords and coverage tags are reported as semantic tokens.
 * **Code completion.** Specification item IDs are suggested while typing a `Covers:` entry or a coverage tag target such as `[impl->`.
+* **Symbol search.** Specification items are found through the editor's workspace symbol search.
 * **Tag skeletons.** Invoking completion manually in comments offers `[impl->...]`, `[utest->...]`, `[itest->...]` and `[stest->...]`.
 
 ## Getting the Project
@@ -60,7 +61,7 @@ git clone https://github.com/fgorke/openfasttrace-language-server.git
 ### Runtime Dependencies
 
 * Java 17 or later
-* For the IntelliJ plugin: IntelliJ IDEA Ultimate (the LSP client API is not part of the Community edition)
+* For the IntelliJ plugin: IntelliJ IDEA Ultimate 2025.3+
 * For the VS Code extension: VS Code 1.82 or later
 
 ### Build Dependencies
