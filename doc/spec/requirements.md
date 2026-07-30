@@ -150,3 +150,23 @@ Covers:
 * feat~code-completion~1
 
 Needs: impl, utest
+
+## Find Specification Items Through Workspace Symbol Search
+req~workspace-symbol-search~1
+
+On `workspace/symbol` the server returns every specification item whose ID or title contains the query, ignoring case. An empty query returns all of them, because editors send one to fill their initial list. Results are ordered by name. Coverage tags are excluded: several tags typically point at the same item, so including them would answer a search for one item with a list of near-identical entries. `req~find-references-covering-tags~1` is the request that reports them.
+
+Covers:
+* feat~symbol-search~1
+
+Needs: impl, utest
+
+## Symbol Naming
+req~symbol-naming~1
+
+A specification item is reported with its ID as the symbol name, because that is what users type when searching
+
+Covers:
+* feat~symbol-search~1
+
+Needs: impl, utest
