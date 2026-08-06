@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 
@@ -15,8 +16,14 @@ public final class OftWorkspaceIndex {
 
     private final Map<SpecificationItemId, SpecificationItem> specItems;
     private final Map<SpecificationItemId, List<SpecificationItem>> coverageBySpecId;
+    private final Map<String, List<LinkedSpecificationItem>> defectsByFile;
 
     public OftWorkspaceIndex(final List<SpecificationItem> items) {
+        this(items, List.of());
+    }
+
+    private OftWorkspaceIndex(final List<SpecificationItem> items,
+            final List<LinkedSpecificationItem> linkedItems) {
         final Map<SpecificationItemId, SpecificationItem> specMap = new LinkedHashMap<>();
         final Map<SpecificationItemId, List<SpecificationItem>> coverMap = new LinkedHashMap<>();
 
@@ -29,10 +36,35 @@ public final class OftWorkspaceIndex {
 
         this.specItems = Collections.unmodifiableMap(specMap);
         this.coverageBySpecId = Collections.unmodifiableMap(coverMap);
+        this.defectsByFile = groupDefectsByFile(linkedItems);
+    }
+
+    // [impl->req~diagnostic-trace-defects~1]
+    public static OftWorkspaceIndex ofLinkedItems(final List<LinkedSpecificationItem> linkedItems) {
+        return new OftWorkspaceIndex(
+                linkedItems.stream().map(LinkedSpecificationItem::getItem).toList(), linkedItems);
+    }
+
+    private static Map<String, List<LinkedSpecificationItem>> groupDefectsByFile(
+            final List<LinkedSpecificationItem> linkedItems) {
+        final Map<String, List<LinkedSpecificationItem>> byFile = new LinkedHashMap<>();
+        for (final LinkedSpecificationItem item : linkedItems) {
+            if (!item.isDefect() || item.getLocation() == null) {
+                continue;
+            }
+            final String key = LocationConverter.toFileKey(item.getLocation().getPath());
+            byFile.computeIfAbsent(key, k -> new ArrayList<>()).add(item);
+        }
+        return Collections.unmodifiableMap(byFile);
     }
 
     public static OftWorkspaceIndex empty() {
         return new OftWorkspaceIndex(List.of());
+    }
+
+    // [impl->req~diagnostic-trace-defects~1]
+    public List<LinkedSpecificationItem> defectsInFile(final String uriOrPath) {
+        return defectsByFile.getOrDefault(LocationConverter.toFileKey(uriOrPath), List.of());
     }
 
     public Optional<SpecificationItem> findSpecItem(final SpecificationItemId id) {
@@ -49,11 +81,6 @@ public final class OftWorkspaceIndex {
                 .filter(item -> artifactType.equals(item.getId().getArtifactType())
                         && name.equals(item.getId().getName()))
                 .findFirst();
-    }
-
-    public Optional<SpecificationItem> findOutdatedTarget(final SpecificationItemId tagId) {
-        return findSpecItemByTypeAndName(tagId.getArtifactType(), tagId.getName())
-                .filter(specItem -> specItem.getId().getRevision() != tagId.getRevision());
     }
 
     public int specItemCount() {

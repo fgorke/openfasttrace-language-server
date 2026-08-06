@@ -48,7 +48,7 @@ The server emits a diagnostic warning for every coverage tag whose referenced re
 Covers:
 * feat~quickfix-outdated-version~1
 
-Needs: impl, utest
+Needs: impl, itest
 
 ## Quick Fix Updates Version Number
 req~quickfix-updates-version~1
@@ -210,3 +210,13 @@ Covers:
 * feat~rename~1
 
 Needs: impl, utest
+
+## Diagnostic for Trace Defects
+req~diagnostic-trace-defects~1
+
+The server links the indexed specification items and reports every resulting defect as a diagnostic at the location of the item that caused it. Covered are links to items that do not exist, links to an ambiguous or unwanted target, specification items missing a required artifact type, duplicate definitions and coverage cycles.
+
+Covers:
+* feat~trace-in-editor~1
+
+Needs: impl, itest

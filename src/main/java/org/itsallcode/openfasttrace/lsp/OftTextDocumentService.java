@@ -390,7 +390,7 @@ public class OftTextDocumentService implements TextDocumentService {
             return;
         }
         final List<String> lines = readAllLines(uri);
-        final List<Diagnostic> diagnostics = diagnosticsProvider.diagnoseLines(lines, index);
+        final List<Diagnostic> diagnostics = diagnosticsProvider.diagnoseFile(uri, lines, index);
         client.publishDiagnostics(new PublishDiagnosticsParams(uri, diagnostics));
     }
 
