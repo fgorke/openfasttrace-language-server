@@ -8,8 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -38,17 +41,27 @@ import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.PrepareRenameDefaultBehavior;
+import org.eclipse.lsp4j.PrepareRenameParams;
+import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ReferenceParams;
+import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.messages.Either3;
+import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
+import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionContext;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionSupport;
 import org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider;
@@ -57,6 +70,7 @@ import org.itsallcode.openfasttrace.lsp.highlighting.OftSemanticTokensProvider;
 import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
 import org.itsallcode.openfasttrace.lsp.index.OftIdAtPosition;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
+import org.itsallcode.openfasttrace.lsp.rename.OftRenameProvider;
 import org.tinylog.Logger;
 
 public class OftTextDocumentService implements TextDocumentService {
@@ -131,8 +145,8 @@ public class OftTextDocumentService implements TextDocumentService {
                     final Optional<SpecificationItem> specItem = index.findSpecItem(id);
                     final boolean cursorIsInSpecFile = specItem
                             .map(SpecificationItem::getLocation)
-                            .map(loc -> currentFileUri.endsWith(loc.getPath())
-                                    || loc.getPath().equals(uriToPath(currentFileUri)))
+                            .map(loc -> LocationConverter.toFileKey(loc.getPath())
+                                    .equals(LocationConverter.toFileKey(currentFileUri)))
                             .orElse(false);
 
                     if (cursorIsInSpecFile) {
@@ -260,6 +274,97 @@ public class OftTextDocumentService implements TextDocumentService {
         return completionItem;
     }
 
+    // [impl->req~prepare-rename~1]
+    @Override
+    public CompletableFuture<Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>>
+            prepareRename(final PrepareRenameParams params) {
+        final String uri = params.getTextDocument().getUri();
+        final int line = params.getPosition().getLine();
+        final int col = params.getPosition().getCharacter();
+        Logger.debug("prepareRename: uri=" + uri + " line=" + line + " col=" + col);
+        return CompletableFuture.supplyAsync(() -> prepareRenameAt(readLine(uri, line), line, col)
+                .map(Either3::<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>forSecond)
+                .orElse(null));
+    }
+
+    Optional<PrepareRenameResult> prepareRenameAt(final String lineText, final int line, final int col) {
+        return OftRenameProvider.nameRangeAt(lineText, line, col)
+                .map(range -> new PrepareRenameResult(range,
+                        lineText.substring(range.getStart().getCharacter(),
+                                range.getEnd().getCharacter())));
+    }
+
+    // [impl->req~rename-specification-item~1]
+    // [impl->req~rename-name-part-only~1]
+    @Override
+    public CompletableFuture<WorkspaceEdit> rename(final RenameParams params) {
+        final String uri = params.getTextDocument().getUri();
+        final int line = params.getPosition().getLine();
+        final int col = params.getPosition().getCharacter();
+        Logger.debug("rename: uri=" + uri + " line=" + line + " col=" + col
+                + " newName=" + params.getNewName());
+        try {
+            return CompletableFuture
+                    .completedFuture(renameEdits(uri, line, col, params.getNewName()));
+        } catch (final ResponseErrorException exception) {
+            return CompletableFuture.failedFuture(exception);
+        }
+    }
+
+    WorkspaceEdit renameEdits(final String uri, final int line, final int col,
+            final String requestedName) {
+        final SpecificationItemId id = OftIdAtPosition.findAt(readLine(uri, line), col)
+                .orElseThrow(() -> renameError("There is no specification item ID at the cursor."));
+        final String newName = OftRenameProvider.extractItemName(requestedName);
+        if (!OftRenameProvider.isValidItemName(newName)) {
+            throw renameError("'" + newName + "' is not a valid specification item name. "
+                    + "A name starts with a letter and continues with letters, digits, "
+                    + "underscores, hyphens or dots.");
+        }
+        // [impl->req~rename-conflict-check~1]
+        if (!newName.equals(id.getName())
+                && index.findSpecItemByTypeAndName(id.getArtifactType(), newName).isPresent()) {
+            throw renameError("'" + id.getArtifactType() + "~" + newName
+                    + "' already exists. Choose a different name.");
+        }
+        final Map<String, List<TextEdit>> changes = new LinkedHashMap<>();
+        for (final String fileUri : filesToSearch(uri)) {
+            final List<TextEdit> edits = renameEditsInFile(fileUri, id, newName);
+            if (!edits.isEmpty()) {
+                changes.put(fileUri, edits);
+            }
+        }
+        Logger.info("rename " + id + " to '" + newName + "': " + changes.size() + " file(s)");
+        return new WorkspaceEdit(changes);
+    }
+
+    private List<TextEdit> renameEditsInFile(final String fileUri, final SpecificationItemId id,
+            final String newName) {
+        final List<String> lines = readAllLines(fileUri);
+        final List<TextEdit> edits = new ArrayList<>();
+        for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+            edits.addAll(OftRenameProvider.renameEditsInLine(lines.get(lineIndex), lineIndex,
+                    id.getArtifactType(), id.getName(), newName));
+        }
+        return edits;
+    }
+
+    private Set<String> filesToSearch(final String currentUri) {
+        final Map<String, String> uriByFile = new LinkedHashMap<>();
+        uriByFile.put(LocationConverter.toFileKey(currentUri), currentUri);
+        index.allSpecItems().stream()
+                .map(SpecificationItem::getLocation)
+                .filter(Objects::nonNull)
+                .map(location -> LocationConverter.pathToUri(location.getPath()))
+                .forEach(uri -> uriByFile.putIfAbsent(LocationConverter.toFileKey(uri), uri));
+        return new LinkedHashSet<>(uriByFile.values());
+    }
+
+    private static ResponseErrorException renameError(final String message) {
+        return new ResponseErrorException(
+                new ResponseError(ResponseErrorCode.RequestFailed, message, null));
+    }
+
     // [impl->req~highlight-specification-item~1]
     // [impl->req~highlight-keyword~1]
     // [impl->req~highlight-coverage-tag~1]
@@ -317,14 +422,6 @@ public class OftTextDocumentService implements TextDocumentService {
         Logger.debug("didClose: " + uri);
         openUris.remove(uri);
         openDocumentBuffers.remove(uri);
-    }
-
-    private static String uriToPath(final String uri) {
-        try {
-            return Path.of(URI.create(uri)).toString();
-        } catch (final Exception e) {
-            return uri;
-        }
     }
 
     private String readLine(final String uri, final int lineIndex) {

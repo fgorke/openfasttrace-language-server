@@ -48,3 +48,10 @@ feat~symbol-search~1
 The language server reports specification items as symbols. The user finds them through the editor's symbol search across the whole workspace, without knowing which file they live in.
 
 Needs: req
+
+## Rename Specification Items
+feat~rename~1
+
+The user renames a specification item from anywhere it appears and the server updates the definition together with every coverage tag and reference in the workspace.
+
+Needs: req
