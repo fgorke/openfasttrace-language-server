@@ -9,17 +9,18 @@ import {
 } from "vscode-languageclient/node";
 
 const SUPPORTED_EXTENSIONS = [
-  "md", "markdown",
+  "md", "markdown", "rst",
   "ads", "adb",
   "bat",
-  "c", "cc", "cpp", "h", "hh", "hpp",
-  "cs",
+  "c", "cc", "cpp", "c++", "h", "hh", "hpp", "h++",
+  "dox",
+  "c#", "cs",
   "cfg", "conf", "ini",
   "feature",
   "go",
   "groovy",
-  "htm", "html", "xhtml", "json", "yaml", "yml", "toml",
-  "java", "clj", "kt", "scala",
+  "htm", "html", "xhtml", "xml", "fxml", "json", "yaml", "yml", "toml",
+  "java", "clj", "kt", "kts", "scala",
   "js", "mjs", "cjs", "ejs", "ts",
   "lua",
   "m", "mm",

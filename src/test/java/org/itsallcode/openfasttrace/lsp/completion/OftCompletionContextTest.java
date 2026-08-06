@@ -44,6 +44,37 @@ class OftCompletionContextTest {
         assertThat(result.get().coveringArtifactType()).isEqualTo("impl");
     }
 
+    // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
+    @Test
+    void testGivenCursorAfterCommaInTagWhenFindingContextThenAFreshPrefixIsCaptured() {
+        // given
+        final String line = "// [impl->req~login~1, ";
+        final List<String> lines = List.of(line);
+
+        // when
+        final var result = OftCompletionContext.findAt(lines, 0, line.length());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().prefix()).isEmpty();
+        assertThat(result.get().coveringArtifactType()).isEqualTo("impl");
+    }
+
+    // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
+    @Test
+    void testGivenCursorInSecondIdOfTagWhenFindingContextThenOnlyThatIdIsThePrefix() {
+        // given
+        final String line = "// [impl->req~login~1, req~log";
+        final List<String> lines = List.of(line);
+
+        // when
+        final var result = OftCompletionContext.findAt(lines, 0, line.length());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().prefix()).isEqualTo("req~log");
+    }
+
     // [utest->req~complete-specification-item-id-in-covers-section~1]
     @Test
     void testGivenCoversSectionEndedByOtherKeywordWhenFindingContextThenNoContextIsReturned() {

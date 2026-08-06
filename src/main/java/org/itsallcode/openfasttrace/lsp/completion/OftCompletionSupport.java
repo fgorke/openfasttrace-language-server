@@ -8,8 +8,7 @@ import java.util.stream.Collectors;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 
-// [impl->req~complete-specification-item-id-in-covers-section~1]
-// [impl->req~complete-specification-item-id-in-coverage-tag-target~1]
+// [impl->req~complete-specification-item-id-in-coverage-tag-target~1, req~complete-specification-item-id-in-covers-section~1]
 public final class OftCompletionSupport {
 
     private OftCompletionSupport() {

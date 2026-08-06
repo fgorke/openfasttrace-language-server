@@ -6,8 +6,7 @@ import java.util.Locale;
 import org.eclipse.lsp4j.SymbolKind;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 
-// [impl->req~workspace-symbol-search~1]
-// [impl->req~symbol-naming~1]
+// [impl->req~symbol-naming~1, req~workspace-symbol-search~1]
 public final class OftSymbolProvider {
 
     public static final SymbolKind SYMBOL_KIND = SymbolKind.Class;

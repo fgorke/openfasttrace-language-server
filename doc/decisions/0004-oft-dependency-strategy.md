@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# OFT Dependency Strategy: Individual Modules, Pinned to 4.5.0
+# OFT Dependency Strategy: Individual Modules, Pinned to 4.8.0
 
 ## Context and Problem Statement
 
@@ -17,9 +17,9 @@ OpenFastTrace ships on Maven Central two ways. There is an uber-JAR (`org.itsall
 
 ## Decision Outcome
 
-Chosen option: **individual modules, pinned to 4.5.0**. This keeps unneeded exporters and reporters off the classpath. It shrinks the fat JAR. It makes clear exactly what is used.
+Chosen option: **individual modules, pinned to 4.8.0**. This keeps unneeded exporters and reporters off the classpath. It shrinks the fat JAR. It makes clear exactly what is used.
 
-Updated from 4.3.0 to 4.5.0 on 2026-07-08.
+Updated from 4.3.0 to 4.5.0 on 2026-07-08, and from 4.5.0 to 4.8.0 on 2026-08-06.
 
 Modules included:
 
@@ -29,8 +29,10 @@ Modules included:
 | `openfasttrace-core` | `Oft.create()`, linker, tracer |
 | `openfasttrace-importer-markdown` | Parses spec items from `.md` files |
 | `openfasttrace-importer-tag` | Parses coverage tags from source files |
+| `openfasttrace-importer-gherkin` | Parses coverage tags from `.feature` files |
+| `openfasttrace-importer-restructuredtext` | Parses spec items from `.rst` files |
 
-**Update policy:** bumping the OFT version means updating this ADR, checking API compatibility and bumping `openfasttrace.version`.
+**Update policy:** bumping the OFT version means updating this ADR, checking API compatibility, bumping `openfasttrace.version` and re-checking which importer modules exist.
 
 ### Consequences
 
@@ -38,6 +40,8 @@ Modules included:
 * Good, because the dependency list itself documents the OFT API surface in use.
 * Bad, because each module has to be listed separately instead of one uber-JAR line.
 * Bad, because OFT's internal module boundaries can shift between releases. That means revisiting this list.
+
+The 4.8.0 bump is a concrete case of that last point. OFT 4.7.0 moved Gherkin out of `openfasttrace-importer-tag` into its own module, so `.feature` files silently stopped being indexed: importers are discovered through `ServiceLoader`, so a missing module produces neither a build nor a test failure.
 
 ## Pros and Cons of the Options
 
