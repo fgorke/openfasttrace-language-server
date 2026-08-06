@@ -9,6 +9,7 @@ import org.eclipse.lsp4j.CompletionOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.RenameOptions;
 import org.eclipse.lsp4j.SaveOptions;
 import org.eclipse.lsp4j.SemanticTokensLegend;
 import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions;
@@ -64,6 +65,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setReferencesProvider(true);
         capabilities.setCodeActionProvider(true);
         capabilities.setWorkspaceSymbolProvider(true);
+        capabilities.setRenameProvider(new RenameOptions(true));
         capabilities.setCompletionProvider(new CompletionOptions(false, List.of("~", ">")));
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));

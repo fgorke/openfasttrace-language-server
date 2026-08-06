@@ -40,6 +40,13 @@
         }
       }
     },
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "macro": ["entity.name.tag", "entity.name.function", "keyword.control"]
+        }
+      }
+    ],
     "configurationDefaults": {
       "editor.semanticHighlighting.enabled": true,
       "[markdown]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },

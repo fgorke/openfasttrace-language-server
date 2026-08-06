@@ -170,3 +170,43 @@ Covers:
 * feat~symbol-search~1
 
 Needs: impl, utest
+
+## Rename Updates Definition and All References
+req~rename-specification-item~1
+
+On `textDocument/rename` with the cursor on a specification item ID, the server returns a workspace edit replacing that ID's name everywhere it occurs: in the item's own definition, in every coverage tag and in every `Covers:` or `Depends:` entry.
+
+Covers:
+* feat~rename~1
+
+Needs: impl, utest, itest
+
+## Rename Changes Only the Name Part
+req~rename-name-part-only~1
+
+Only the name part of an ID changes, artifact type and revision stay untouched. The new name has to match the OFT item name pattern, otherwise the server rejects the request with an error the editor shows.
+
+Covers:
+* feat~rename~1
+
+Needs: impl, utest
+
+## Prepare Rename Reports the Name Range
+req~prepare-rename~1
+
+On `textDocument/prepareRename` the server returns the range of the name part and the current name as placeholder, so the editor offers exactly that for editing.
+
+Covers:
+* feat~rename~1
+
+Needs: impl, utest
+
+## Rename Rejects a Conflicting Target Name
+req~rename-conflict-check~1
+
+Before computing edits, the server checks whether an item of the same artifact type already exists under the requested name. If it does, the server rejects the rename with an error the editor shows, rather than silently creating two declarations with the same ID.
+
+Covers:
+* feat~rename~1
+
+Needs: impl, utest

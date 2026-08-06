@@ -1,5 +1,7 @@
 package org.itsallcode.openfasttrace.lsp.index;
 
+import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 
@@ -51,5 +53,19 @@ public final class LocationConverter {
             return "file://" + path;
         }
         return Path.of(path).toUri().toString();
+    }
+
+    public static String toFileKey(final String uriOrPath) {
+        final Path path;
+        try {
+            path = uriOrPath.startsWith("file:") ? Path.of(URI.create(uriOrPath)) : Path.of(uriOrPath);
+        } catch (final RuntimeException exception) {
+            return uriOrPath;
+        }
+        try {
+            return path.toRealPath().toString();
+        } catch (final IOException exception) {
+            return path.normalize().toAbsolutePath().toString();
+        }
     }
 }

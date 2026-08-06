@@ -2,9 +2,17 @@ package org.itsallcode.openfasttrace.lsp.intellij
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
+import com.intellij.platform.lsp.api.customization.LspCustomization
+import com.intellij.platform.lsp.api.customization.LspRenameCustomizer
+import com.intellij.platform.lsp.api.customization.LspRenameSupport
+import com.intellij.platform.lsp.api.customization.LspSemanticTokensCustomizer
+import com.intellij.psi.PsiFile
 import java.io.File
 import java.nio.file.Files
 
@@ -15,7 +23,35 @@ internal class OftLspServerDescriptor(project: Project) :
 
     override fun isSupportedFile(file: VirtualFile): Boolean = Companion.isSupportedFile(file)
 
-    override val lspSemanticTokensSupport = OftSemanticTokensSupport()
+    override val lspCustomization: LspCustomization = object : LspCustomization() {
+
+        override val semanticTokensCustomizer: LspSemanticTokensCustomizer = OftSemanticTokensSupport()
+
+        override val renameCustomizer: LspRenameCustomizer = object : LspRenameSupport() {
+
+            // only allow renames for OFT IDs in supported files
+            override fun shouldRunRename(psiFile: PsiFile): Boolean {
+                val file = psiFile.virtualFile ?: return false
+                if (!Companion.isSupportedFile(file)) {
+                    return false
+                }
+                val editor = FileEditorManager.getInstance(psiFile.project).selectedTextEditor
+                    ?: return false
+                return getRenameableRangeAtOffset(editor.document, editor.caretModel.offset) != null
+            }
+
+            override fun getRenameableRangeAtOffset(document: Document, offset: Int): TextRange? {
+                val lineNumber = document.getLineNumber(offset)
+                val lineStart = document.getLineStartOffset(lineNumber)
+                val lineEnd = document.getLineEndOffset(lineNumber)
+                val line = document.getText(TextRange(lineStart, lineEnd))
+                val col = offset - lineStart
+                return OFT_ID_PATTERN.findAll(line)
+                    .firstOrNull { col in it.range.first..(it.range.last + 1) }
+                    ?.let { TextRange(lineStart + it.range.first, lineStart + it.range.last + 1) }
+            }
+        }
+    }
 
     override fun createCommandLine(): GeneralCommandLine {
         val jarPath = resolveServerJar()
@@ -54,6 +90,8 @@ internal class OftLspServerDescriptor(project: Project) :
         private val SERVER_JAR_PATTERN = Regex(
             "openfasttrace-language-server-.*-standalone\\.jar"
         )
+
+        private val OFT_ID_PATTERN = Regex("""\p{Alpha}+~\p{Alpha}[\w-]*(?:\.[\w-]+)*~\d+""")
 
         private val SUPPORTED_EXTENSIONS = setOf(
             "md", "markdown",
