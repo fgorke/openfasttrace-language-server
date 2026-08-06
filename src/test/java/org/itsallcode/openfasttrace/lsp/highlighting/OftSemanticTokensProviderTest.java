@@ -90,6 +90,34 @@ class OftSemanticTokensProviderTest {
 
     // [utest->req~highlight-coverage-tag~1]
     @Test
+    void testGivenTagCoveringSeveralItemsWhenComputingTokensThenTheWholeTagIsOneToken() {
+        // given
+        final String tag = "[impl->req~login~1, req~logout~2]";
+        final String line = "// " + tag;
+
+        // when
+        final List<Integer> data = OftSemanticTokensProvider.computeTokens(List.of(line));
+
+        // then
+        assertThat(data).containsExactly(0, 3, tag.length(), 2, 0);
+    }
+
+    // [utest->req~highlight-coverage-tag~1]
+    @Test
+    void testGivenNamedTagCoveringSeveralItemsWhenComputingTokensThenTheWholeTagIsOneToken() {
+        // given
+        final String tag = "[impl~login-flow~1 -> req~login~1 , req~logout~2]";
+        final String line = "# " + tag;
+
+        // when
+        final List<Integer> data = OftSemanticTokensProvider.computeTokens(List.of(line));
+
+        // then
+        assertThat(data).containsExactly(0, 2, tag.length(), 2, 0);
+    }
+
+    // [utest->req~highlight-coverage-tag~1]
+    @Test
     void testGivenMultipleLinesWithTokensWhenComputingTokensThenDeltasAreEncodedRelatively() {
         // given
         final List<String> lines = List.of(

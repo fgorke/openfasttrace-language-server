@@ -30,7 +30,7 @@
 
         <!-- Dependency versions -->
         <lsp4j.version>1.0.0</lsp4j.version>
-        <openfasttrace.version>4.5.0</openfasttrace.version>
+        <openfasttrace.version>4.8.0</openfasttrace.version>
         <tinylog.version>2.7.0</tinylog.version>
         <junit.version>6.1.1</junit.version>
         <assertj.version>3.27.7</assertj.version>
@@ -83,6 +83,20 @@
         <dependency>
             <groupId>org.itsallcode.openfasttrace</groupId>
             <artifactId>openfasttrace-importer-tag</artifactId>
+            <version>${openfasttrace.version}</version>
+        </dependency>
+        <!--
+            Gherkin (.feature) moved out of the tag importer into its own module in OFT 4.7.0.
+            Without this dependency .feature files are silently no longer imported.
+        -->
+        <dependency>
+            <groupId>org.itsallcode.openfasttrace</groupId>
+            <artifactId>openfasttrace-importer-gherkin</artifactId>
+            <version>${openfasttrace.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.itsallcode.openfasttrace</groupId>
+            <artifactId>openfasttrace-importer-restructuredtext</artifactId>
             <version>${openfasttrace.version}</version>
         </dependency>
 

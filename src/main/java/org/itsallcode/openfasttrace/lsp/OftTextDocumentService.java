@@ -122,8 +122,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return new Hover(content);
     }
 
-    // [impl->req~goto-definition-tag-to-spec~1]
-    // [impl->req~goto-definition-spec-to-tags~1]
+    // [impl->req~goto-definition-spec-to-tags~1, req~goto-definition-tag-to-spec~1]
     @Override
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
             definition(final DefinitionParams params) {
@@ -190,8 +189,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return LocationConverter.toLspLocation(oftLocation, lineText);
     }
 
-    // [impl->req~diagnostic-outdated-version~1]
-    // [impl->req~quickfix-updates-version~1]
+    // [impl->req~quickfix-updates-version~1, req~diagnostic-outdated-version~1]
     @Override
     public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(
             final CodeActionParams params) {
@@ -294,8 +292,7 @@ public class OftTextDocumentService implements TextDocumentService {
                                 range.getEnd().getCharacter())));
     }
 
-    // [impl->req~rename-specification-item~1]
-    // [impl->req~rename-name-part-only~1]
+    // [impl->req~rename-name-part-only~1, req~rename-specification-item~1]
     @Override
     public CompletableFuture<WorkspaceEdit> rename(final RenameParams params) {
         final String uri = params.getTextDocument().getUri();

@@ -15,8 +15,7 @@ import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
 import org.tinylog.Logger;
 
-// [impl->req~index-on-startup~1]
-// [impl->req~index-refresh-on-save~1]
+// [impl->req~index-refresh-on-save~1, req~index-on-startup~1]
 public class WorkspaceIndexer {
 
     private static final Set<String> EXCLUDED_DIRECTORY_NAMES =

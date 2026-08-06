@@ -15,9 +15,12 @@ public final class OftSyntax {
     public static final Pattern SECTION_KEYWORD_LINE = Pattern.compile(
             "^\\s*(Needs|Covers|Depends|Status|Description|Rationale|Comment|Tags):");
 
+    private static final String COVERED_ID_LIST = SPECIFICATION_ITEM_ID.pattern()
+            + "(?:\\s*,\\s*" + SPECIFICATION_ITEM_ID.pattern() + ")*";
+
     public static final Pattern COVERAGE_TAG = Pattern.compile(
             "\\[\\s*\\p{Alpha}+(?:~" + SpecificationItemId.ITEM_NAME_PATTERN + "~\\d+)?\\s*->\\s*"
-                    + SPECIFICATION_ITEM_ID.pattern() + "\\s*]");
+                    + COVERED_ID_LIST + "\\s*]");
 
     public static final Pattern COVERAGE_TAG_LOOSE = Pattern.compile("\\[[^\\]\\n]*->[^\\]\\n]*]");
 

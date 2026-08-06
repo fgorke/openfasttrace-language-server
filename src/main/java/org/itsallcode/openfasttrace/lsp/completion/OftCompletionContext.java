@@ -37,7 +37,10 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
         if (targetStart > col) {
             return Optional.empty();
         }
-        final String between = line.substring(targetStart, col);
+
+        final int segmentStart =
+                Math.max(targetStart, line.lastIndexOf(',', Math.max(0, col - 1)) + 1);
+        final String between = line.substring(segmentStart, col);
         if (!between.matches("\\s*" + OftSyntax.ID_CHARACTER_CLASS + "*")) {
             return Optional.empty();
         }
