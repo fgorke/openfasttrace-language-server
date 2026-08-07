@@ -17,6 +17,8 @@
     "precompile": "npm run copy-server-jar",
     "prewatch": "npm run copy-server-jar",
     "copy-server-jar": "node scripts/copy-server-jar.js",
+    "build-runtime": "node scripts/build-runtime.js",
+    "package": "node scripts/package.js",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./"
   },

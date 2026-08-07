@@ -17,7 +17,9 @@ The server starts automatically when a supported file is opened. No configuratio
 
 ## Requirements
 
-* Java 17 or later on `PATH` (or configured via `oft.java.path`)
+Every released package bundles a Java runtime, so nothing else needs to be installed. Packages exist for `win32-x64`, `linux-x64`, `linux-arm64`, `darwin-x64` and `darwin-arm64`.
+
+On a platform outside that list, the extension falls back to Java 17 or later on the `PATH`. Setting `oft.java.path` always takes precedence over the bundled runtime.
 
 ## Settings
 
