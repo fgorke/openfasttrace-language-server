@@ -10,7 +10,10 @@
             <li><b>Hover documentation</b>: title and description of the referenced specification item</li>
             <li><b>Go to Definition</b>: from a coverage tag to the specification item and from an item to all its covering tags</li>
             <li><b>Find References</b>: all coverage tags in the workspace that cover a specification item</li>
-            <li><b>Diagnostics and quick fix</b>: warnings for outdated coverage tag revisions with a one-click version update</li>
+            <li><b>Trace diagnostics</b>: uncovered specification items, links to items that do not exist and duplicate definitions, reported while editing</li>
+            <li><b>Quick fix</b>: one-click update of an outdated coverage tag revision</li>
+            <li><b>Rename</b>: renames a specification item together with every coverage tag and reference in the workspace</li>
+            <li><b>Symbol search</b>: finds specification items through Search Everywhere</li>
             <li><b>Syntax highlighting</b>: specification item definitions, section keywords and coverage tags via semantic tokens</li>
             <li><b>Code completion</b>: specification item IDs in <code>Covers:</code> sections and coverage tag targets</li>
             <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers
@@ -19,6 +22,8 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
+            <li>0.3: trace defects reported as diagnostics, rename across the workspace,
+                symbol search, and OpenFastTrace updated to 4.8.0</li>
             <li>0.2: released new VS Code extension</li>
             <li>0.1: initial release with navigation, hover, diagnostics, quick fix,
                 semantic highlighting and completion backed by the OFT language server</li>

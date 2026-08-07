@@ -6,7 +6,7 @@
 
     <groupId>org.itsallcode.openfasttrace</groupId>
     <artifactId>openfasttrace-language-server</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
 
     <name>OpenFastTrace Language Server</name>
