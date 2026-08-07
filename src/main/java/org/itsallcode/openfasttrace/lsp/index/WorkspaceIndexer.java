@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
@@ -31,14 +32,18 @@ public class WorkspaceIndexer {
         this.runner = runner;
     }
 
+    // [impl->req~diagnostic-trace-defects~1]
     public OftWorkspaceIndex buildIndex(final Path workspaceRoot) {
         Logger.info("Indexing workspace: " + workspaceRoot);
         final ImportSettings settings = ImportSettings.builder()
                 .addInputs(collectInputs(workspaceRoot))
                 .build();
         final List<SpecificationItem> items = runner.importItems(settings);
-        Logger.info("Indexed " + items.size() + " specification item(s)");
-        return new OftWorkspaceIndex(items);
+        final List<LinkedSpecificationItem> linkedItems = runner.link(items);
+        Logger.info("Indexed " + items.size() + " specification item(s), "
+                + linkedItems.stream().filter(LinkedSpecificationItem::isDefect).count()
+                + " defect(s)");
+        return OftWorkspaceIndex.ofLinkedItems(linkedItems);
     }
 
     @SuppressWarnings("NullableProblems")

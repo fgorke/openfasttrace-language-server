@@ -55,3 +55,10 @@ feat~rename~1
 The user renames a specification item from anywhere it appears and the server updates the definition together with every coverage tag and reference in the workspace.
 
 Needs: req
+
+## Trace Results in the Editor
+feat~trace-in-editor~1
+
+The language server runs the OpenFastTrace linker over the workspace and reports every defect it finds as a diagnostic at the source position that caused it.
+
+Needs: req
