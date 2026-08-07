@@ -70,7 +70,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));
 
-        final var serverInfo = new ServerInfo("OpenFastTrace Language Server", "0.1.0");
+        final var serverInfo = new ServerInfo("OpenFastTrace Language Server", "0.3.0");
         return CompletableFuture.completedFuture(new InitializeResult(capabilities, serverInfo));
     }
 
