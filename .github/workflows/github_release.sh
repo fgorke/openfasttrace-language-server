@@ -59,9 +59,13 @@ server_jar=$(find_single_artifact "standalone server JAR" \
     "$base_dir/target" "openfasttrace-language-server-${project_version}-standalone.jar")
 readonly server_jar
 
-vscode_extension=$(find_single_artifact "VS Code extension package" \
-    "$base_dir/vscode-extension" '*.vsix')
-readonly vscode_extension
+# One package per platform, each bundling a Java runtime for that platform.
+mapfile -t vscode_extensions < <(find "$base_dir/vscode-extension" -maxdepth 1 -type f -name '*.vsix' | sort)
+readonly vscode_extensions
+if [[ ${#vscode_extensions[@]} -eq 0 ]]; then
+    echo "Could not find any VS Code extension package in $base_dir/vscode-extension" >&2
+    exit 1
+fi
 
 echo "Calculate sha256sum for plugin archive, server JAR and VS Code extension"
 
@@ -83,14 +87,17 @@ sha256sum "$server_name" > "$checksum_server_name"
 checksum_server_path="$server_dir/$checksum_server_name"
 cd "$base_dir"
 
-# checksum for VS Code extension
-vscode_dir="$(dirname "$vscode_extension")"
-vscode_name="$(basename "$vscode_extension")"
-cd "$vscode_dir"
-checksum_vscode_name="${vscode_name}.sha256"
-sha256sum "$vscode_name" > "$checksum_vscode_name"
-checksum_vscode_path="$vscode_dir/$checksum_vscode_name"
-cd "$base_dir"
+# checksums for every VS Code extension package
+vscode_upload_files=()
+for extension in "${vscode_extensions[@]}"; do
+    vscode_dir="$(dirname "$extension")"
+    vscode_name="$(basename "$extension")"
+    cd "$vscode_dir"
+    sha256sum "$vscode_name" > "${vscode_name}.sha256"
+    cd "$base_dir"
+    vscode_upload_files+=("$extension" "$vscode_dir/${vscode_name}.sha256")
+done
+readonly vscode_upload_files
 
 readonly title="Release $project_version"
 readonly tag="$project_version"
@@ -102,12 +109,12 @@ echo "Plugin file  : $artifact_path"
 echo "Plugin sha256: $checksum_plugin_path"
 echo "Server JAR   : $server_jar"
 echo "Server sha256: $checksum_server_path"
-echo "VS Code ext. : $vscode_extension"
-echo "VS Code sha256: $checksum_vscode_path"
+echo "VS Code ext. : ${#vscode_extensions[@]} package(s)"
+printf '  %s\n' "${vscode_extensions[@]}"
 
 release_url=$(gh release create --latest --title "$title" --notes-file "$changes_file" --target main "$tag" \
     "$artifact_path" "$checksum_plugin_path" "$server_jar" "$checksum_server_path" \
-    "$vscode_extension" "$checksum_vscode_path")
+    "${vscode_upload_files[@]}")
 readonly release_url
 echo "Release URL: $release_url"
 
