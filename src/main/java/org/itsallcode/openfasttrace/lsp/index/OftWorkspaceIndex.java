@@ -16,7 +16,7 @@ public final class OftWorkspaceIndex {
 
     private final Map<SpecificationItemId, SpecificationItem> specItems;
     private final Map<SpecificationItemId, List<SpecificationItem>> coverageBySpecId;
-    private final Map<String, List<LinkedSpecificationItem>> defectsByFile;
+    private final Map<String, List<LinkedSpecificationItem>> linkedItemsByFile;
 
     public OftWorkspaceIndex(final List<SpecificationItem> items) {
         this(items, List.of());
@@ -36,7 +36,7 @@ public final class OftWorkspaceIndex {
 
         this.specItems = Collections.unmodifiableMap(specMap);
         this.coverageBySpecId = Collections.unmodifiableMap(coverMap);
-        this.defectsByFile = groupDefectsByFile(linkedItems);
+        this.linkedItemsByFile = groupByFile(linkedItems);
     }
 
     // [impl->req~diagnostic-trace-defects~1]
@@ -45,11 +45,11 @@ public final class OftWorkspaceIndex {
                 linkedItems.stream().map(LinkedSpecificationItem::getItem).toList(), linkedItems);
     }
 
-    private static Map<String, List<LinkedSpecificationItem>> groupDefectsByFile(
+    private static Map<String, List<LinkedSpecificationItem>> groupByFile(
             final List<LinkedSpecificationItem> linkedItems) {
         final Map<String, List<LinkedSpecificationItem>> byFile = new LinkedHashMap<>();
         for (final LinkedSpecificationItem item : linkedItems) {
-            if (!item.isDefect() || item.getLocation() == null) {
+            if (item.getLocation() == null) {
                 continue;
             }
             final String key = LocationConverter.toFileKey(item.getLocation().getPath());
@@ -62,9 +62,16 @@ public final class OftWorkspaceIndex {
         return new OftWorkspaceIndex(List.of());
     }
 
+    // [impl->req~coverage-code-lens~1]
+    public List<LinkedSpecificationItem> linkedItemsInFile(final String uriOrPath) {
+        return linkedItemsByFile.getOrDefault(LocationConverter.toFileKey(uriOrPath), List.of());
+    }
+
     // [impl->req~diagnostic-trace-defects~1]
     public List<LinkedSpecificationItem> defectsInFile(final String uriOrPath) {
-        return defectsByFile.getOrDefault(LocationConverter.toFileKey(uriOrPath), List.of());
+        return linkedItemsInFile(uriOrPath).stream()
+                .filter(LinkedSpecificationItem::isDefect)
+                .toList();
     }
 
     public Optional<SpecificationItem> findSpecItem(final SpecificationItemId id) {

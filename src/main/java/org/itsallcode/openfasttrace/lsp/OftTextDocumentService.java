@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
+import org.eclipse.lsp4j.CodeLens;
+import org.eclipse.lsp4j.CodeLensParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
@@ -66,6 +68,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
+import org.itsallcode.openfasttrace.lsp.codelens.OftCodeLensProvider;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionContext;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionSupport;
 import org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider;
@@ -164,6 +167,15 @@ public class OftTextDocumentService implements TextDocumentService {
                             .orElse(Collections.emptyList());
                 })
                 .orElse(Collections.emptyList());
+    }
+
+    // [impl->req~coverage-code-lens~1]
+    @Override
+    public CompletableFuture<List<? extends CodeLens>> codeLens(final CodeLensParams params) {
+        final String uri = params.getTextDocument().getUri();
+        Logger.debug("codeLens: uri=" + uri);
+        return CompletableFuture.supplyAsync(
+                () -> OftCodeLensProvider.codeLenses(index.linkedItemsInFile(uri)));
     }
 
     // [impl->req~coverage-hierarchy~1]

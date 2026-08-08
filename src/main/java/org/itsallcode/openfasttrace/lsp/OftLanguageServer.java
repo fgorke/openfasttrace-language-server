@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.CompletionOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
@@ -67,6 +68,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setWorkspaceSymbolProvider(true);
         capabilities.setRenameProvider(new RenameOptions(true));
         capabilities.setTypeHierarchyProvider(true);
+        capabilities.setCodeLensProvider(new CodeLensOptions(false));
         capabilities.setCompletionProvider(new CompletionOptions(false, List.of("~", ">")));
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));
