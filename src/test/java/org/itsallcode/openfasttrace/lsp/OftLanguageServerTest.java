@@ -89,6 +89,19 @@ class OftLanguageServerTest {
         assertThat(triggerCharacters).contains("~", ">").doesNotContain("-", "[");
     }
 
+    // [itest->req~coverage-hierarchy~1]
+    @Test
+    void testGivenInitializeParamsWhenInitializingThenTypeHierarchyIsDeclared() throws Exception {
+        // given
+        final var params = new InitializeParams();
+
+        // when
+        final InitializeResult result = server.initialize(params).get();
+
+        // then
+        assertThat(result.getCapabilities().getTypeHierarchyProvider().getLeft()).isTrue();
+    }
+
     @Test
     void testGivenInitializeParamsWhenInitializingThenTextDocumentSyncIsDeclared() throws Exception {
         // given

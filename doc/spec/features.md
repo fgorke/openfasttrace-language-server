@@ -62,3 +62,10 @@ feat~trace-in-editor~1
 The language server runs the OpenFastTrace linker over the workspace and reports every defect it finds as a diagnostic at the source position that caused it.
 
 Needs: req
+
+## Coverage Hierarchy
+feat~coverage-hierarchy~1
+
+The editor shows the full coverage chain as a hierarchy, starting at the top. It can be opened by invoking it on a specification item.
+
+Needs: req

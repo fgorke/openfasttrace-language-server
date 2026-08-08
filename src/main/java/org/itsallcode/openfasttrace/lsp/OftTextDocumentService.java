@@ -51,6 +51,10 @@ import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TypeHierarchyItem;
+import org.eclipse.lsp4j.TypeHierarchyPrepareParams;
+import org.eclipse.lsp4j.TypeHierarchySubtypesParams;
+import org.eclipse.lsp4j.TypeHierarchySupertypesParams;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -66,6 +70,7 @@ import org.itsallcode.openfasttrace.lsp.completion.OftCompletionContext;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionSupport;
 import org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider;
 import org.itsallcode.openfasttrace.lsp.diagnostics.QuickFixProvider;
+import org.itsallcode.openfasttrace.lsp.hierarchy.OftTypeHierarchyProvider;
 import org.itsallcode.openfasttrace.lsp.highlighting.OftSemanticTokensProvider;
 import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
 import org.itsallcode.openfasttrace.lsp.index.OftIdAtPosition;
@@ -159,6 +164,32 @@ public class OftTextDocumentService implements TextDocumentService {
                             .orElse(Collections.emptyList());
                 })
                 .orElse(Collections.emptyList());
+    }
+
+    // [impl->req~coverage-hierarchy~1]
+    @Override
+    public CompletableFuture<List<TypeHierarchyItem>> prepareTypeHierarchy(
+            final TypeHierarchyPrepareParams params) {
+        final String uri = params.getTextDocument().getUri();
+        final int line = params.getPosition().getLine();
+        final int col = params.getPosition().getCharacter();
+        Logger.debug("prepareTypeHierarchy: uri=" + uri + " line=" + line + " col=" + col);
+        return CompletableFuture.supplyAsync(
+                () -> OftTypeHierarchyProvider.prepareAt(readLine(uri, line), col, index));
+    }
+
+    @Override
+    public CompletableFuture<List<TypeHierarchyItem>> typeHierarchySupertypes(
+            final TypeHierarchySupertypesParams params) {
+        return CompletableFuture.supplyAsync(
+                () -> OftTypeHierarchyProvider.supertypesOf(params.getItem(), index));
+    }
+
+    @Override
+    public CompletableFuture<List<TypeHierarchyItem>> typeHierarchySubtypes(
+            final TypeHierarchySubtypesParams params) {
+        return CompletableFuture.supplyAsync(
+                () -> OftTypeHierarchyProvider.subtypesOf(params.getItem(), index));
     }
 
     // [impl->req~find-references-covering-tags~1]
