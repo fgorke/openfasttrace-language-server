@@ -220,3 +220,13 @@ Covers:
 * feat~trace-in-editor~1
 
 Needs: impl, itest
+
+## Coverage Hierarchy
+req~coverage-hierarchy~1
+
+The hierarchy is opened on a specification item ID. The server reports the top of the coverage chain, so it is complete no matter where in the chain that item sits. From there, the items covering an item are its subtypes and the items it covers are its supertypes. Coverage tags appear as the innermost subtypes.
+
+Covers:
+* feat~coverage-hierarchy~1
+
+Needs: impl, itest

@@ -66,6 +66,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setCodeActionProvider(true);
         capabilities.setWorkspaceSymbolProvider(true);
         capabilities.setRenameProvider(new RenameOptions(true));
+        capabilities.setTypeHierarchyProvider(true);
         capabilities.setCompletionProvider(new CompletionOptions(false, List.of("~", ">")));
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));
