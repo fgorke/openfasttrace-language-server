@@ -230,3 +230,13 @@ Covers:
 * feat~coverage-hierarchy~1
 
 Needs: impl, itest
+
+## Coverage Code Lens
+req~coverage-code-lens~1
+
+The server reports a code lens above each specification item, naming the artifact types it still needs and the artifact types already covering it. An item that neither needs nor has coverage gets no lens, and coverage tags get none either.
+
+Covers:
+* feat~coverage-code-lens~1
+
+Needs: impl, itest

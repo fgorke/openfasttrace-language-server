@@ -8,6 +8,7 @@ Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT
 * **Trace diagnostics**: uncovered specification items, links to items that do not exist and duplicate definitions, reported while editing
 * **Quick fix**: one-click update of an outdated coverage tag revision
 * **Rename**: renames a specification item together with every coverage tag and reference in the workspace (F2)
+* **Coverage code lens**: a summary above each specification item naming the artifact types it still needs and the artifact types already covering it
 * **Coverage hierarchy**: the full coverage chain as a type hierarchy (*Show Type Hierarchy*), always starting at the top and reaching down to the coverage tags in source. Opened on a specification item ID
 * **Symbol search**: finds specification items through *Go to Symbol in Workspace* (Ctrl+T)
 * **Syntax highlighting**: specification item definitions, section keywords and coverage tags via semantic tokens

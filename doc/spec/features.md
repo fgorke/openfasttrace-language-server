@@ -69,3 +69,10 @@ feat~coverage-hierarchy~1
 The editor shows the full coverage chain as a hierarchy, starting at the top. It can be opened by invoking it on a specification item.
 
 Needs: req
+
+## Coverage Code Lens
+feat~coverage-code-lens~1
+
+The editor shows a short coverage summary above each specification item, so its state is visible while reading the specification.
+
+Needs: req
