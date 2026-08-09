@@ -31,12 +31,14 @@ Modules included:
 | `openfasttrace-importer-tag` | Parses coverage tags from source files |
 | `openfasttrace-importer-gherkin` | Parses coverage tags from `.feature` files |
 | `openfasttrace-importer-restructuredtext` | Parses spec items from `.rst` files |
+| `openfasttrace-reporter-html` | Renders the trace report requested from the editor |
+| `openfasttrace-reporter-plaintext` | Same, as plain text |
 
 **Update policy:** bumping the OFT version means updating this ADR, checking API compatibility, bumping `openfasttrace.version` and re-checking which importer modules exist.
 
 ### Consequences
 
-* Good, because unused OFT modules (reporters, specobject exporter, zip importer) never end up on the classpath.
+* Good, because unused OFT modules (specobject exporter, zip importer, remaining reporters) never end up on the classpath.
 * Good, because the dependency list itself documents the OFT API surface in use.
 * Bad, because each module has to be listed separately instead of one uber-JAR line.
 * Bad, because OFT's internal module boundaries can shift between releases. That means revisiting this list.

@@ -62,6 +62,11 @@ public final class OftWorkspaceIndex {
         return new OftWorkspaceIndex(List.of());
     }
 
+    // [impl->req~trace-report-on-request~1]
+    public List<LinkedSpecificationItem> allLinkedItems() {
+        return linkedItemsByFile.values().stream().flatMap(List::stream).toList();
+    }
+
     // [impl->req~coverage-code-lens~1]
     public List<LinkedSpecificationItem> linkedItemsInFile(final String uriOrPath) {
         return linkedItemsByFile.getOrDefault(LocationConverter.toFileKey(uriOrPath), List.of());
