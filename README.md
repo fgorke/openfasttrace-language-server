@@ -23,7 +23,7 @@ The easiest way to get started with the OpenFastTrace Language Server is to inst
 
 ### VS Code
 
-1. Download the latest `.vsix` from the [Releases](../../releases) page.
+1. Download the `.vsix` for your platform from the [Releases](../../releases) page. Each one carries its own Java runtime, so the file name ends in the platform, for example `-win32-x64` or `-darwin-arm64`.
 2. Run `code --install-extension <downloaded-file>.vsix`, or open the Extensions view, click the `...` menu and choose **Install from VSIX...**.
 
 Both clients start the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
@@ -64,9 +64,9 @@ git clone https://github.com/fgorke/openfasttrace-language-server.git
 
 ### Runtime Dependencies
 
-* Java 17 or later
 * For the IntelliJ plugin: IntelliJ IDEA Ultimate 2026.1 or later.
-* For the VS Code extension: VS Code 1.82 or later
+* For the VS Code extension: VS Code 1.82 or later.
+* For the standalone server: Java 17 or later
 
 ### Build Dependencies
 
@@ -131,16 +131,18 @@ npm run watch
 
 Then press F5 in VS Code (with `vscode-extension/` open as the workspace) to launch it.
 
-Build an installable package:
+Build an installable package with a Java runtime bundled for the current machine:
 
 ```bash
 mvn package
 cd vscode-extension
 npm install
-npx vsce package
+npm run package
 ```
 
-The `.vsix` lands in `vscode-extension/`.
+The `.vsix` lands in `vscode-extension/` and its name ends in the platform, for example `-win32-x64`.
+
+`jlink` only builds a runtime for the platform it runs on.
 
 ## Requirement Tracing
 

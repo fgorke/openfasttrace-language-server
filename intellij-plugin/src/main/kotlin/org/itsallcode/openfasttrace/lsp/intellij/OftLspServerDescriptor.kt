@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
@@ -15,6 +16,7 @@ import com.intellij.platform.lsp.api.customization.LspSemanticTokensCustomizer
 import com.intellij.psi.PsiFile
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
 private val LOG = logger<OftLspServerDescriptor>()
 
@@ -55,8 +57,19 @@ internal class OftLspServerDescriptor(project: Project) :
 
     override fun createCommandLine(): GeneralCommandLine {
         val jarPath = resolveServerJar()
-        LOG.info("Starting OpenFastTrace LSP server: $jarPath")
-        return GeneralCommandLine("java", "-jar", jarPath)
+        val java = javaExecutable()
+        LOG.info("Starting OpenFastTrace LSP server with $java: $jarPath")
+        return GeneralCommandLine(java, "-jar", jarPath)
+    }
+
+    private fun javaExecutable(): String {
+        val launcher = Path.of(System.getProperty("java.home"), "bin",
+            if (SystemInfo.isWindows) "java.exe" else "java")
+        if (Files.isExecutable(launcher)) {
+            return launcher.toString()
+        }
+        LOG.warn("No launcher in the IDE runtime at $launcher, falling back to 'java' on the PATH")
+        return "java"
     }
 
     private fun resolveServerJar(): String {
