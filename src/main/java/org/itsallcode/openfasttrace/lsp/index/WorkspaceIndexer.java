@@ -61,7 +61,8 @@ public class WorkspaceIndexer {
 
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
-                    if (!file.getFileName().toString().startsWith(".")) {
+                    if (!file.getFileName().toString().startsWith(".")
+                            && OftSupportedFiles.isSupported(file)) {
                         files.add(file);
                     }
                     return FileVisitResult.CONTINUE;
