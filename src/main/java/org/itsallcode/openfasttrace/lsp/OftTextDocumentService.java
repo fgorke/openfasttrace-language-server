@@ -158,11 +158,11 @@ public class OftTextDocumentService implements TextDocumentService {
 
                     if (cursorIsInSpecFile) {
                         return index.findCoverageTags(id).stream()
-                                .map(tag -> tightLocation(tag.getLocation()))
+                                .map(this::tightLocation)
                                 .collect(Collectors.toList());
                     }
                     return specItem
-                            .map(item -> tightLocation(item.getLocation()))
+                            .map(this::tightLocation)
                             .map(List::of)
                             .orElse(Collections.emptyList());
                 })
@@ -221,9 +221,17 @@ public class OftTextDocumentService implements TextDocumentService {
     List<Location> referencesForLine(final String lineText, final int col) {
         return OftIdAtPosition.findAt(lineText, col)
                 .map(id -> index.findCoverageTags(id).stream()
-                        .map(tag -> tightLocation(tag.getLocation()))
+                        .map(this::tightLocation)
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
+    }
+
+    // [impl->req~precise-ranges-from-oft~1]
+    private Location tightLocation(final SpecificationItem item) {
+        final String uri = LocationConverter.pathToUri(item.getLocation().getPath());
+        return LocationConverter.rangeOfDeclaredId(item)
+                .map(range -> new Location(uri, range))
+                .orElseGet(() -> tightLocation(item.getLocation()));
     }
 
     private Location tightLocation(final org.itsallcode.openfasttrace.api.core.Location oftLocation) {

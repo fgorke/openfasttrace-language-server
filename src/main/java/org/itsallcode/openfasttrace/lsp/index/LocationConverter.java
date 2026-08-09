@@ -3,11 +3,14 @@ package org.itsallcode.openfasttrace.lsp.index;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.itsallcode.openfasttrace.api.core.Location;
+import org.itsallcode.openfasttrace.api.core.SourceRange;
+import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
 public final class LocationConverter {
@@ -17,6 +20,22 @@ public final class LocationConverter {
 
     public static org.eclipse.lsp4j.Location toLspLocation(final Location oftLocation) {
         return toLspLocation(oftLocation, null);
+    }
+
+    // [impl->req~precise-ranges-from-oft~1]
+    public static Optional<Range> toLspRange(final SourceRange range) {
+        if (range == null || range.getStart() == null || range.getEnd() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new Range(
+                new Position(range.getStart().getLine(), range.getStart().getColumn()),
+                new Position(range.getEnd().getLine(), range.getEnd().getColumn())));
+    }
+
+    // [impl->req~precise-ranges-from-oft~1]
+    public static Optional<Range> rangeOfDeclaredId(final SpecificationItem item) {
+        return Optional.ofNullable(item.getLocatedId())
+                .flatMap(located -> toLspRange(located.getRange()));
     }
 
     public static org.eclipse.lsp4j.Location toLspLocation(final Location oftLocation,
