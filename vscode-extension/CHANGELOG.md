@@ -5,6 +5,7 @@
 * Released once per platform with a Java runtime bundled, so no separate Java installation is needed
 * The coverage chain of a specification item is shown as a type hierarchy, down to the coverage tags in the source
 * A coverage summary above each specification item names the artifact types it still needs and those already covering it
+* *OpenFastTrace: Generate Trace Report* creates a full report as HTML or plain text and opens it
 * Updated OpenFastTrace to 4.9.0
 
 ## 0.3.0
