@@ -89,7 +89,7 @@ class OftLanguageServerTest {
         assertThat(triggerCharacters).contains("~", ">").doesNotContain("-", "[");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenInitializeParamsWhenInitializingThenTypeHierarchyIsDeclared() throws Exception {
         // given

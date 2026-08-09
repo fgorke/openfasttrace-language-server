@@ -23,7 +23,7 @@ import org.itsallcode.openfasttrace.lsp.index.OftIdAtPosition;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 import org.itsallcode.openfasttrace.lsp.symbols.OftSymbolProvider;
 
-// [impl->req~coverage-hierarchy~1]
+// [impl->req~coverage-hierarchy~2]
 public final class OftTypeHierarchyProvider {
 
     private OftTypeHierarchyProvider() {

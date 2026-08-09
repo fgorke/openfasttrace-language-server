@@ -56,7 +56,7 @@ class OftTypeHierarchyProviderTest {
         return subtypes.get(0);
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenCursorOnRequirementWhenPreparingThenTheChainStartsAtTheFeature() {
         assertThat(prepare("`req~login~1`", 6)).singleElement().satisfies(root -> {
@@ -65,14 +65,14 @@ class OftTypeHierarchyProviderTest {
         });
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenCursorOnTheFeatureItselfWhenPreparingThenItIsTheRoot() {
         assertThat(prepare("`feat~login~1`", 7)).singleElement()
                 .extracting(TypeHierarchyItem::getName).isEqualTo("[feat] login~1");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenTheFeatureWhenWalkingDownThenTheWholeChainIsReachable() {
         // when
@@ -87,7 +87,7 @@ class OftTypeHierarchyProviderTest {
         assertThat(tag.getUri()).endsWith("Login.java");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenACoverageTagInTheTreeWhenAskingForSupertypesThenTheCoveredItemIsReturned() {
         // given
@@ -98,7 +98,7 @@ class OftTypeHierarchyProviderTest {
                 .extracting(TypeHierarchyItem::getName).isEqualTo("[dsn] login~1");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenItemsCoveringEachOtherWhenPreparingThenTheWalkUpTerminates() throws Exception {
         // given
