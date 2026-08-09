@@ -178,7 +178,7 @@ public class OftTextDocumentService implements TextDocumentService {
                 () -> OftCodeLensProvider.codeLenses(index.linkedItemsInFile(uri)));
     }
 
-    // [impl->req~coverage-hierarchy~1]
+    // [impl->req~coverage-hierarchy~2]
     @Override
     public CompletableFuture<List<TypeHierarchyItem>> prepareTypeHierarchy(
             final TypeHierarchyPrepareParams params) {

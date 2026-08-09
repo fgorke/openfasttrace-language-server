@@ -46,14 +46,14 @@ class OftTextDocumentServiceTypeHierarchyTest {
         return items.get(0);
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenPositionOnRequirementWhenPreparingThroughTheServiceThenTheFeatureIsReturned()
             throws Exception {
         assertThat(prepareOnRequirement().getName()).isEqualTo("[feat] login~1");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenTheRootWhenAskingTheServiceForSubtypesThenTheRequirementIsReturned()
             throws Exception {
@@ -69,7 +69,7 @@ class OftTextDocumentServiceTypeHierarchyTest {
                 .extracting(TypeHierarchyItem::getName).isEqualTo("[req] login~1");
     }
 
-    // [itest->req~coverage-hierarchy~1]
+    // [itest->req~coverage-hierarchy~2]
     @Test
     void testGivenTheRootWhenAskingTheServiceForSupertypesThenNothingIsAboveIt() throws Exception {
         // given

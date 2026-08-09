@@ -222,9 +222,11 @@ Covers:
 Needs: impl, itest
 
 ## Coverage Hierarchy
-req~coverage-hierarchy~1
+req~coverage-hierarchy~2
 
 The hierarchy is opened on a specification item ID. The server reports the top of the coverage chain, so it is complete no matter where in the chain that item sits. From there, the items covering an item are its subtypes and the items it covers are its supertypes. Coverage tags appear as the innermost subtypes.
+
+Deserializing a `TypeHierarchyItem` sent by the client needs a Gson instance creator, because LSP4J declares no parameterless constructor for it.
 
 Covers:
 * feat~coverage-hierarchy~1
