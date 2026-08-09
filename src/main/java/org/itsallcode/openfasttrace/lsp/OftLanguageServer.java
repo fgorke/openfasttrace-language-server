@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.CompletionOptions;
+import org.eclipse.lsp4j.ExecuteCommandOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
@@ -69,6 +70,8 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         capabilities.setRenameProvider(new RenameOptions(true));
         capabilities.setTypeHierarchyProvider(true);
         capabilities.setCodeLensProvider(new CodeLensOptions(false));
+        capabilities.setExecuteCommandProvider(new ExecuteCommandOptions(
+                List.of(OftWorkspaceService.GENERATE_TRACE_REPORT_COMMAND)));
         capabilities.setCompletionProvider(new CompletionOptions(false, List.of("~", ">")));
         capabilities.setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions(
                 new SemanticTokensLegend(OftSemanticTokensProvider.TOKEN_TYPES, List.of()), true));

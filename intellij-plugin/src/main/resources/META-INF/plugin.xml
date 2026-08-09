@@ -13,6 +13,7 @@
             <li><b>Trace diagnostics</b>: uncovered specification items, links to items that do not exist and duplicate definitions, reported while editing</li>
             <li><b>Quick fix</b>: one-click update of an outdated coverage tag revision</li>
             <li><b>Rename</b>: renames a specification item together with every coverage tag and reference in the workspace</li>
+            <li><b>Trace report</b>: renders a full OpenFastTrace report through <i>Tools | Generate OpenFastTrace Report</i> and opens it in the editor</li>
             <li><b>Coverage code lens</b>: a summary above each specification item naming the artifact types it still needs and the artifact types already covering it</li>
             <li><b>Coverage hierarchy</b>: the full coverage chain as a type hierarchy (Ctrl+H), always starting at the top and reaching down to the coverage tags in source. Opened on a specification item ID</li>
             <li><b>Symbol search</b>: finds specification items through Search Everywhere</li>
@@ -42,4 +43,13 @@
         <completion.confidence language="any" order="first"
                 implementationClass="org.itsallcode.openfasttrace.lsp.intellij.OftCompletionConfidence"/>
     </extensions>
+
+    <actions>
+        <action id="Oft.GenerateTraceReport"
+                class="org.itsallcode.openfasttrace.lsp.intellij.OftGenerateTraceReportAction"
+                text="Generate OpenFastTrace Report..."
+                description="Renders a trace report for the workspace and opens it in the editor">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

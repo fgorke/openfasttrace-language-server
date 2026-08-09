@@ -100,6 +100,18 @@
             <version>${openfasttrace.version}</version>
         </dependency>
 
+        <!-- Reporters for the trace report generated on request -->
+        <dependency>
+            <groupId>org.itsallcode.openfasttrace</groupId>
+            <artifactId>openfasttrace-reporter-html</artifactId>
+            <version>${openfasttrace.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.itsallcode.openfasttrace</groupId>
+            <artifactId>openfasttrace-reporter-plaintext</artifactId>
+            <version>${openfasttrace.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

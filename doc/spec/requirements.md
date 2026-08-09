@@ -262,3 +262,13 @@ Covers:
 * feat~trace-in-editor~1
 
 Needs: impl, itest
+
+## Trace Report on Request
+req~trace-report-on-request~1
+
+On the `oft.generateTraceReport` command the server renders a trace report with OpenFastTrace's own reporters, writes it to a temporary file and answers with its path, which the client then opens. The command takes a preset naming the output format and the level of detail.
+
+Covers:
+* feat~trace-report-on-request~1
+
+Needs: impl, utest, itest

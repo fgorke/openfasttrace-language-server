@@ -76,3 +76,10 @@ feat~coverage-code-lens~1
 The editor shows a short coverage summary above each specification item, so its state is visible while reading the specification.
 
 Needs: req
+
+## Trace Report on Request
+feat~trace-report-on-request~1
+
+The user can generate a trace report from the editor. The report is rendered by OpenFastTrace itself, as HTML or as plain text in several levels of detail.
+
+Needs: req

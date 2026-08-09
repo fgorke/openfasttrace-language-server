@@ -42,6 +42,13 @@
         }
       }
     },
+    "commands": [
+      {
+        "command": "oft.showTraceReport",
+        "title": "Generate Trace Report",
+        "category": "OpenFastTrace"
+      }
+    ],
     "semanticTokenScopes": [
       {
         "scopes": {

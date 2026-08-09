@@ -75,6 +75,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     clientOptions
   );
 
+  registerGenerateReportCommand(context);
+
   try {
     await client.start();
   } catch (error) {
@@ -97,6 +99,77 @@ function startupErrorMessage(javaPath: string, error: unknown): string {
 
 export function deactivate(): Thenable<void> | undefined {
   return client?.stop();
+}
+
+const GENERATE_TRACE_REPORT_COMMAND = "oft.generateTraceReport";
+
+const REPORT_PRESETS: { id: string; label: string; description: string }[] = [
+  { id: "html", label: "HTML report", description: "the full trace as a web page" },
+  { id: "plain-all", label: "Plain text, every item", description: "" },
+  { id: "plain-failures", label: "Plain text, defects only", description: "" },
+  {
+    id: "plain-direct-failures",
+    label: "Plain text, defects only",
+    description: "without those inherited from covered items",
+  },
+  { id: "plain-summary", label: "Plain text, summary", description: "a single line" },
+];
+
+function registerGenerateReportCommand(context: vscode.ExtensionContext): void {
+  const command = vscode.commands.registerCommand("oft.showTraceReport", async () => {
+    if (client === undefined) {
+      vscode.window.showErrorMessage("OpenFastTrace: the language server is not running.");
+      return;
+    }
+    const picked = await vscode.window.showQuickPick(
+      REPORT_PRESETS.map(preset => ({ label: preset.label, detail: preset.description, id: preset.id })),
+      { title: "Generate OpenFastTrace report", placeHolder: "Choose a report" }
+    );
+    if (picked === undefined) {
+      return;
+    }
+    await generateAndOpen(picked.id);
+  });
+  context.subscriptions.push(command);
+}
+
+async function generateAndOpen(preset: string): Promise<void> {
+  try {
+    const path = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: "Generating OpenFastTrace report" },
+      () =>
+        client!.sendRequest<string | null>("workspace/executeCommand", {
+          command: GENERATE_TRACE_REPORT_COMMAND,
+          arguments: [preset],
+        })
+    );
+    if (!path) {
+      vscode.window.showErrorMessage("OpenFastTrace: the server returned no report.");
+      return;
+    }
+    await openReport(vscode.Uri.file(path), preset);
+  } catch (error) {
+    vscode.window.showErrorMessage(`OpenFastTrace: could not generate the report: ${error}`);
+  }
+}
+
+async function openReport(uri: vscode.Uri, preset: string): Promise<void> {
+  if (preset === "html") {
+    showRenderedReport(uri);
+    return;
+  }
+  const document = await vscode.workspace.openTextDocument(uri);
+  await vscode.window.showTextDocument(document);
+}
+
+function showRenderedReport(uri: vscode.Uri): void {
+  const panel = vscode.window.createWebviewPanel(
+    "oftTraceReport",
+    "OpenFastTrace Report",
+    vscode.ViewColumn.Active,
+    { enableFindWidget: true, retainContextWhenHidden: true }
+  );
+  panel.webview.html = fs.readFileSync(uri.fsPath, "utf8");
 }
 
 function resolveServerJar(context: vscode.ExtensionContext): string | undefined {
