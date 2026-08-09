@@ -240,3 +240,23 @@ Covers:
 * feat~coverage-code-lens~1
 
 Needs: impl, itest
+
+## Precise Ranges from OFT
+req~precise-ranges-from-oft~1
+
+Where OpenFastTrace reports the source range of a specification item ID, the server uses that range instead of searching the line for the ID. If an importer supplies no range, the server falls back to scanning the line.
+
+Covers:
+* feat~trace-in-editor~1
+* feat~goto-definition~1
+
+Needs: impl, itest
+## Supported Files from OFT
+req~supported-files-from-oft~1
+
+Whether OpenFastTrace can read a file is decided by asking the importers on the classpath, not by a list of file extensions kept in the server. The workspace walk passes only those files to OFT, so files no importer reads never enter the import.
+
+Covers:
+* feat~trace-in-editor~1
+
+Needs: impl, itest

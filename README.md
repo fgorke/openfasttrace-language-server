@@ -33,7 +33,7 @@ For building a client yourself or running the language server standalone, see th
 ## Project Information
 
 * Bachelor thesis project, work in progress
-* Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.8.0
+* Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.9.0
 * License: [GPL-3.0-or-later](LICENSE)
 * Requirements: [doc/spec/](doc/spec/), architecture decisions: [doc/decisions/](doc/decisions/)
 

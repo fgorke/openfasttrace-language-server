@@ -16,6 +16,7 @@ import org.itsallcode.openfasttrace.api.core.DeepCoverageStatus;
 import org.itsallcode.openfasttrace.api.core.LinkStatus;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
+import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
 // [impl->req~diagnostic-trace-defects~1]
@@ -97,7 +98,7 @@ public final class TraceDiagnostics {
     private static Diagnostic badLinkDiagnostic(final LinkedSpecificationItem defect,
             final LinkStatus status, final SpecificationItemId targetId, final String line,
             final int lineIndex) {
-        final Range range = rangeOfId(line, lineIndex, targetId);
+        final Range range = rangeOfCoveredId(defect, targetId, line, lineIndex);
         final Diagnostic diagnostic = switch (status) {
             case ORPHANED -> new Diagnostic(range,
                     "Covers '" + targetId + "', which does not exist.",
@@ -136,18 +137,18 @@ public final class TraceDiagnostics {
             final String line, final int lineIndex) {
         final List<String> uncovered = defect.getUncoveredArtifactTypes();
         if (!uncovered.isEmpty()) {
-            return Optional.of(new Diagnostic(rangeOfId(line, lineIndex, defect.getId()),
+            return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                     "Not covered by: " + String.join(", ", uncovered) + ".",
                     DiagnosticSeverity.Warning, SOURCE));
         }
         if (defect.getDeepCoverageStatus() == DeepCoverageStatus.UNCOVERED
                 && defect.isTransitiveDefect()) {
-            return Optional.of(new Diagnostic(rangeOfId(line, lineIndex, defect.getId()),
+            return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                     "Not covered all the way down: " + incompleteCoveringItems(defect) + ".",
                     DiagnosticSeverity.Information, SOURCE));
         }
         if (defect.getDeepCoverageStatus() == DeepCoverageStatus.CYCLE) {
-            return Optional.of(new Diagnostic(rangeOfId(line, lineIndex, defect.getId()),
+            return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                     "Coverage of this item forms a cycle.",
                     DiagnosticSeverity.Warning, SOURCE));
         }
@@ -167,12 +168,30 @@ public final class TraceDiagnostics {
         if (!defect.hasDuplicates()) {
             return Optional.empty();
         }
-        return Optional.of(new Diagnostic(rangeOfId(line, lineIndex, defect.getId()),
+        return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                 "'" + defect.getId() + "' is defined more than once.",
                 DiagnosticSeverity.Warning, SOURCE));
     }
 
-    private static Range rangeOfId(final String line, final int lineIndex,
+    // [impl->req~precise-ranges-from-oft~1]
+    private static Range rangeOfOwnId(final LinkedSpecificationItem defect, final String line,
+            final int lineIndex) {
+        return LocationConverter.rangeOfDeclaredId(defect.getItem())
+                .orElseGet(() -> scanForId(line, lineIndex, defect.getId()));
+    }
+
+    // [impl->req~precise-ranges-from-oft~1]
+    private static Range rangeOfCoveredId(final LinkedSpecificationItem defect,
+            final SpecificationItemId targetId, final String line, final int lineIndex) {
+        return defect.getItem().getLocatedCoveredIds().stream()
+                .filter(located -> sameItem(located.getId(), targetId))
+                .findFirst()
+                .flatMap(located -> LocationConverter.toLspRange(located.getRange()))
+                .orElseGet(() -> scanForId(line, lineIndex, targetId));
+    }
+
+    //fallback for when OFT does not provide a range for the id, which can happen for some file types
+    private static Range scanForId(final String line, final int lineIndex,
             final SpecificationItemId id) {
         final Matcher matcher = OftSyntax.SPECIFICATION_ITEM_ID.matcher(line);
         while (matcher.find()) {
