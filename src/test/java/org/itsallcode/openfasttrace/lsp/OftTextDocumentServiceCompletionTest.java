@@ -115,7 +115,7 @@ class OftTextDocumentServiceCompletionTest {
         assertThat(items).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~1]
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
     @Test
     void testGivenLineWithLoneAsteriskWhenCompletingThenNoSkeletonsAreSuggested() {
         // given
@@ -130,11 +130,12 @@ class OftTextDocumentServiceCompletionTest {
         assertThat(items).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~1]
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
     @Test
     void testGivenManualInvocationInsideCommentWithoutTagWhenCompletingThenTagSkeletonsAreSuggested() {
         // given
-        service.updateIndex(OftWorkspaceIndex.empty());
+        service.updateIndex(new OftWorkspaceIndex(List.of(
+                itemNeeding("req~login~1", "impl", "utest"))));
         final String line = "// ";
         final List<String> lines = List.of(line);
 
@@ -143,13 +144,39 @@ class OftTextDocumentServiceCompletionTest {
 
         // then
         assertThat(items).extracting(CompletionItem::getLabel)
-                .containsExactlyInAnyOrder("[impl->...]", "[utest->...]", "[itest->...]", "[stest->...]");
+                .containsExactly("[impl->...]", "[utest->...]");
         final var edit = items.get(0).getTextEdit().getLeft();
         assertThat(edit.getNewText()).matches("\\[\\w+->\\$0]");
         assertThat(edit.getRange().getStart()).isEqualTo(edit.getRange().getEnd());
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~1]
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    @Test
+    void testGivenItemNeedingACustomArtifactTypeWhenCompletingThenItsSkeletonIsSuggested() {
+        // given
+        service.updateIndex(new OftWorkspaceIndex(List.of(
+                itemNeeding("req~login~1", "arch"))));
+        final String line = "// ";
+
+        // when
+        final List<CompletionItem> items = service.completionForPosition(List.of(line), 0, line.length(), true);
+
+        // then
+        assertThat(items).extracting(CompletionItem::getLabel).containsExactly("[arch->...]");
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    @Test
+    void testGivenWorkspaceWithoutNeededArtifactTypesWhenCompletingThenNoSkeletonIsSuggested() {
+        // given
+        service.updateIndex(new OftWorkspaceIndex(List.of(specItem("req~login~1"))));
+        final String line = "// ";
+
+        // when / then
+        assertThat(service.completionForPosition(List.of(line), 0, line.length(), true)).isEmpty();
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
     @Test
     void testGivenTriggerCharacterInvocationInsideCommentWhenCompletingThenNoTagStartIsSuggested() {
         // given
@@ -170,6 +197,17 @@ class OftTextDocumentServiceCompletionTest {
                 .title("Title")
                 .description("")
                 .build();
+    }
+
+    private static SpecificationItem itemNeeding(final String id, final String... artifactTypes) {
+        final SpecificationItem.Builder builder = SpecificationItem.builder()
+                .id(SpecificationItemId.parseId(id))
+                .title("Title")
+                .description("");
+        for (final String artifactType : artifactTypes) {
+            builder.addNeedsArtifactType(artifactType);
+        }
+        return builder.build();
     }
 
     private static SpecificationItem coverableItem(final String id) {

@@ -204,7 +204,7 @@ class OftCompletionContextTest {
         assertThat(result.get().prefix()).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~1]
+    // [utest->req~suggest-coverage-tag-start-in-comment~2]
     @Test
     void testGivenCursorAlreadyInsideOpenTagWhenCheckingForOpenTagThenResultIsFalse() {
         // given

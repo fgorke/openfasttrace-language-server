@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
@@ -132,8 +133,8 @@ public class OftTextDocumentService implements TextDocumentService {
 
     // [impl->req~goto-definition-spec-to-tags~1, req~goto-definition-tag-to-spec~1]
     @Override
-    public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
-            definition(final DefinitionParams params) {
+    public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(
+            final DefinitionParams params) {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
@@ -253,13 +254,10 @@ public class OftTextDocumentService implements TextDocumentService {
                 .collect(Collectors.toList()));
     }
 
-    private static final List<String> COVERAGE_TAG_ARTIFACT_TYPES =
-            List.of("impl", "utest", "itest", "stest");
-
     // [impl->req~complete-specification-item-id-in-covers-section~1]
     // [impl->req~complete-specification-item-id-in-coverage-tag-target~1]
     // [impl->req~complete-closing-bracket-for-coverage-tag~1]
-    // [impl->req~suggest-coverage-tag-start-in-comment~1]
+    // [impl->req~suggest-coverage-tag-start-in-comment~2]
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
             final CompletionParams params) {
@@ -271,8 +269,7 @@ public class OftTextDocumentService implements TextDocumentService {
                 || params.getContext().getTriggerKind() != CompletionTriggerKind.TriggerCharacter;
         Logger.debug("completion: uri=" + uri + " line=" + line + " col=" + col);
         return CompletableFuture.supplyAsync(() -> {
-            final List<CompletionItem> items =
-                    completionForPosition(readAllLines(uri), line, col, suggestTagStart);
+            final List<CompletionItem> items = completionForPosition(readAllLines(uri), line, col, suggestTagStart);
             return Either.<List<CompletionItem>, CompletionList>forLeft(items);
         });
     }
@@ -301,22 +298,25 @@ public class OftTextDocumentService implements TextDocumentService {
         completionItem.setKind(CompletionItemKind.Reference);
         completionItem.setDetail(item.getId().getArtifactType());
         completionItem.setSortText(OftCompletionSupport.sortTextFor(item, context.prefix()));
-        final var range =
-                new Range(new Position(line, col - context.prefix().length()), new Position(line, col));
+        final var range = new Range(new Position(line, col - context.prefix().length()), new Position(line, col));
         completionItem.setTextEdit(Either.forLeft(new TextEdit(range, newText)));
         return completionItem;
     }
 
+    // [impl->req~suggest-coverage-tag-start-in-comment~2]
     private List<CompletionItem> tagStartSnippets(final int line, final int col) {
-        return COVERAGE_TAG_ARTIFACT_TYPES.stream()
-                .map(type -> toTagStartSnippet(type, line, col))
+        final List<String> types = index.neededArtifactTypes();
+        return IntStream.range(0, types.size())
+                .mapToObj(position -> toTagStartSnippet(types.get(position), position, line, col))
                 .collect(Collectors.toList());
     }
 
-    private CompletionItem toTagStartSnippet(final String artifactType, final int line, final int col) {
+    private CompletionItem toTagStartSnippet(final String artifactType, final int position,
+            final int line, final int col) {
         final var completionItem = new CompletionItem("[" + artifactType + "->...]");
         completionItem.setKind(CompletionItemKind.Snippet);
         completionItem.setDetail("OFT coverage tag");
+        completionItem.setSortText(String.format("%02d_%s", position, artifactType));
         completionItem.setInsertTextFormat(InsertTextFormat.Snippet);
         final var range = new Range(new Position(line, col), new Position(line, col));
         completionItem.setTextEdit(Either.forLeft(new TextEdit(range, "[" + artifactType + "->$0]")));
@@ -325,8 +325,8 @@ public class OftTextDocumentService implements TextDocumentService {
 
     // [impl->req~prepare-rename~1]
     @Override
-    public CompletableFuture<Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>>
-            prepareRename(final PrepareRenameParams params) {
+    public CompletableFuture<Either3<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>> prepareRename(
+            final PrepareRenameParams params) {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();

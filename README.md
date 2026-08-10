@@ -53,7 +53,7 @@ The server provides these features to any connected editor:
 * **Coverage hierarchy.** The full coverage chain is shown as a type hierarchy, always starting at the top: downwards the items covering an item, ending at the coverage tags in the source code. It is opened on a specification item ID.
 * **Symbol search.** Specification items are found through the editor's workspace symbol search.
 * **Rename.** Renaming a specification item updates its definition together with every coverage tag and `Covers:` entry in the workspace.
-* **Tag skeletons.** Invoking completion manually in comments offers `[impl->...]`, `[utest->...]`, `[itest->...]` and `[stest->...]`.
+* **Tag skeletons.** Invoking completion manually in comments offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones.
 
 ## Getting the Project
 
