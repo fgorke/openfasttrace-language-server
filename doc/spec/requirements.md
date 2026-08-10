@@ -102,9 +102,9 @@ Covers:
 Needs: impl, utest
 
 ## Highlight Coverage Tags
-req~highlight-coverage-tag~1
+req~highlight-coverage-tag~2
 
-When a coverage tag (e.g. `[impl->req~login~1]`) appears in a line, the server reports its full span as a semantic token of type `macro`. The span includes the brackets and the arrow.
+When a coverage tag (e.g. `[impl->req~login~1]`) appears in a line, the server reports its full span as a semantic token of type `macro`. The span includes the brackets and the arrow. All optional parts OpenFastTrace accepts belong to the tag: an own revision (`[impl~~2->...]`), an own name and revision (`[impl~login~2->...]`) and needed coverage (`[dsn->req~login~1>>impl,utest]`).
 
 Covers:
 * feat~syntax-highlighting~1
