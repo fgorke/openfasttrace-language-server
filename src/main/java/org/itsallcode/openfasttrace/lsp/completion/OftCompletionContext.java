@@ -58,7 +58,13 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
 
     private static boolean hasCommentMarkerBefore(final String line, final int bracketStart) {
         final String before = line.substring(0, bracketStart).strip();
-        return OftSyntax.COMMENT_MARKERS.stream().anyMatch(before::endsWith);
+        return OftSyntax.COMMENT_MARKERS.stream().anyMatch(before::endsWith)
+                || startsWithLineComment(before);
+    }
+
+    private static boolean startsWithLineComment(final String beforeCursor) {
+        final String stripped = beforeCursor.stripLeading();
+        return OftSyntax.LINE_START_COMMENT_MARKERS.stream().anyMatch(stripped::startsWith);
     }
 
     private static boolean hasClosingBracketAhead(final String line, final int col) {
@@ -106,7 +112,8 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
     public static boolean isInsideCommentWithoutOpenTag(final String line, final int col) {
         final int boundedCol = Math.min(Math.max(col, 0), line.length());
         final String beforeCursor = line.substring(0, boundedCol);
-        if (OftSyntax.COMMENT_STARTERS.stream().noneMatch(beforeCursor::contains)) {
+        if (OftSyntax.COMMENT_STARTERS.stream().noneMatch(beforeCursor::contains)
+                && !startsWithLineComment(beforeCursor)) {
             return false;
         }
         final int bracketStart = line.lastIndexOf('[', Math.max(0, boundedCol - 1));

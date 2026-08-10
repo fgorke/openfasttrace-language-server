@@ -74,7 +74,7 @@ class OftSemanticTokensProviderTest {
         assertThat(data).containsExactly(0, 2, 5, 1, 0);
     }
 
-    // [utest->req~highlight-coverage-tag~1]
+    // [utest->req~highlight-coverage-tag~2]
     @Test
     void testGivenCoverageTagWhenComputingTokensThenCoverageTagTokenSpansEntireTag() {
         // given
@@ -88,7 +88,7 @@ class OftSemanticTokensProviderTest {
         assertThat(data).containsExactly(0, 3, expectedLength, 2, 0);
     }
 
-    // [utest->req~highlight-coverage-tag~1]
+    // [utest->req~highlight-coverage-tag~2]
     @Test
     void testGivenTagCoveringSeveralItemsWhenComputingTokensThenTheWholeTagIsOneToken() {
         // given
@@ -102,7 +102,7 @@ class OftSemanticTokensProviderTest {
         assertThat(data).containsExactly(0, 3, tag.length(), 2, 0);
     }
 
-    // [utest->req~highlight-coverage-tag~1]
+    // [utest->req~highlight-coverage-tag~2]
     @Test
     void testGivenNamedTagCoveringSeveralItemsWhenComputingTokensThenTheWholeTagIsOneToken() {
         // given
@@ -116,7 +116,33 @@ class OftSemanticTokensProviderTest {
         assertThat(data).containsExactly(0, 2, tag.length(), 2, 0);
     }
 
-    // [utest->req~highlight-coverage-tag~1]
+    // [utest->req~highlight-coverage-tag~2]
+    @Test
+    void testGivenTagWithRevisionButNoNameWhenComputingTokensThenTheWholeTagIsOneToken() {
+        // given
+        final String tag = "[impl~~2->req~login~1]";
+
+        // when
+        final List<Integer> data = OftSemanticTokensProvider.computeTokens(List.of("// " + tag));
+
+        // then
+        assertThat(data).containsExactly(0, 3, tag.length(), 2, 0);
+    }
+
+    // [utest->req~highlight-coverage-tag~2]
+    @Test
+    void testGivenTagDeclaringNeededCoverageWhenComputingTokensThenTheWholeTagIsOneToken() {
+        // given
+        final String tag = "[dsn->req~login~1>>impl, utest]";
+
+        // when
+        final List<Integer> data = OftSemanticTokensProvider.computeTokens(List.of("' " + tag));
+
+        // then
+        assertThat(data).containsExactly(0, 2, tag.length(), 2, 0);
+    }
+
+    // [utest->req~highlight-coverage-tag~2]
     @Test
     void testGivenMultipleLinesWithTokensWhenComputingTokensThenDeltasAreEncodedRelatively() {
         // given

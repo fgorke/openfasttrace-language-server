@@ -230,6 +230,10 @@ public class OftTextDocumentService implements TextDocumentService {
     // [impl->req~precise-ranges-from-oft~1]
     private Location tightLocation(final SpecificationItem item) {
         final String uri = LocationConverter.pathToUri(item.getLocation().getPath());
+        final String lineText = readLine(uri, Math.max(0, item.getLocation().getLine() - 1));
+        if (OftSyntax.COVERAGE_TAG_LOOSE.matcher(lineText).find()) {
+            return LocationConverter.toLspLocation(item.getLocation(), lineText);
+        }
         return LocationConverter.rangeOfDeclaredId(item)
                 .map(range -> new Location(uri, range))
                 .orElseGet(() -> tightLocation(item.getLocation()));
@@ -415,7 +419,7 @@ public class OftTextDocumentService implements TextDocumentService {
 
     // [impl->req~highlight-specification-item~1]
     // [impl->req~highlight-keyword~1]
-    // [impl->req~highlight-coverage-tag~1]
+    // [impl->req~highlight-coverage-tag~2]
     @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(final SemanticTokensParams params) {
         final String uri = params.getTextDocument().getUri();

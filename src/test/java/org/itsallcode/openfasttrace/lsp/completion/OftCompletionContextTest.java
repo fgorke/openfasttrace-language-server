@@ -204,6 +204,31 @@ class OftCompletionContextTest {
         assertThat(result.get().prefix()).isEmpty();
     }
 
+    // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
+    @Test
+    void testGivenTagInAPlantUmlCommentWhenFindingContextThenTheTargetIsCompleted() {
+        // given
+        final String line = "' [dsn->req~lo";
+
+        // when
+        final var result = OftCompletionContext.findAt(List.of(line), 0, line.length());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().prefix()).isEqualTo("req~lo");
+        assertThat(result.get().coveringArtifactType()).isEqualTo("dsn");
+    }
+
+    // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
+    @Test
+    void testGivenBracketAfterAnApostropheInsideCodeWhenFindingContextThenNothingIsFound() {
+        // given
+        final String line = "char quote = '[dsn->req~lo";
+
+        // when / then
+        assertThat(OftCompletionContext.findAt(List.of(line), 0, line.length())).isEmpty();
+    }
+
     // [utest->req~suggest-coverage-tag-start-in-comment~2]
     @Test
     void testGivenCursorAlreadyInsideOpenTagWhenCheckingForOpenTagThenResultIsFalse() {

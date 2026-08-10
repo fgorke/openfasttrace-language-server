@@ -18,9 +18,18 @@ public final class OftSyntax {
     private static final String COVERED_ID_LIST = SPECIFICATION_ITEM_ID.pattern()
             + "(?:\\s*,\\s*" + SPECIFICATION_ITEM_ID.pattern() + ")*";
 
+    private static final String OPTIONAL_NAME_AND_REVISION =
+            "(?:" + SpecificationItemId.ARTIFACT_TYPE_SEPARATOR
+                    + "(?:" + SpecificationItemId.ITEM_NAME_PATTERN + ")?"
+                    + SpecificationItemId.REVISION_SEPARATOR
+                    + SpecificationItemId.ITEM_REVISION_PATTERN + ")?";
+
+    private static final String OPTIONAL_NEEDED_COVERAGE =
+            "(?:>>\\s*\\p{Alpha}+(?:\\s*,\\s*\\p{Alpha}+)*\\s*)?";
+
     public static final Pattern COVERAGE_TAG = Pattern.compile(
-            "\\[\\s*\\p{Alpha}+(?:~" + SpecificationItemId.ITEM_NAME_PATTERN + "~\\d+)?\\s*->\\s*"
-                    + COVERED_ID_LIST + "\\s*]");
+            "\\[\\s*\\p{Alpha}+" + OPTIONAL_NAME_AND_REVISION + "\\s*->\\s*"
+                    + COVERED_ID_LIST + "\\s*" + OPTIONAL_NEEDED_COVERAGE + "]");
 
     public static final Pattern COVERAGE_TAG_LOOSE = Pattern.compile("\\[[^\\]\\n]*->[^\\]\\n]*]");
 
@@ -31,6 +40,8 @@ public final class OftSyntax {
 
     public static final List<String> COMMENT_STARTERS =
             List.of("//", "#", "--", ";", "/*", "<!--");
+
+    public static final List<String> LINE_START_COMMENT_MARKERS = List.of("'", "..");
 
     private OftSyntax() {
     }
