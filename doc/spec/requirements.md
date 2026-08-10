@@ -142,9 +142,9 @@ Covers:
 Needs: impl, utest
 
 ## Suggest Coverage Tag Start in Comment
-req~suggest-coverage-tag-start-in-comment~1
+req~suggest-coverage-tag-start-in-comment~2
 
-When completion is invoked manually in a comment line without an open coverage tag, the server suggests a coverage tag skeleton for each of `impl`, `utest`, `itest` and `stest`, e.g. `[impl->...]`.
+When completion is invoked manually in a comment line without an open coverage tag, the server suggests a coverage tag skeleton, e.g. `[impl->...]`, for every artifact type the specification items of the workspace need.
 
 Covers:
 * feat~code-completion~1

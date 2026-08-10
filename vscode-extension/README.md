@@ -14,7 +14,7 @@ Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT
 * **Symbol search**: finds specification items through *Go to Symbol in Workspace* (Ctrl+T)
 * **Syntax highlighting**: specification item definitions, section keywords and coverage tags via semantic tokens
 * **Code completion**: specification item IDs in `Covers:` sections and coverage tag targets
-* **Tag skeletons**: invoking completion manually in a comment offers `[impl->...]`, `[utest->...]`, `[itest->...]` and `[stest->...]`
+* **Tag skeletons**: invoking completion manually in a comment offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones
 
 The server starts automatically when a supported file is opened. No configuration is required.
 

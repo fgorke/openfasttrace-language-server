@@ -19,8 +19,8 @@
             <li><b>Symbol search</b>: finds specification items through Search Everywhere</li>
             <li><b>Syntax highlighting</b>: specification item definitions, section keywords and coverage tags via semantic tokens</li>
             <li><b>Code completion</b>: specification item IDs in <code>Covers:</code> sections and coverage tag targets</li>
-            <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers
-                <code>[impl->...]</code>, <code>[utest->...]</code>, <code>[itest->...]</code> and <code>[stest->...]</code></li>
+            <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers a skeleton such as
+                <code>[impl-&gt;...]</code> for every artifact type the workspace needs, including project specific ones</li>
         </ul>
     ]]></description>
     <change-notes><![CDATA[
