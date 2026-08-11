@@ -35,25 +35,28 @@ public class WorkspaceIndexer {
     // [impl->req~diagnostic-trace-defects~1]
     public OftWorkspaceIndex buildIndex(final Path workspaceRoot) {
         Logger.info("Indexing workspace: " + workspaceRoot);
+        // [impl->req~index-ignore-file~1]
+        final OftIgnore ignore = OftIgnore.load(workspaceRoot);
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(collectInputs(workspaceRoot))
+                .addInputs(collectInputs(workspaceRoot, ignore))
                 .build();
         final List<SpecificationItem> items = runner.importItems(settings);
         final List<LinkedSpecificationItem> linkedItems = runner.link(items);
         Logger.info("Indexed " + items.size() + " specification item(s), "
                 + linkedItems.stream().filter(LinkedSpecificationItem::isDefect).count()
                 + " defect(s)");
-        return OftWorkspaceIndex.ofLinkedItems(linkedItems);
+        return OftWorkspaceIndex.ofLinkedItems(linkedItems, ignore);
     }
 
     @SuppressWarnings("NullableProblems")
-    private static List<Path> collectInputs(final Path workspaceRoot) {
+    private static List<Path> collectInputs(final Path workspaceRoot, final OftIgnore ignore) {
         final List<Path> files = new ArrayList<>();
         try {
             Files.walkFileTree(workspaceRoot, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
-                    if (!dir.equals(workspaceRoot) && isExcluded(dir.getFileName().toString())) {
+                    if (!dir.equals(workspaceRoot) && (isExcluded(dir.getFileName().toString())
+                            || ignore.isExcluded(dir))) {
                         return FileVisitResult.SKIP_SUBTREE;
                     }
                     return FileVisitResult.CONTINUE;
@@ -62,6 +65,7 @@ public class WorkspaceIndexer {
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
                     if (!file.getFileName().toString().startsWith(".")
+                            && !ignore.isExcluded(file)
                             && OftSupportedFiles.isSupported(file)) {
                         files.add(file);
                     }

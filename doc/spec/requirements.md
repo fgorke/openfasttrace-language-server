@@ -67,6 +67,13 @@ On the `initialized` notification, the server imports all OFT-traceable files in
 
 Needs: impl, utest, itest
 
+## Ignore File Excludes Paths From OFT Features
+req~index-ignore-file~1
+
+A file named `.oftignore` in the workspace root lists glob patterns, one per line. Blank lines and lines starting with `#` are skipped. A pattern matching a directory excludes everything below it. Matching files are not imported into the index and get neither semantic tokens nor completion.
+
+Needs: impl, utest, itest
+
 ## Index Refresh on File Save
 req~index-refresh-on-save~1
 
