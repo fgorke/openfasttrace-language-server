@@ -29,7 +29,7 @@ class OftIgnoreTest {
         assertThat(ignore.isExcluded(workspace.resolve("target/copy.md"))).isTrue();
     }
 
-    // [utest->req~index-on-startup~2]
+    // [utest->req~index-on-startup~3]
     @Test
     void testGivenBuildOutputAtAnyDepthWhenCheckingThenItIsExcluded() {
         // given
@@ -43,7 +43,7 @@ class OftIgnoreTest {
         assertThat(ignore.isExcluded(workspace.resolve("core/src/spec.md"))).isFalse();
     }
 
-    // [utest->req~index-on-startup~2]
+    // [utest->req~index-on-startup~3]
     @Test
     void testGivenHiddenPathsWhenCheckingThenTheyAreExcludedAtAnyDepth() {
         // given

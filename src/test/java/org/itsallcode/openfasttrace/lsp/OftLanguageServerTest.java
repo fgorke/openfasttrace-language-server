@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.lsp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +23,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 class OftLanguageServerTest {
 
+    private static final int INDEX_TIMEOUT_MS = 5_000;
+
     private OftLanguageServer server;
 
     @BeforeEach
@@ -29,7 +32,7 @@ class OftLanguageServerTest {
         server = new OftLanguageServer();
     }
 
-    // [utest->req~index-on-startup~2]
+    // [utest->req~index-on-startup~3]
     @Test
     void testGivenWorkspaceFoldersAndRootUriWhenInitializingThenIndexIsBuiltFromWorkspaceFolder(
             @TempDir final Path fromFolders, @TempDir final Path fromRootUri) throws Exception {
@@ -47,10 +50,10 @@ class OftLanguageServerTest {
         serverWithIndexer.initialized(new InitializedParams());
 
         // then
-        verify(indexer).buildIndex(fromFolders);
+        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(fromFolders);
     }
 
-    // [utest->req~index-on-startup~2]
+    // [utest->req~index-on-startup~3]
     @Test
     void testGivenOnlyRootUriWhenInitializingThenIndexIsBuiltFromRootUri(@TempDir final Path root)
             throws Exception {
@@ -66,7 +69,7 @@ class OftLanguageServerTest {
         serverWithIndexer.initialized(new InitializedParams());
 
         // then
-        verify(indexer).buildIndex(root);
+        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(root);
     }
 
     private static void setDeprecatedRootUri(final InitializeParams params, final Path root) {

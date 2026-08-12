@@ -38,6 +38,8 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
 
     private String rootUri;
     private volatile boolean shutdownReceived = false;
+    private volatile boolean supportsProgress = false;
+    private LanguageClient client;
 
     public OftLanguageServer() {
         this(new WorkspaceIndexer());
@@ -52,6 +54,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     @Override
     public CompletableFuture<InitializeResult> initialize(final InitializeParams params) {
         this.rootUri = resolveRootUri(params);
+        this.supportsProgress = announcesProgressSupport(params);
         Logger.info("initialize: rootUri=" + rootUri);
 
         final var syncOptions = new TextDocumentSyncOptions();
@@ -80,6 +83,12 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         return CompletableFuture.completedFuture(new InitializeResult(capabilities, serverInfo));
     }
 
+    private static boolean announcesProgressSupport(final InitializeParams params) {
+        return params.getCapabilities() != null
+                && params.getCapabilities().getWindow() != null
+                && Boolean.TRUE.equals(params.getCapabilities().getWindow().getWorkDoneProgress());
+    }
+
     private static String resolveRootUri(final InitializeParams params) {
         final List<WorkspaceFolder> folders = params.getWorkspaceFolders();
         if (folders != null && !folders.isEmpty()) {
@@ -92,7 +101,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         return params.getRootUri();
     }
 
-    // [impl->req~index-on-startup~2]
+    // [impl->req~index-on-startup~3]
     @Override
     public void initialized(final InitializedParams params) {
         Logger.info("initialized, building workspace index");
@@ -102,7 +111,17 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         }
         textDocumentService.setOnSaveCallback(this::rebuildIndex);
         workspaceService.setOnFilesChangedCallback(this::rebuildIndex);
-        rebuildIndex();
+        CompletableFuture.runAsync(this::buildInitialIndex);
+    }
+
+    private void buildInitialIndex() {
+        final ProgressReport progress = ProgressReport.start(client, supportsProgress,
+                "OFT: indexing the workspace");
+        try {
+            rebuildIndex();
+        } finally {
+            progress.finish();
+        }
     }
 
     private void rebuildIndex() {
@@ -142,6 +161,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     @Override
     public void connect(final LanguageClient client) {
         Logger.info("client connected");
+        this.client = client;
         textDocumentService.connect(client);
     }
 }
