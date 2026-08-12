@@ -5,7 +5,7 @@ Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT
 * **Hover documentation**: title and description of the referenced specification item
 * **Go to definition**: from a coverage tag to the specification item and from an item to all its covering tags
 * **Find references**: all coverage tags in the workspace that cover a specification item
-* **Trace diagnostics**: uncovered specification items, links to items that do not exist and duplicate definitions, reported while editing
+* **Trace diagnostics**: uncovered specification items, links to items that do not exist and duplicate definitions, reported for every file in the Problems view
 * **Quick fix**: one-click update of an outdated coverage tag revision
 * **Rename**: renames a specification item together with every coverage tag and reference in the workspace (F2)
 * **Trace report**: renders a full OpenFastTrace report through the *OpenFastTrace: Generate Trace Report* command and opens it in the editor

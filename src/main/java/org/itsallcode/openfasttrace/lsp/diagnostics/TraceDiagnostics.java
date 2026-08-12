@@ -19,7 +19,7 @@ import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
-// [impl->req~diagnostic-trace-defects~1]
+// [impl->req~diagnostic-trace-defects~2]
 public final class TraceDiagnostics {
 
     private static final String SOURCE = "openfasttrace-lsp";

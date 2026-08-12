@@ -24,7 +24,7 @@ class TraceDiagnosticsTest {
                 Files.readAllLines(file));
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenOutdatedTagWhenDiagnosingThenTheOrphanedLinkIsNotReportedAsWell()
             throws Exception {
@@ -43,7 +43,7 @@ class TraceDiagnosticsTest {
                 .asString().contains("Outdated");
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenBrokenChainWhenDiagnosingThenOnlyTheCausingItemIsAWarning() throws Exception {
         // given
@@ -70,7 +70,7 @@ class TraceDiagnosticsTest {
                 .hasSize(2);
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenDuplicateDefinitionsWhenDiagnosingThenBothAreFlagged() throws Exception {
         // given
@@ -88,7 +88,7 @@ class TraceDiagnosticsTest {
                 .hasSize(2);
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenDefectOnALineNotPresentInTheBufferWhenDiagnosingThenNothingIsEmitted()
             throws Exception {

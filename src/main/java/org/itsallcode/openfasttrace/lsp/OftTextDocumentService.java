@@ -87,6 +87,7 @@ public class OftTextDocumentService implements TextDocumentService {
     private LanguageClient client;
     private volatile OftWorkspaceIndex index = OftWorkspaceIndex.empty();
     private final Set<String> openUris = ConcurrentHashMap.newKeySet();
+    private final Set<String> workspaceDiagnosticUris = ConcurrentHashMap.newKeySet();
     private final Map<String, List<String>> openDocumentBuffers = new ConcurrentHashMap<>();
     private Runnable onSaveCallback = null;
 
@@ -97,9 +98,28 @@ public class OftTextDocumentService implements TextDocumentService {
         this.onSaveCallback = callback;
     }
 
+    // [impl->req~diagnostic-trace-defects~2]
     void updateIndex(final OftWorkspaceIndex index) {
         this.index = index;
-        openUris.forEach(this::publishDiagnostics);
+        publishWorkspaceDiagnostics();
+    }
+
+    private void publishWorkspaceDiagnostics() {
+        final Set<String> targets = new LinkedHashSet<>(openUris);
+        index.filesWithDefects().stream().filter(uri -> !isOpenFile(uri)).forEach(targets::add);
+        workspaceDiagnosticUris.stream().filter(uri -> !isOpenFile(uri)).forEach(targets::add);
+
+        targets.forEach(this::publishDiagnostics);
+
+        workspaceDiagnosticUris.clear();
+        index.filesWithDefects().stream()
+                .filter(uri -> !isOpenFile(uri))
+                .forEach(workspaceDiagnosticUris::add);
+    }
+
+    private boolean isOpenFile(final String uri) {
+        final String key = LocationConverter.toFileKey(uri);
+        return openUris.stream().anyMatch(open -> LocationConverter.toFileKey(open).equals(key));
     }
 
     void connect(final LanguageClient client) {

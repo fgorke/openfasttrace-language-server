@@ -57,7 +57,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenTagPointingAtMissingItemWhenDiagnosingThenTheTagIsFlagged() throws Exception {
         // given
@@ -79,7 +79,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenItemMissingRequiredCoverageWhenDiagnosingThenTheDefinitionIsFlagged()
             throws Exception {
@@ -97,7 +97,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenFullyCoveredWorkspaceWhenDiagnosingThenNothingIsReported() throws Exception {
         // given
@@ -112,7 +112,7 @@ class DiagnosticsProviderTest {
         assertThat(diagnose(source, index)).isEmpty();
     }
 
-    // [itest->req~diagnostic-trace-defects~1]
+    // [itest->req~diagnostic-trace-defects~2]
     @Test
     void testGivenDefectsInAnotherFileWhenDiagnosingThenOnlyLocalOnesAreReported()
             throws Exception {
