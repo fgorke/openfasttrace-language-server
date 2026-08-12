@@ -41,9 +41,9 @@ Covers:
 Needs: impl, utest
 
 ## Diagnostic for Outdated Version
-req~diagnostic-outdated-version~1
+req~diagnostic-outdated-version~2
 
-The server emits a diagnostic warning for every coverage tag whose referenced revision does not match the current revision of the specification item.
+The server emits a diagnostic warning for every coverage tag whose referenced revision does not match the current revision of the specification item. That holds for a revision behind the item as well as for one ahead of it, and both carry the current ID for the quick fix to work from.
 
 Covers:
 * feat~quickfix-outdated-version~1
@@ -53,12 +53,22 @@ Needs: impl, itest
 ## Quick Fix Updates Version Number
 req~quickfix-updates-version~1
 
-Each diagnostic from `req~diagnostic-outdated-version~1` comes with a code action. The action replaces the outdated revision number in the coverage tag with the current revision of the specification item.
+Each diagnostic from `req~diagnostic-outdated-version~2` comes with a code action. The action replaces the mismatched revision number in the coverage tag with the current revision of the specification item.
 
 Covers:
 * feat~quickfix-outdated-version~1
 
 Needs: impl, utest
+
+## Quick Fix Updates All Outdated References
+req~quickfix-updates-all-versions~1
+
+When more than one reference to the same specification item is outdated, the diagnostic comes with a second code action that updates all of them across the workspace.
+
+Covers:
+* feat~quickfix-outdated-version~1
+
+Needs: impl, utest, itest
 
 ## Workspace Indexing on Startup
 req~index-on-startup~3

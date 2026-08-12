@@ -8,6 +8,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +63,52 @@ class QuickFixProviderTest {
         // then
         assertThat(actions).hasSize(1);
         assertThat(actions.get(0).getTitle()).contains("req~my-req~3");
+    }
+
+    // [utest->req~quickfix-updates-all-versions~1]
+    @Test
+    void testGivenLineWithAnOutdatedTagWhenCollectingUpdatesThenOnlyTheRevisionIsReplaced() {
+        // given
+        final String line = "    // [impl->req~my-req~1]";
+
+        // when
+        final var edits = QuickFixProvider.revisionUpdatesInLine(line, 4,
+                SpecificationItemId.parseId("req~my-req~3"));
+
+        // then
+        assertThat(edits).singleElement().satisfies(edit -> {
+            assertThat(edit.getNewText()).isEqualTo("3");
+            assertThat(edit.getRange().getStart().getLine()).isEqualTo(4);
+            assertThat(edit.getRange().getStart().getCharacter()).isEqualTo(line.indexOf("1]"));
+            assertThat(edit.getRange().getEnd().getCharacter()).isEqualTo(line.indexOf("]"));
+        });
+    }
+
+    // [utest->req~quickfix-updates-all-versions~1]
+    @Test
+    void testGivenSeveralOutdatedIdsInOneLineWhenCollectingUpdatesThenEachOneIsEdited() {
+        // given
+        final String line = "// [impl->req~my-req~1, req~my-req~2]";
+
+        // when
+        final var edits = QuickFixProvider.revisionUpdatesInLine(line, 0,
+                SpecificationItemId.parseId("req~my-req~3"));
+
+        // then
+        assertThat(edits).hasSize(2);
+        assertThat(edits).allSatisfy(edit -> assertThat(edit.getNewText()).isEqualTo("3"));
+    }
+
+
+    // [utest->req~quickfix-updates-all-versions~1]
+    @Test
+    void testGivenADiagnosticWithoutDataWhenAskingForTheOutdatedTargetThenNothingIsReturned() {
+        // given
+        final var diagnostic = new Diagnostic(new Range(new Position(0, 0), new Position(0, 1)),
+                "Not covered by: impl.", DiagnosticSeverity.Warning, "openfasttrace-lsp");
+
+        // when / then
+        assertThat(QuickFixProvider.outdatedTargetOf(diagnostic)).isEmpty();
     }
 
     // [utest->req~quickfix-updates-version~1]

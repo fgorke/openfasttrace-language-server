@@ -103,12 +103,10 @@ public final class TraceDiagnostics {
             case ORPHANED -> new Diagnostic(range,
                     "Covers '" + targetId + "', which does not exist.",
                     DiagnosticSeverity.Warning, SOURCE);
-            case OUTDATED -> outdatedDiagnostic(range, targetId);
-            case PREDATED -> new Diagnostic(range,
-                    "Covers a revision of '" + targetId.getArtifactType() + "~"
-                            + targetId.getName() + "' that is newer than the item itself (revision "
-                            + targetId.getRevision() + ").",
-                    DiagnosticSeverity.Warning, SOURCE);
+            case OUTDATED -> revisionMismatchDiagnostic(range, targetId,
+                    "Outdated reference: current revision of '");
+            case PREDATED -> revisionMismatchDiagnostic(range, targetId,
+                    "Reference to a revision that does not exist yet: current revision of '");
             case AMBIGUOUS -> new Diagnostic(range,
                     "Covers '" + targetId + "', which is defined more than once.",
                     DiagnosticSeverity.Warning, SOURCE);
@@ -122,12 +120,12 @@ public final class TraceDiagnostics {
         return diagnostic;
     }
 
-    // [impl->req~diagnostic-outdated-version~1]
-    private static Diagnostic outdatedDiagnostic(final Range range,
-            final SpecificationItemId currentId) {
+    // [impl->req~diagnostic-outdated-version~2]
+    private static Diagnostic revisionMismatchDiagnostic(final Range range,
+            final SpecificationItemId currentId, final String prefix) {
         final Diagnostic diagnostic = new Diagnostic(range,
-                "Outdated reference: current revision of '" + currentId.getArtifactType() + "~"
-                        + currentId.getName() + "' is " + currentId.getRevision() + ".",
+                prefix + currentId.getArtifactType() + "~" + currentId.getName() + "' is "
+                        + currentId.getRevision() + ".",
                 DiagnosticSeverity.Warning, SOURCE);
         diagnostic.setData(currentId.toString());
         return diagnostic;
