@@ -36,7 +36,7 @@ class DiagnosticsProviderTest {
                 Files.readAllLines(file), index);
     }
 
-    // [itest->req~diagnostic-outdated-version~1]
+    // [itest->req~diagnostic-outdated-version~2]
     @Test
     void testGivenTagWithOutdatedRevisionWhenDiagnosingThenWarningCarriesTheCurrentId()
             throws Exception {
@@ -54,6 +54,26 @@ class DiagnosticsProviderTest {
             assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Warning);
             assertThat(diagnostic.getMessage().getLeft()).contains("req~login").contains("3");
             assertThat(diagnostic.getData()).isEqualTo("req~login~3");
+        });
+    }
+
+    // [itest->req~diagnostic-outdated-version~2]
+    @Test
+    void testGivenTagAheadOfTheItemWhenDiagnosingThenWarningCarriesTheCurrentIdAsWell()
+            throws Exception {
+        // given
+        Files.writeString(workspace.resolve("spec.md"),
+                "# Login\n\n`req~login~2`\n\nNeeds: impl\n");
+        final Path source = workspace.resolve("Login.java");
+        Files.writeString(source, "// [impl->req~login~7]\n");
+
+        // when
+        final List<Diagnostic> diagnostics = diagnose(source, indexOf(workspace));
+
+        // then
+        assertThat(diagnostics).singleElement().satisfies(diagnostic -> {
+            assertThat(diagnostic.getMessage().getLeft()).contains("req~login").contains("2");
+            assertThat(diagnostic.getData()).isEqualTo("req~login~2");
         });
     }
 

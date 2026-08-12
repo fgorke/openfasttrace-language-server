@@ -19,8 +19,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionKind;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensParams;
@@ -265,17 +267,54 @@ public class OftTextDocumentService implements TextDocumentService {
         return LocationConverter.toLspLocation(oftLocation, lineText);
     }
 
-    // [impl->req~quickfix-updates-version~1, req~diagnostic-outdated-version~1]
     @Override
     public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(
             final CodeActionParams params) {
         final String uri = params.getTextDocument().getUri();
         return CompletableFuture.supplyAsync(() -> params.getContext().getDiagnostics().stream()
                 .filter(d -> "openfasttrace-lsp".equals(d.getSource()))
-                .flatMap(d -> quickFixProvider
-                        .quickFixesForDiagnostic(d, uri).stream())
+                .flatMap(d -> Stream.concat(
+                        quickFixProvider.quickFixesForDiagnostic(d, uri).stream(),
+                        updateAllReferencesAction(d, uri).stream()))
                 .map(action -> Either.<Command, CodeAction>forRight(action))
                 .collect(Collectors.toList()));
+    }
+
+    // [impl->req~quickfix-updates-all-versions~1]
+    private Optional<CodeAction> updateAllReferencesAction(final Diagnostic diagnostic,
+            final String currentUri) {
+        return QuickFixProvider.outdatedTargetOf(diagnostic)
+                .map(currentId -> revisionUpdates(currentId, currentUri))
+                .filter(changes -> countEdits(changes) > 1)
+                .map(changes -> {
+                    final var action = new CodeAction(
+                            "Update all " + countEdits(changes) + " references to the current revision");
+                    action.setKind(CodeActionKind.QuickFix);
+                    action.setDiagnostics(List.of(diagnostic));
+                    action.setEdit(new WorkspaceEdit(changes));
+                    return action;
+                });
+    }
+
+    private Map<String, List<TextEdit>> revisionUpdates(final SpecificationItemId currentId,
+            final String currentUri) {
+        final Map<String, List<TextEdit>> changes = new LinkedHashMap<>();
+        for (final String fileUri : filesToSearch(currentUri)) {
+            final List<String> lines = readAllLines(fileUri);
+            final List<TextEdit> edits = IntStream.range(0, lines.size())
+                    .mapToObj(lineIndex -> QuickFixProvider.revisionUpdatesInLine(
+                            lines.get(lineIndex), lineIndex, currentId))
+                    .flatMap(List::stream)
+                    .toList();
+            if (!edits.isEmpty()) {
+                changes.put(fileUri, edits);
+            }
+        }
+        return changes;
+    }
+
+    private static int countEdits(final Map<String, List<TextEdit>> changes) {
+        return changes.values().stream().mapToInt(List::size).sum();
     }
 
     // [impl->req~complete-specification-item-id-in-covers-section~1]

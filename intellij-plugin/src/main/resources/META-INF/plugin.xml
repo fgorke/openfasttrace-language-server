@@ -11,7 +11,7 @@
             <li><b>Go to definition</b>: from a coverage tag to the specification item and from an item to all its covering tags</li>
             <li><b>Find references</b>: all coverage tags in the workspace that cover a specification item</li>
             <li><b>Trace diagnostics</b>: uncovered specification items, links to items that do not exist and duplicate definitions, reported for every file in the project and listed under <i>Project Errors</i></li>
-            <li><b>Quick fix</b>: one-click update of an outdated coverage tag revision</li>
+            <li><b>Quick fix</b>: one-click update of an outdated coverage tag revision, for a single tag or for every outdated reference to the item at once</li>
             <li><b>Rename</b>: renames a specification item together with every coverage tag and reference in the workspace</li>
             <li><b>Trace report</b>: renders a full OpenFastTrace report through <i>Tools | Generate OpenFastTrace Report</i> and opens it in the editor</li>
             <li><b>Coverage code lens</b>: a summary above each specification item naming the artifact types it still needs and the artifact types already covering it</li>
