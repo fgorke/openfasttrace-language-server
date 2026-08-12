@@ -17,7 +17,7 @@ public final class OftIgnore {
 
     public static final String FILE_NAME = ".oftignore";
 
-    // [impl->req~index-on-startup~2]
+    // [impl->req~index-on-startup~3]
     private static final List<String> DEFAULT_PATTERNS = List.of(
             "{target,build,out,dist,node_modules}",
             "**/{target,build,out,dist,node_modules}",

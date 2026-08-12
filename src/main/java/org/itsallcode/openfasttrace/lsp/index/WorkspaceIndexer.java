@@ -15,7 +15,7 @@ import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
 import org.tinylog.Logger;
 
-// [impl->req~index-refresh-on-save~1, req~index-on-startup~2]
+// [impl->req~index-refresh-on-save~1, req~index-on-startup~3]
 public class WorkspaceIndexer {
 
     private final OftRunner runner;

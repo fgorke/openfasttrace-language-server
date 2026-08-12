@@ -24,14 +24,16 @@ A `didChange` (keystroke-level) event does **not** trigger a re-import. Only sav
 
 This decision covers only the **OFT workspace index**: spec items and coverage links across the whole project. That is what `Oft.importItems()` rebuilds. It is genuinely expensive to redo on every keystroke. It does **not** mean the server ignores unsaved edits. The current text of every open document is still tracked in memory. It is updated on every `didChange` (`req~live-document-buffer~1`). So requests that only need the text of the file being edited see live content. That covers hover, definition, semantic tokens and especially completion, which almost always runs on text the user has not saved yet. Only cross-file concerns that depend on the *index* lag behind until the next save. An example is whether a given ID still exists workspace-wide.
 
-**Excluding build output** Handing the workspace root straight to `Oft.importItems()` also indexed build output. The indexer now does its own file walk. It prunes hidden directories and the common build output names `target`, `build`, `out`, `dist` and `node_modules`, then hands the surviving files to OFT. Files without a matching importer are skipped by OFT itself, so passing single files is safe.
+**Excluding build output** Handing the workspace root straight to `Oft.importItems()` also indexed build output. The indexer now does its own file walk. It prunes hidden paths and the common build output names `target`, `build`, `out`, `dist` and `node_modules` at every depth, then hands the surviving files to OFT. Files without a matching importer are skipped by OFT itself, so passing single files is safe. A `.oftignore` file in the workspace root adds further glob patterns.
+
+**Off the message loop** The initial import runs asynchronously and reports itself as a task through `window/workDoneProgress`. Doing it inside the `initialized` notification blocked the editor for as long as the import took, which on a few thousand files is seconds.
 
 ### Consequences
 
 * Good, because the index always matches the saved state of the workspace.
 * Good, because the implementation is simple.
 * Good, because build output stays out of the index. Copied specification files no longer show up as duplicates in completion and navigation.
-* Bad, because the exclude list is currently fixed.
+* Good, because a large workspace no longer freezes the editor while it is indexed. The price is that requests before the first import finishes are answered from an empty index.
 * Good, because separating "live document text" from "workspace index" keeps the expensive part save-gated while the cheap part stays live. Completion would be unusable if it only saw saved content.
 * Neutral, because the *index* lags behind unsaved edits. A newly typed spec item ID does not resolve workspace-wide until saved. That matches most build-tool-backed language servers.
 * Bad, because a large workspace re-imports everything on every save, not just the changed file. Worth revisiting if profiling later shows this is too slow.

@@ -1,8 +1,9 @@
 package org.itsallcode.openfasttrace.lsp.index;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 
@@ -74,6 +75,9 @@ public final class LocationConverter {
         return Path.of(path).toUri().toString();
     }
 
+    private static final boolean CASE_INSENSITIVE_PATHS = File.separatorChar == '\\';
+
+    // [impl->req~index-on-startup~3]
     public static String toFileKey(final String uriOrPath) {
         final Path path;
         try {
@@ -81,10 +85,7 @@ public final class LocationConverter {
         } catch (final RuntimeException exception) {
             return uriOrPath;
         }
-        try {
-            return path.toRealPath().toString();
-        } catch (final IOException exception) {
-            return path.normalize().toAbsolutePath().toString();
-        }
+        final String key = path.toAbsolutePath().normalize().toString();
+        return CASE_INSENSITIVE_PATHS ? key.toLowerCase(Locale.ROOT) : key;
     }
 }

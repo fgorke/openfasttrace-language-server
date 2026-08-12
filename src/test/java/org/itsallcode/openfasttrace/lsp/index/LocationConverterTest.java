@@ -2,9 +2,13 @@ package org.itsallcode.openfasttrace.lsp.index;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.eclipse.lsp4j.Range;
 import org.itsallcode.openfasttrace.api.core.Location;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class LocationConverterTest {
 
@@ -55,4 +59,38 @@ class LocationConverterTest {
         assertThat(range.getEnd().getCharacter()).isEqualTo(1 + "req~login~1".length());
     }
 
+    // [utest->req~index-on-startup~3]
+    @Test
+    void testGivenTheSameFileAsUriAndAsPathWhenBuildingTheKeyThenBothMatch(
+            @TempDir final Path workspace) throws Exception {
+        // given
+        final Path file = workspace.resolve("spec.md");
+        Files.writeString(file, "content");
+
+        // when / then
+        assertThat(LocationConverter.toFileKey(file.toUri().toString()))
+                .isEqualTo(LocationConverter.toFileKey(file.toString()));
+    }
+
+    // [utest->req~index-on-startup~3]
+    @Test
+    void testGivenARelativeAndAnAbsolutePathOfOneFileWhenBuildingTheKeyThenBothMatch() {
+        // given
+        final String relative = "doc/../doc/spec/requirements.md";
+        final String absolute = Path.of(relative).toAbsolutePath().toString();
+
+        // when / then
+        assertThat(LocationConverter.toFileKey(relative))
+                .isEqualTo(LocationConverter.toFileKey(absolute));
+    }
+
+    // [utest->req~index-on-startup~3]
+    @Test
+    void testGivenAPathThatDoesNotExistWhenBuildingTheKeyThenItIsStillAnAbsolutePath() {
+        // when
+        final String key = LocationConverter.toFileKey("no/such/file.md");
+
+        // then
+        assertThat(Path.of(key)).isAbsolute();
+    }
 }
