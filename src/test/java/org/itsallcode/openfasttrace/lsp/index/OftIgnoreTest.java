@@ -20,12 +20,47 @@ class OftIgnoreTest {
 
     // [utest->req~index-ignore-file~1]
     @Test
-    void testGivenNoIgnoreFileWhenLoadingThenNothingIsExcluded() {
+    void testGivenNoIgnoreFileWhenLoadingThenOnlyTheDefaultsExclude() {
         // when
         final OftIgnore ignore = OftIgnore.load(workspace);
 
         // then
         assertThat(ignore.isExcluded(workspace.resolve("spec.md"))).isFalse();
+        assertThat(ignore.isExcluded(workspace.resolve("target/copy.md"))).isTrue();
+    }
+
+    // [utest->req~index-on-startup~2]
+    @Test
+    void testGivenBuildOutputAtAnyDepthWhenCheckingThenItIsExcluded() {
+        // given
+        final OftIgnore ignore = OftIgnore.load(workspace);
+
+        // when / then
+        assertThat(ignore.isExcluded(workspace.resolve("target/classes/spec.md"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("core/target/classes/spec.md"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("app/ui/build/spec.md"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("web/node_modules/pkg/readme.md"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("core/src/spec.md"))).isFalse();
+    }
+
+    // [utest->req~index-on-startup~2]
+    @Test
+    void testGivenHiddenPathsWhenCheckingThenTheyAreExcludedAtAnyDepth() {
+        // given
+        final OftIgnore ignore = OftIgnore.load(workspace);
+
+        // when / then
+        assertThat(ignore.isExcluded(workspace.resolve(".git/config"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("doc/.hidden/spec.md"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("doc/.oftignore"))).isTrue();
+        assertThat(ignore.isExcluded(workspace.resolve("doc/spec.md"))).isFalse();
+    }
+
+    // [utest->req~index-ignore-file~1]
+    @Test
+    void testGivenAnIndexWithoutAWorkspaceWhenCheckingThenNothingIsExcluded() {
+        // when / then
+        assertThat(OftIgnore.none().isExcluded(workspace.resolve("target/copy.md"))).isFalse();
     }
 
     // [utest->req~index-ignore-file~1]

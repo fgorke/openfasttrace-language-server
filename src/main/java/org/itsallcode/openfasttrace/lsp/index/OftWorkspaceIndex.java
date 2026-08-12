@@ -11,7 +11,7 @@ import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 
-// [impl->req~index-on-startup~1]
+// [impl->req~index-on-startup~2]
 public final class OftWorkspaceIndex {
 
     private final Map<SpecificationItemId, SpecificationItem> specItems;

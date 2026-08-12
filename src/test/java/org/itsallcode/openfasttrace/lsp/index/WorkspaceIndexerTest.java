@@ -25,7 +25,7 @@ class WorkspaceIndexerTest {
         return Paths.get(getClass().getClassLoader().getResource("testworkspace").toURI());
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenWorkspaceWithSpecFilesWhenBuildingIndexThenSpecItemsAreLoaded()
             throws URISyntaxException {
@@ -42,7 +42,7 @@ class WorkspaceIndexerTest {
         assertThat(item.getDescription()).contains("testing the workspace indexer");
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenWorkspaceWithSourceCoverageTagsWhenBuildingIndexThenCoverageTagsAreIndexed()
             throws URISyntaxException {
@@ -59,7 +59,7 @@ class WorkspaceIndexerTest {
         assertThat(tags.get(0).getId().getArtifactType()).isEqualTo("impl");
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenSpecCopiesInBuildOutputWhenBuildingIndexThenBuildOutputIsSkipped(
             @TempDir final Path workspace) throws Exception {
@@ -79,7 +79,7 @@ class WorkspaceIndexerTest {
         assertThat(index.findSpecItem(SpecificationItemId.parseId("req~copied-item~1"))).isEmpty();
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenEmptyWorkspaceDirectoryWhenBuildingIndexThenIndexIsEmpty(@TempDir final Path emptyDir) {
         // given / when

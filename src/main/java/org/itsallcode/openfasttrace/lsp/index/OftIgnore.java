@@ -6,6 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,13 @@ import org.tinylog.Logger;
 public final class OftIgnore {
 
     public static final String FILE_NAME = ".oftignore";
+
+    // [impl->req~index-on-startup~2]
+    private static final List<String> DEFAULT_PATTERNS = List.of(
+            "{target,build,out,dist,node_modules}",
+            "**/{target,build,out,dist,node_modules}",
+            ".*",
+            "**/.*");
 
     private final Path workspaceRoot;
     private final List<PathMatcher> matchers;
@@ -29,24 +37,31 @@ public final class OftIgnore {
     }
 
     public static OftIgnore load(final Path workspaceRoot) {
-        final Path file = workspaceRoot.resolve(FILE_NAME);
+        final List<PathMatcher> matchers = new ArrayList<>(compileAll(DEFAULT_PATTERNS));
+        matchers.addAll(compileAll(patternsFrom(workspaceRoot.resolve(FILE_NAME))));
+        return new OftIgnore(workspaceRoot.toAbsolutePath().normalize(), matchers);
+    }
+
+    private static List<String> patternsFrom(final Path file) {
         if (!Files.isRegularFile(file)) {
-            return none();
+            return List.of();
         }
         try {
-            final List<PathMatcher> matchers = Files.readAllLines(file).stream()
+            final List<String> patterns = Files.readAllLines(file).stream()
                     .map(String::strip)
                     .filter(line -> !line.isEmpty() && !line.startsWith("#"))
                     .map(line -> line.endsWith("/") ? line.substring(0, line.length() - 1) : line)
-                    .map(OftIgnore::compile)
-                    .flatMap(Optional::stream)
                     .toList();
-            Logger.info("Loaded " + matchers.size() + " pattern(s) from " + file);
-            return new OftIgnore(workspaceRoot.toAbsolutePath().normalize(), matchers);
+            Logger.info("Loaded " + patterns.size() + " pattern(s) from " + file);
+            return patterns;
         } catch (final IOException exception) {
             Logger.warn("Could not read " + file + ": " + exception.getMessage());
-            return none();
+            return List.of();
         }
+    }
+
+    private static List<PathMatcher> compileAll(final List<String> patterns) {
+        return patterns.stream().map(OftIgnore::compile).flatMap(Optional::stream).toList();
     }
 
     private static Optional<PathMatcher> compile(final String pattern) {

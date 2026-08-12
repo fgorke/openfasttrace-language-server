@@ -54,7 +54,7 @@ The server provides these features to any connected editor:
 * **Symbol search.** Specification items are found through the editor's workspace symbol search.
 * **Rename.** Renaming a specification item updates its definition together with every coverage tag and `Covers:` entry in the workspace.
 * **Tag skeletons.** Invoking completion manually in comments offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones.
-* **Ignore file.** Glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features.
+* **Ignore file.** Glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features. Build output (`target`, `build`, `out`, `dist`, `node_modules`) and hidden paths are excluded by default, at every depth.
 
 ## Getting the Project
 

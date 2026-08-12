@@ -8,7 +8,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
@@ -16,11 +15,8 @@ import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
 import org.tinylog.Logger;
 
-// [impl->req~index-refresh-on-save~1, req~index-on-startup~1]
+// [impl->req~index-refresh-on-save~1, req~index-on-startup~2]
 public class WorkspaceIndexer {
-
-    private static final Set<String> EXCLUDED_DIRECTORY_NAMES =
-            Set.of("target", "build", "out", "dist", "node_modules");
 
     private final OftRunner runner;
 
@@ -55,8 +51,7 @@ public class WorkspaceIndexer {
             Files.walkFileTree(workspaceRoot, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
-                    if (!dir.equals(workspaceRoot) && (isExcluded(dir.getFileName().toString())
-                            || ignore.isExcluded(dir))) {
+                    if (!dir.equals(workspaceRoot) && ignore.isExcluded(dir)) {
                         return FileVisitResult.SKIP_SUBTREE;
                     }
                     return FileVisitResult.CONTINUE;
@@ -64,9 +59,7 @@ public class WorkspaceIndexer {
 
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
-                    if (!file.getFileName().toString().startsWith(".")
-                            && !ignore.isExcluded(file)
-                            && OftSupportedFiles.isSupported(file)) {
+                    if (!ignore.isExcluded(file) && OftSupportedFiles.isSupported(file)) {
                         files.add(file);
                     }
                     return FileVisitResult.CONTINUE;
@@ -84,9 +77,5 @@ public class WorkspaceIndexer {
             return List.of(workspaceRoot);
         }
         return files;
-    }
-
-    private static boolean isExcluded(final String directoryName) {
-        return directoryName.startsWith(".") || EXCLUDED_DIRECTORY_NAMES.contains(directoryName);
     }
 }

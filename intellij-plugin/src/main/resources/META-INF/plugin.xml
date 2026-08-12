@@ -22,7 +22,8 @@
             <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers a skeleton such as
                 <code>[impl-&gt;...]</code> for every artifact type the workspace needs, including project specific ones</li>
             <li><b>Ignore file</b>: glob patterns in a <code>.oftignore</code> file in the project root
-                exclude files from all OFT features</li>
+                exclude files from all OFT features, on top of the build output and hidden paths
+                that are excluded by default</li>
         </ul>
     ]]></description>
     <change-notes><![CDATA[

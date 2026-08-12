@@ -15,7 +15,7 @@ Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT
 * **Syntax highlighting**: specification item definitions, section keywords and coverage tags via semantic tokens
 * **Code completion**: specification item IDs in `Covers:` sections and coverage tag targets
 * **Tag skeletons**: invoking completion manually in a comment offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones
-* **Ignore file**: glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features
+* **Ignore file**: glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features, on top of the build output and hidden paths that are excluded by default
 
 The server starts automatically when a supported file is opened. No configuration is required.
 
