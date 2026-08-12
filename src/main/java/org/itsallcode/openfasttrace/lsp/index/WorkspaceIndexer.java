@@ -8,7 +8,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
@@ -16,11 +15,8 @@ import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
 import org.tinylog.Logger;
 
-// [impl->req~index-refresh-on-save~1, req~index-on-startup~1]
+// [impl->req~index-refresh-on-save~1, req~index-on-startup~2]
 public class WorkspaceIndexer {
-
-    private static final Set<String> EXCLUDED_DIRECTORY_NAMES =
-            Set.of("target", "build", "out", "dist", "node_modules");
 
     private final OftRunner runner;
 
@@ -35,25 +31,27 @@ public class WorkspaceIndexer {
     // [impl->req~diagnostic-trace-defects~1]
     public OftWorkspaceIndex buildIndex(final Path workspaceRoot) {
         Logger.info("Indexing workspace: " + workspaceRoot);
+        // [impl->req~index-ignore-file~1]
+        final OftIgnore ignore = OftIgnore.load(workspaceRoot);
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(collectInputs(workspaceRoot))
+                .addInputs(collectInputs(workspaceRoot, ignore))
                 .build();
         final List<SpecificationItem> items = runner.importItems(settings);
         final List<LinkedSpecificationItem> linkedItems = runner.link(items);
         Logger.info("Indexed " + items.size() + " specification item(s), "
                 + linkedItems.stream().filter(LinkedSpecificationItem::isDefect).count()
                 + " defect(s)");
-        return OftWorkspaceIndex.ofLinkedItems(linkedItems);
+        return OftWorkspaceIndex.ofLinkedItems(linkedItems, ignore);
     }
 
     @SuppressWarnings("NullableProblems")
-    private static List<Path> collectInputs(final Path workspaceRoot) {
+    private static List<Path> collectInputs(final Path workspaceRoot, final OftIgnore ignore) {
         final List<Path> files = new ArrayList<>();
         try {
             Files.walkFileTree(workspaceRoot, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
-                    if (!dir.equals(workspaceRoot) && isExcluded(dir.getFileName().toString())) {
+                    if (!dir.equals(workspaceRoot) && ignore.isExcluded(dir)) {
                         return FileVisitResult.SKIP_SUBTREE;
                     }
                     return FileVisitResult.CONTINUE;
@@ -61,8 +59,7 @@ public class WorkspaceIndexer {
 
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
-                    if (!file.getFileName().toString().startsWith(".")
-                            && OftSupportedFiles.isSupported(file)) {
+                    if (!ignore.isExcluded(file) && OftSupportedFiles.isSupported(file)) {
                         files.add(file);
                     }
                     return FileVisitResult.CONTINUE;
@@ -80,9 +77,5 @@ public class WorkspaceIndexer {
             return List.of(workspaceRoot);
         }
         return files;
-    }
-
-    private static boolean isExcluded(final String directoryName) {
-        return directoryName.startsWith(".") || EXCLUDED_DIRECTORY_NAMES.contains(directoryName);
     }
 }

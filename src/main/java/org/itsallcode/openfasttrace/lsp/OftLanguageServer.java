@@ -92,7 +92,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         return params.getRootUri();
     }
 
-    // [impl->req~index-on-startup~1]
+    // [impl->req~index-on-startup~2]
     @Override
     public void initialized(final InitializedParams params) {
         Logger.info("initialized, building workspace index");

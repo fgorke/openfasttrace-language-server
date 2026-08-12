@@ -29,7 +29,7 @@ class OftLanguageServerTest {
         server = new OftLanguageServer();
     }
 
-    // [utest->req~index-on-startup~1]
+    // [utest->req~index-on-startup~2]
     @Test
     void testGivenWorkspaceFoldersAndRootUriWhenInitializingThenIndexIsBuiltFromWorkspaceFolder(
             @TempDir final Path fromFolders, @TempDir final Path fromRootUri) throws Exception {
@@ -50,7 +50,7 @@ class OftLanguageServerTest {
         verify(indexer).buildIndex(fromFolders);
     }
 
-    // [utest->req~index-on-startup~1]
+    // [utest->req~index-on-startup~2]
     @Test
     void testGivenOnlyRootUriWhenInitializingThenIndexIsBuiltFromRootUri(@TempDir final Path root)
             throws Exception {

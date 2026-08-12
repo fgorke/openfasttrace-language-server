@@ -25,7 +25,7 @@ class WorkspaceIndexerTest {
         return Paths.get(getClass().getClassLoader().getResource("testworkspace").toURI());
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenWorkspaceWithSpecFilesWhenBuildingIndexThenSpecItemsAreLoaded()
             throws URISyntaxException {
@@ -42,7 +42,7 @@ class WorkspaceIndexerTest {
         assertThat(item.getDescription()).contains("testing the workspace indexer");
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenWorkspaceWithSourceCoverageTagsWhenBuildingIndexThenCoverageTagsAreIndexed()
             throws URISyntaxException {
@@ -59,7 +59,7 @@ class WorkspaceIndexerTest {
         assertThat(tags.get(0).getId().getArtifactType()).isEqualTo("impl");
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenSpecCopiesInBuildOutputWhenBuildingIndexThenBuildOutputIsSkipped(
             @TempDir final Path workspace) throws Exception {
@@ -79,7 +79,7 @@ class WorkspaceIndexerTest {
         assertThat(index.findSpecItem(SpecificationItemId.parseId("req~copied-item~1"))).isEmpty();
     }
 
-    // [itest->req~index-on-startup~1]
+    // [itest->req~index-on-startup~2]
     @Test
     void testGivenEmptyWorkspaceDirectoryWhenBuildingIndexThenIndexIsEmpty(@TempDir final Path emptyDir) {
         // given / when
@@ -87,5 +87,27 @@ class WorkspaceIndexerTest {
 
         // then
         assertThat(index.specItemCount()).isZero();
+    }
+
+    // [itest->req~index-ignore-file~1]
+    @Test
+    void testGivenIgnoreFileWhenBuildingIndexThenMatchingPathsProduceNoItems(
+            @TempDir final Path workspace) throws Exception {
+        // given
+        Files.writeString(workspace.resolve(".oftignore"), "# demo docs\ndocs\n");
+        Files.writeString(workspace.resolve("spec.md"),
+                "# Real Item\n\n`req~real-item~1`\n\nThe real one.\n");
+        final Path docs = Files.createDirectories(workspace.resolve("docs"));
+        Files.writeString(docs.resolve("walkthrough.md"),
+                "# Walkthrough\n\n`req~quoted-item~1`\n\nQuoted in documentation.\n");
+
+        // when
+        final var index = indexer.buildIndex(workspace);
+
+        // then
+        assertThat(index.findSpecItem(SpecificationItemId.parseId("req~real-item~1"))).isPresent();
+        assertThat(index.findSpecItem(SpecificationItemId.parseId("req~quoted-item~1"))).isEmpty();
+        assertThat(index.isExcludedFile(docs.resolve("walkthrough.md").toUri().toString())).isTrue();
+        assertThat(index.isExcludedFile(workspace.resolve("spec.md").toUri().toString())).isFalse();
     }
 }

@@ -11,19 +11,20 @@ import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 
-// [impl->req~index-on-startup~1]
+// [impl->req~index-on-startup~2]
 public final class OftWorkspaceIndex {
 
     private final Map<SpecificationItemId, SpecificationItem> specItems;
     private final Map<SpecificationItemId, List<SpecificationItem>> coverageBySpecId;
     private final Map<String, List<LinkedSpecificationItem>> linkedItemsByFile;
+    private final OftIgnore ignore;
 
     public OftWorkspaceIndex(final List<SpecificationItem> items) {
-        this(items, List.of());
+        this(items, List.of(), OftIgnore.none());
     }
 
     private OftWorkspaceIndex(final List<SpecificationItem> items,
-            final List<LinkedSpecificationItem> linkedItems) {
+            final List<LinkedSpecificationItem> linkedItems, final OftIgnore ignore) {
         final Map<SpecificationItemId, SpecificationItem> specMap = new LinkedHashMap<>();
         final Map<SpecificationItemId, List<SpecificationItem>> coverMap = new LinkedHashMap<>();
 
@@ -37,12 +38,20 @@ public final class OftWorkspaceIndex {
         this.specItems = Collections.unmodifiableMap(specMap);
         this.coverageBySpecId = Collections.unmodifiableMap(coverMap);
         this.linkedItemsByFile = groupByFile(linkedItems);
+        this.ignore = ignore;
     }
 
     // [impl->req~diagnostic-trace-defects~1]
-    public static OftWorkspaceIndex ofLinkedItems(final List<LinkedSpecificationItem> linkedItems) {
+    public static OftWorkspaceIndex ofLinkedItems(final List<LinkedSpecificationItem> linkedItems,
+            final OftIgnore ignore) {
         return new OftWorkspaceIndex(
-                linkedItems.stream().map(LinkedSpecificationItem::getItem).toList(), linkedItems);
+                linkedItems.stream().map(LinkedSpecificationItem::getItem).toList(), linkedItems,
+                ignore);
+    }
+
+    // [impl->req~index-ignore-file~1]
+    public boolean isExcludedFile(final String uriOrPath) {
+        return ignore.isExcluded(uriOrPath);
     }
 
     private static Map<String, List<LinkedSpecificationItem>> groupByFile(

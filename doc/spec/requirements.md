@@ -61,9 +61,16 @@ Covers:
 Needs: impl, utest
 
 ## Workspace Indexing on Startup
-req~index-on-startup~1
+req~index-on-startup~2
 
-On the `initialized` notification, the server imports all OFT-traceable files in the workspace. It builds an internal index from them. Hidden directories and build output directories (`target`, `build`, `out`, `dist`, `node_modules`) are skipped, so copied specification files do not appear twice.
+On the `initialized` notification, the server imports all OFT-traceable files in the workspace. It builds an internal index from them. Hidden paths and build output directories (`target`, `build`, `out`, `dist`, `node_modules`) are skipped at every depth, so copied specification files do not appear twice.
+
+Needs: impl, utest, itest
+
+## Ignore File Excludes Paths From OFT Features
+req~index-ignore-file~1
+
+A file named `.oftignore` in the workspace root lists glob patterns, one per line. Blank lines and lines starting with `#` are skipped. A pattern matching a directory excludes everything below it. Matching files are not imported into the index and get neither semantic tokens nor completion.
 
 Needs: impl, utest, itest
 

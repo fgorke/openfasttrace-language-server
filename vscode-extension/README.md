@@ -3,8 +3,8 @@
 Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) language server into VS Code via the built-in Language Server Protocol client. The server understands OFT specification items and coverage tags and provides:
 
 * **Hover documentation**: title and description of the referenced specification item
-* **Go to Definition**: from a coverage tag to the specification item and from an item to all its covering tags
-* **Find References**: all coverage tags in the workspace that cover a specification item
+* **Go to definition**: from a coverage tag to the specification item and from an item to all its covering tags
+* **Find references**: all coverage tags in the workspace that cover a specification item
 * **Trace diagnostics**: uncovered specification items, links to items that do not exist and duplicate definitions, reported while editing
 * **Quick fix**: one-click update of an outdated coverage tag revision
 * **Rename**: renames a specification item together with every coverage tag and reference in the workspace (F2)
@@ -15,6 +15,7 @@ Integrates the [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT
 * **Syntax highlighting**: specification item definitions, section keywords and coverage tags via semantic tokens
 * **Code completion**: specification item IDs in `Covers:` sections and coverage tag targets
 * **Tag skeletons**: invoking completion manually in a comment offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones
+* **Ignore file**: glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features, on top of the build output and hidden paths that are excluded by default
 
 The server starts automatically when a supported file is opened. No configuration is required.
 

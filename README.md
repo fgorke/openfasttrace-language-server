@@ -14,7 +14,7 @@ The easiest way to get started with the OpenFastTrace Language Server is to inst
 
 ### IntelliJ IDEA
 
-1. Download the latest plugin ZIP from the [Releases](../../releases) page.
+1. Download the latest plugin ZIP from the [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
 2. Open IntelliJ IDEA Ultimate.
 3. Go to **Settings → Plugins**.
 4. Click the gear icon and select **Install Plugin from Disk**.
@@ -23,7 +23,7 @@ The easiest way to get started with the OpenFastTrace Language Server is to inst
 
 ### VS Code
 
-1. Download the `.vsix` for your platform from the [Releases](../../releases) page. Each one carries its own Java runtime, so the file name ends in the platform, for example `-win32-x64` or `-darwin-arm64`.
+1. Download the `.vsix` for your platform from the [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page. Each one carries its own Java runtime, so the file name ends in the platform, for example `-win32-x64` or `-darwin-arm64`.
 2. Run `code --install-extension <downloaded-file>.vsix`, or open the Extensions view, click the `...` menu and choose **Install from VSIX...**.
 
 Both clients start the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
@@ -42,8 +42,8 @@ For building a client yourself or running the language server standalone, see th
 The server provides these features to any connected editor:
 
 * **Hover documentation.** Hovering over a coverage tag shows the referenced specification item's title and description.
-* **Go to Definition.** A coverage tag jumps to the specification item in Markdown. A specification item ID jumps to all its covering tags.
-* **Find References.** Lists every coverage tag in the workspace that covers a specification item.
+* **Go to definition.** A coverage tag jumps to the specification item in Markdown. A specification item ID jumps to all its covering tags.
+* **Find references.** Lists every coverage tag in the workspace that covers a specification item.
 * **Trace diagnostics.** Specification items that are missing required coverage, coverage tags pointing at items that do not exist, and duplicate definitions are reported at the position that caused them.
 * **Quick fix.** Coverage tags that reference an outdated revision get a warning with a quick fix that updates the version number to the current revision.
 * **Syntax highlighting.** Specification item definitions, section keywords and coverage tags are reported as semantic tokens.
@@ -54,6 +54,7 @@ The server provides these features to any connected editor:
 * **Symbol search.** Specification items are found through the editor's workspace symbol search.
 * **Rename.** Renaming a specification item updates its definition together with every coverage tag and `Covers:` entry in the workspace.
 * **Tag skeletons.** Invoking completion manually in comments offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones.
+* **Ignore file.** Glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features. Build output (`target`, `build`, `out`, `dist`, `node_modules`) and hidden paths are excluded by default, at every depth.
 
 ## Getting the Project
 

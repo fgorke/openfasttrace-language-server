@@ -262,6 +262,7 @@ public class OftTextDocumentService implements TextDocumentService {
     // [impl->req~complete-specification-item-id-in-coverage-tag-target~1]
     // [impl->req~complete-closing-bracket-for-coverage-tag~1]
     // [impl->req~suggest-coverage-tag-start-in-comment~2]
+    // [impl->req~index-ignore-file~1]
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
             final CompletionParams params) {
@@ -272,6 +273,9 @@ public class OftTextDocumentService implements TextDocumentService {
         final boolean suggestTagStart = params.getContext() == null
                 || params.getContext().getTriggerKind() != CompletionTriggerKind.TriggerCharacter;
         Logger.debug("completion: uri=" + uri + " line=" + line + " col=" + col);
+        if (index.isExcludedFile(uri)) {
+            return CompletableFuture.completedFuture(Either.forLeft(List.of()));
+        }
         return CompletableFuture.supplyAsync(() -> {
             final List<CompletionItem> items = completionForPosition(readAllLines(uri), line, col, suggestTagStart);
             return Either.<List<CompletionItem>, CompletionList>forLeft(items);
@@ -420,10 +424,14 @@ public class OftTextDocumentService implements TextDocumentService {
     // [impl->req~highlight-specification-item~1]
     // [impl->req~highlight-keyword~1]
     // [impl->req~highlight-coverage-tag~2]
+    // [impl->req~index-ignore-file~1]
     @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(final SemanticTokensParams params) {
         final String uri = params.getTextDocument().getUri();
         Logger.debug("semanticTokensFull: uri=" + uri);
+        if (index.isExcludedFile(uri)) {
+            return CompletableFuture.completedFuture(new SemanticTokens(List.of()));
+        }
         return CompletableFuture.supplyAsync(
                 () -> new SemanticTokens(OftSemanticTokensProvider.computeTokens(readAllLines(uri))));
     }
