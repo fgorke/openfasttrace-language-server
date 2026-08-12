@@ -8,6 +8,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.platform.lsp.api.Lsp4jClient
+import com.intellij.platform.lsp.api.LspServerNotificationsHandler
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 import com.intellij.platform.lsp.api.customization.LspCustomization
 import com.intellij.platform.lsp.api.customization.LspRenameCustomizer
@@ -24,6 +26,9 @@ internal class OftLspServerDescriptor(project: Project) :
     ProjectWideLspServerDescriptor(project, "OpenFastTrace LSP") {
 
     override fun isSupportedFile(file: VirtualFile): Boolean = Companion.isSupportedFile(file)
+
+    override fun createLsp4jClient(handler: LspServerNotificationsHandler): Lsp4jClient =
+        OftLspClient(project, handler)
 
     override val lspCustomization: LspCustomization = object : LspCustomization() {
 

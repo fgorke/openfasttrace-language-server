@@ -44,7 +44,7 @@ The server provides these features to any connected editor:
 * **Hover documentation.** Hovering over a coverage tag shows the referenced specification item's title and description.
 * **Go to definition.** A coverage tag jumps to the specification item in Markdown. A specification item ID jumps to all its covering tags.
 * **Find references.** Lists every coverage tag in the workspace that covers a specification item.
-* **Trace diagnostics.** Specification items that are missing required coverage, coverage tags pointing at items that do not exist, and duplicate definitions are reported at the position that caused them.
+* **Trace diagnostics.** Specification items that are missing required coverage, coverage tags pointing at items that do not exist, and duplicate definitions are reported at the position that caused them. Shown in the editor's problems view.
 * **Quick fix.** Coverage tags that reference an outdated revision get a warning with a quick fix that updates the version number to the current revision.
 * **Syntax highlighting.** Specification item definitions, section keywords and coverage tags are reported as semantic tokens.
 * **Code completion.** Specification item IDs are suggested while typing a `Covers:` entry or a coverage tag target such as `[impl->`.

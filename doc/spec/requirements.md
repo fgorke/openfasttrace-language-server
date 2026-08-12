@@ -219,9 +219,9 @@ Covers:
 Needs: impl, utest
 
 ## Diagnostic for Trace Defects
-req~diagnostic-trace-defects~1
+req~diagnostic-trace-defects~2
 
-The server links the indexed specification items and reports every resulting defect as a diagnostic at the location of the item that caused it. Covered are links to items that do not exist, links to an ambiguous or unwanted target, specification items missing a required artifact type, duplicate definitions and coverage cycles.
+The server links the indexed specification items and reports every resulting defect as a diagnostic at the location of the item that caused it. Covered are links to items that do not exist, links to an ambiguous or unwanted target, specification items missing a required artifact type, duplicate definitions and coverage cycles. After every index rebuild the diagnostics are published for each affected file in the workspace.
 
 Covers:
 * feat~trace-in-editor~1
