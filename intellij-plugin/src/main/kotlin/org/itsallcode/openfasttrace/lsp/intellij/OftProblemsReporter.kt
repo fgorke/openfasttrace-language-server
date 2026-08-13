@@ -3,16 +3,20 @@ package org.itsallcode.openfasttrace.lsp.intellij
 import com.intellij.analysis.problemsView.FileProblem
 import com.intellij.analysis.problemsView.ProblemsCollector
 import com.intellij.analysis.problemsView.ProblemsProvider
+import com.intellij.codeHighlighting.HighlightDisplayLevel
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import org.eclipse.lsp4j.DiagnosticSeverity
 import org.eclipse.lsp4j.PublishDiagnosticsParams
 import java.net.URI
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
+import javax.swing.Icon
 
 private val LOG = logger<OftProblemsReporter>()
 
@@ -24,7 +28,10 @@ internal class OftProblemsReporter(override val project: Project) : ProblemsProv
     fun diagnosticsPublished(params: PublishDiagnosticsParams) {
         val file = findFile(params.uri) ?: return
         val current = params.diagnostics.orEmpty()
-            .map { OftFileProblem(this, file, it.message, it.range.start.line, it.range.start.character) }
+            .map {
+                OftFileProblem(this, file, it.message, it.range.start.line,
+                    it.range.start.character, it.severity)
+            }
             .toSet()
         val previous = if (current.isEmpty()) {
             reportedProblems.remove(params.uri).orEmpty()
@@ -68,7 +75,16 @@ private data class OftFileProblem(
     override val text: String,
     override val line: Int,
     override val column: Int,
+    private val severity: DiagnosticSeverity?,
 ) : FileProblem {
+
+    override val icon: Icon
+        get() = when (severity) {
+            DiagnosticSeverity.Error -> HighlightDisplayLevel.ERROR.icon
+            DiagnosticSeverity.Warning -> HighlightDisplayLevel.WARNING.icon
+            DiagnosticSeverity.Hint -> HighlightDisplayLevel.WEAK_WARNING.icon
+            else -> AllIcons.General.Information
+        }
 
     override fun toString(): String = "$text (${file.name}:${line + 1})"
 }
