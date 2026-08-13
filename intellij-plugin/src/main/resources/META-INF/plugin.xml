@@ -28,6 +28,8 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
+            <li>0.5: trace defects of the whole project, quick fix for all outdated references
+                at once, .oftignore file, and faster indexing</li>
             <li>0.4: no separate Java installation needed, coverage hierarchy,
                 coverage code lens, trace report generation, and OpenFastTrace updated to 4.9.0</li>
             <li>0.3: trace defects reported as diagnostics, rename across the workspace,

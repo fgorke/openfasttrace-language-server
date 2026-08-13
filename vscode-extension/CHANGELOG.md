@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0
+
+* Trace defects are reported for every file in the workspace, not only for the open ones
+* A quick fix updates every outdated reference to a specification item at once
+* Glob patterns in a `.oftignore` file exclude paths from all OFT features
+* Coverage tag skeletons cover the artifact types the workspace needs, and tags with an own revision or with needed coverage are recognized
+* Indexing a large workspace runs in the background with a progress indicator and is faster
+
 ## 0.4.0
 
 * Released once per platform with a Java runtime bundled, so no separate Java installation is needed
