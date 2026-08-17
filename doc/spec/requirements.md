@@ -31,9 +31,9 @@ Covers:
 Needs: impl, utest
 
 ## Hover Shows Title and Description
-req~hover-title-and-description~1
+req~hover-title-and-description~2
 
-When the user hovers over a coverage tag, the server returns a Markdown response with the specification item's title and description.
+When the user hovers over a coverage tag, the server returns a Markdown response with the specification item's title and description, together with the columns of the whole ID so that the editor marks all of it.
 
 Covers:
 * feat~hover-documentation~1
