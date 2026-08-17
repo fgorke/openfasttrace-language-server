@@ -121,7 +121,7 @@ public final class OftWorkspaceIndex {
         return List.copyOf(specItems.values());
     }
 
-    // [impl->req~suggest-coverage-tag-start-in-comment~2]
+    // [impl->req~suggest-coverage-tag-start-in-comment~3]
     public List<String> neededArtifactTypes() {
         return specItems.values().stream()
                 .flatMap(item -> item.getNeedsArtifactTypes().stream())

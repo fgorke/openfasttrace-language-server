@@ -58,18 +58,18 @@
     ],
     "configurationDefaults": {
       "editor.semanticHighlighting.enabled": true,
-      "[markdown]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[java]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[kotlin]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[c]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[cpp]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[python]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[javascript]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[typescript]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[ruby]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[go]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[rust]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } },
-      "[csharp]": { "editor.quickSuggestions": { "other": true, "comments": true, "strings": false } }
+      "[markdown]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[java]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[kotlin]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[c]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[cpp]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[python]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[javascript]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[typescript]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[ruby]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[go]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[rust]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } },
+      "[csharp]": { "editor.quickSuggestions": { "other": true, "comments": false, "strings": false } }
     }
   }
 }

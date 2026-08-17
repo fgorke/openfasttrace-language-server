@@ -38,8 +38,7 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
             return Optional.empty();
         }
 
-        final int segmentStart =
-                Math.max(targetStart, line.lastIndexOf(',', Math.max(0, col - 1)) + 1);
+        final int segmentStart = Math.max(targetStart, line.lastIndexOf(',', Math.max(0, col - 1)) + 1);
         final String between = line.substring(segmentStart, col);
         if (!between.matches("\\s*" + OftSyntax.ID_CHARACTER_CLASS + "*")) {
             return Optional.empty();
@@ -65,6 +64,11 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
     private static boolean startsWithLineComment(final String beforeCursor) {
         final String stripped = beforeCursor.stripLeading();
         return OftSyntax.LINE_START_COMMENT_MARKERS.stream().anyMatch(stripped::startsWith);
+    }
+
+    private static boolean startsWithLineComment(final String beforeCursor, final String uri) {
+        final String stripped = beforeCursor.stripLeading();
+        return OftSyntax.lineStartCommentMarkersFor(uri).stream().anyMatch(stripped::startsWith);
     }
 
     private static boolean hasClosingBracketAhead(final String line, final int col) {
@@ -109,11 +113,20 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
         return line.substring(start, col);
     }
 
-    public static boolean isInsideCommentWithoutOpenTag(final String line, final int col) {
+    public static String wordBefore(final String line, final int col) {
+        final int boundedCol = Math.min(Math.max(col, 0), line.length());
+        int start = boundedCol;
+        while (start > 0 && Character.isLetter(line.charAt(start - 1))) {
+            start--;
+        }
+        return line.substring(start, boundedCol);
+    }
+
+    public static boolean isInsideCommentWithoutOpenTag(final String line, final int col, final String uri) {
         final int boundedCol = Math.min(Math.max(col, 0), line.length());
         final String beforeCursor = line.substring(0, boundedCol);
-        if (OftSyntax.COMMENT_STARTERS.stream().noneMatch(beforeCursor::contains)
-                && !startsWithLineComment(beforeCursor)) {
+        if (OftSyntax.commentStartersFor(uri).stream().noneMatch(beforeCursor::contains)
+                && !startsWithLineComment(beforeCursor, uri)) {
             return false;
         }
         final int bracketStart = line.lastIndexOf('[', Math.max(0, boundedCol - 1));

@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.lsp;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
@@ -42,6 +43,46 @@ public final class OftSyntax {
             List.of("//", "#", "--", ";", "/*", "<!--");
 
     public static final List<String> LINE_START_COMMENT_MARKERS = List.of("'", "..");
+
+    private record CommentStyle(List<String> starters, List<String> lineStartMarkers) {
+    }
+
+    private static final CommentStyle CODE =
+            new CommentStyle(COMMENT_STARTERS, LINE_START_COMMENT_MARKERS);
+
+    private static final CommentStyle MARKDOWN = new CommentStyle(List.of("<!--"), List.of());
+
+    private static final CommentStyle RESTRUCTURED_TEXT = new CommentStyle(List.of(), List.of(".."));
+
+    private static final List<String> MARKDOWN_EXTENSIONS = List.of(".md", ".markdown");
+
+    private static final List<String> RESTRUCTURED_TEXT_EXTENSIONS = List.of(".rst");
+
+    public static List<String> commentStartersFor(final String uriOrPath) {
+        return styleFor(uriOrPath).starters();
+    }
+
+    public static List<String> lineStartCommentMarkersFor(final String uriOrPath) {
+        return styleFor(uriOrPath).lineStartMarkers();
+    }
+
+    private static CommentStyle styleFor(final String uriOrPath) {
+        if (uriOrPath == null) {
+            return CODE;
+        }
+        final String lowerCase = uriOrPath.toLowerCase(Locale.ROOT);
+        if (endsWithAny(lowerCase, MARKDOWN_EXTENSIONS)) {
+            return MARKDOWN;
+        }
+        if (endsWithAny(lowerCase, RESTRUCTURED_TEXT_EXTENSIONS)) {
+            return RESTRUCTURED_TEXT;
+        }
+        return CODE;
+    }
+
+    private static boolean endsWithAny(final String lowerCase, final List<String> extensions) {
+        return extensions.stream().anyMatch(lowerCase::endsWith);
+    }
 
     private OftSyntax() {
     }

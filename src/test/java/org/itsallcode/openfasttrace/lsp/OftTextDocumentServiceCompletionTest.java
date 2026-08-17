@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 
 class OftTextDocumentServiceCompletionTest {
 
+    private static final String JAVA_URI = "file:///workspace/Login.java";
+    private static final String MARKDOWN_URI = "file:///workspace/spec.md";
+
     private OftTextDocumentService service;
 
     @BeforeEach
@@ -31,7 +34,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of("req~login~1", "", "Covers:", lastLine);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 3, lastLine.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 3, lastLine.length(), true, JAVA_URI);
 
         // then
         assertThat(items).extracting(CompletionItem::getLabel).containsExactly("dsn~auth-flow~1");
@@ -47,7 +50,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true, JAVA_URI);
 
         // then
         assertThat(items).extracting(CompletionItem::getLabel).containsExactly("req~login~1");
@@ -62,7 +65,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true, JAVA_URI);
 
         // then
         assertThat(items.get(0).getTextEdit().getLeft().getNewText()).isEqualTo("req~login~1]");
@@ -78,7 +81,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, col, true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, col, true, JAVA_URI);
 
         // then
         assertThat(items.get(0).getTextEdit().getLeft().getNewText()).isEqualTo("req~login~1");
@@ -93,7 +96,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true, JAVA_URI);
 
         // then
         final var range = items.get(0).getTextEdit().getLeft().getRange();
@@ -109,13 +112,13 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of("plain source code, no tag here");
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, 10, true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, 10, true, JAVA_URI);
 
         // then
         assertThat(items).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenLineWithLoneAsteriskWhenCompletingThenNoSkeletonsAreSuggested() {
         // given
@@ -124,13 +127,13 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true, JAVA_URI);
 
         // then
         assertThat(items).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenManualInvocationInsideCommentWithoutTagWhenCompletingThenTagSkeletonsAreSuggested() {
         // given
@@ -140,7 +143,7 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), true, JAVA_URI);
 
         // then
         assertThat(items).extracting(CompletionItem::getLabel)
@@ -150,7 +153,7 @@ class OftTextDocumentServiceCompletionTest {
         assertThat(edit.getRange().getStart()).isEqualTo(edit.getRange().getEnd());
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenItemNeedingACustomArtifactTypeWhenCompletingThenItsSkeletonIsSuggested() {
         // given
@@ -159,13 +162,14 @@ class OftTextDocumentServiceCompletionTest {
         final String line = "// ";
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(List.of(line), 0, line.length(), true);
+        final List<CompletionItem> items = service.completionForPosition(List.of(line), 0, line.length(), true,
+                JAVA_URI);
 
         // then
         assertThat(items).extracting(CompletionItem::getLabel).containsExactly("[arch->...]");
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenWorkspaceWithoutNeededArtifactTypesWhenCompletingThenNoSkeletonIsSuggested() {
         // given
@@ -173,10 +177,10 @@ class OftTextDocumentServiceCompletionTest {
         final String line = "// ";
 
         // when / then
-        assertThat(service.completionForPosition(List.of(line), 0, line.length(), true)).isEmpty();
+        assertThat(service.completionForPosition(List.of(line), 0, line.length(), true, JAVA_URI)).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenTriggerCharacterInvocationInsideCommentWhenCompletingThenNoTagStartIsSuggested() {
         // given
@@ -185,10 +189,36 @@ class OftTextDocumentServiceCompletionTest {
         final List<String> lines = List.of(line);
 
         // when
-        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), false);
+        final List<CompletionItem> items = service.completionForPosition(lines, 0, line.length(), false, JAVA_URI);
 
         // then
         assertThat(items).isEmpty();
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
+    @Test
+    void testGivenMarkdownHeadingWhenCompletingThenNoSkeletonIsSuggested() {
+        // given
+        service.updateIndex(new OftWorkspaceIndex(List.of(itemNeeding("req~login~1", "impl"))));
+        final String line = "# The user can login";
+
+        // when / then
+        assertThat(service.completionForPosition(List.of(line), 0, line.length(), true, MARKDOWN_URI)).isEmpty();
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
+    @Test
+    void testGivenHashInsideSourceCommentWhenCompletingThenSkeletonIsStillSuggested() {
+        // given
+        service.updateIndex(new OftWorkspaceIndex(List.of(itemNeeding("req~login~1", "impl"))));
+        final String line = "# ";
+
+        // when
+        final List<CompletionItem> items = service.completionForPosition(List.of(line), 0, line.length(), true,
+                "file:///workspace/build.sh");
+
+        // then
+        assertThat(items).extracting(CompletionItem::getLabel).containsExactly("[impl->...]");
     }
 
     private static SpecificationItem specItem(final String id) {

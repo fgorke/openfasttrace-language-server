@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class OftCompletionContextTest {
 
@@ -229,16 +231,57 @@ class OftCompletionContextTest {
         assertThat(OftCompletionContext.findAt(List.of(line), 0, line.length())).isEmpty();
     }
 
-    // [utest->req~suggest-coverage-tag-start-in-comment~2]
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
     @Test
     void testGivenCursorAlreadyInsideOpenTagWhenCheckingForOpenTagThenResultIsFalse() {
         // given
         final String line = "// [impl->req~lo";
 
         // when
-        final boolean result = OftCompletionContext.isInsideCommentWithoutOpenTag(line, line.length());
+        final boolean result = OftCompletionContext.isInsideCommentWithoutOpenTag(line, line.length(),
+                "file:///workspace/Login.java");
 
         // then
         assertThat(result).isFalse();
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
+    @ParameterizedTest
+    @CsvSource({
+            "'# The user can login', false",
+            "'This is a well-known problem -- see above', false",
+            "'Item covers #1 of the list', false",
+            "'<!-- ', true"
+    })
+    void testGivenMarkdownProseWhenCheckingForCommentThenOnlyHtmlCommentCounts(final String line,
+            final boolean expected) {
+        assertThat(OftCompletionContext.isInsideCommentWithoutOpenTag(line, line.length(),
+                "file:///workspace/spec.md")).isEqualTo(expected);
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
+    @ParameterizedTest
+    @CsvSource({
+            "'######', false",
+            "'# Title', false",
+            "'Some -- prose', false",
+            "'.. ', true"
+    })
+    void testGivenRestructuredTextMarkupWhenCheckingForCommentThenOnlyTwoDotsCount(final String line,
+            final boolean expected) {
+        assertThat(OftCompletionContext.isInsideCommentWithoutOpenTag(line, line.length(),
+                "file:///workspace/spec.rst")).isEqualTo(expected);
+    }
+
+    // [utest->req~suggest-coverage-tag-start-in-comment~3]
+    @ParameterizedTest
+    @CsvSource({
+            "'// denominator', denominator",
+            "'// ', ''",
+            "'// im', im"
+    })
+    void testGivenCursorBehindAWordWhenAskingForTheWordThenTheLettersAreReturned(final String line,
+            final String expected) {
+        assertThat(OftCompletionContext.wordBefore(line, line.length())).isEqualTo(expected);
     }
 }
