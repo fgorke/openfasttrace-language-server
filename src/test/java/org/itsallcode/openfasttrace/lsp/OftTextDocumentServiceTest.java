@@ -72,7 +72,7 @@ class OftTextDocumentServiceTest {
         assertThat(result).isEmpty();
     }
 
-    // [utest->req~index-refresh-on-save~1]
+    // [utest->req~index-refresh-on-save~2]
     @Test
     void testGivenTwoOpenFilesWhenIndexIsUpdatedThenDiagnosticsAreRepublishedForBoth() {
         // given
@@ -93,7 +93,7 @@ class OftTextDocumentServiceTest {
                 .containsExactlyInAnyOrder("file:///spec.md", "file:///source.java");
     }
 
-    // [utest->req~index-refresh-on-save~1]
+    // [utest->req~index-refresh-on-save~2]
     @Test
     void testGivenAClosedFileWhenIndexIsUpdatedThenNoDiagnosticsArePublishedForIt() {
         // given
