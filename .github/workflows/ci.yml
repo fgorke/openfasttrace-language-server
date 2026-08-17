@@ -58,6 +58,12 @@ jobs:
         working-directory: intellij-plugin
         run: ./gradlew buildPlugin --no-daemon
 
+      - name: Upload plugin package
+        uses: actions/upload-artifact@v4
+        with:
+          name: intellij-plugin
+          path: intellij-plugin/build/distributions/*.zip
+
   vscode-extension:
     name: Build VS Code extension (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
