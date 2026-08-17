@@ -128,7 +128,7 @@ public class OftTextDocumentService implements TextDocumentService {
         this.client = client;
     }
 
-    // [impl->req~hover-title-and-description~1]
+    // [impl->req~hover-title-and-description~2]
     @Override
     public CompletableFuture<Hover> hover(final HoverParams params) {
         final String uri = params.getTextDocument().getUri();
@@ -137,20 +137,25 @@ public class OftTextDocumentService implements TextDocumentService {
         Logger.debug("hover: uri=" + uri + " line=" + line + " col=" + col);
         return CompletableFuture.supplyAsync(() -> {
             final String lineText = readLine(uri, line);
-            return hoverForLine(lineText, col).orElse(null);
+            return hoverForLine(lineText, col, line).orElse(null);
         });
     }
 
-    Optional<Hover> hoverForLine(final String lineText, final int col) {
-        return OftIdAtPosition.findAt(lineText, col)
-                .flatMap(id -> index.findSpecItem(id))
-                .map(this::toHover);
+    Optional<Hover> hoverForLine(final String lineText, final int col, final int line) {
+        return OftIdAtPosition.spanAt(lineText, col)
+                .flatMap(span -> index.findSpecItem(span.id())
+                        .map(item -> toHover(item, rangeOf(span, line))));
     }
 
-    private Hover toHover(final SpecificationItem item) {
+    private Hover toHover(final SpecificationItem item, final Range range) {
         final String markdown = "**" + item.getTitle() + "**\n\n" + item.getDescription();
         final var content = new MarkupContent(MarkupKind.MARKDOWN, markdown);
-        return new Hover(content);
+        return new Hover(content, range);
+    }
+
+    private static Range rangeOf(final OftIdAtPosition.IdSpan span, final int line) {
+        return new Range(new Position(line, span.startColumn()),
+                new Position(line, span.endColumn()));
     }
 
     // [impl->req~goto-definition-spec-to-tags~1, req~goto-definition-tag-to-spec~1]

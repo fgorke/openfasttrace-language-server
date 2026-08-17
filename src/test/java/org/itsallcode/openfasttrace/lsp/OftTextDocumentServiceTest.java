@@ -23,7 +23,7 @@ class OftTextDocumentServiceTest {
         service = new OftTextDocumentService();
     }
 
-    // [utest->req~hover-title-and-description~1]
+    // [utest->req~hover-title-and-description~2]
     @Test
     void testGivenCursorOnCoverageTagWhenHoveringThenSpecItemTitleAndDescriptionAreReturned() {
         // given
@@ -36,7 +36,7 @@ class OftTextDocumentServiceTest {
         final String line = "Covers: req~my-req~1";
 
         // when
-        final var result = service.hoverForLine(line, 9);
+        final var result = service.hoverForLine(line, 9, 0);
 
         // then
         assertThat(result).isPresent();
@@ -46,27 +46,50 @@ class OftTextDocumentServiceTest {
                 .contains("This is the description.");
     }
 
-    // [utest->req~hover-title-and-description~1]
+    // [utest->req~hover-title-and-description~2]
+    @Test
+    void testGivenCursorOnIdWithSeparatorsWhenHoveringThenTheRangeSpansTheWholeId() {
+        // given
+        final var specItem = SpecificationItem.builder()
+                .id(SpecificationItemId.parseId("req~my-req~1"))
+                .title("My Requirement")
+                .description("This is the description.")
+                .build();
+        service.updateIndex(new OftWorkspaceIndex(List.of(specItem)));
+        final String line = "// [impl->req~my-req~1]";
+        final int insideTheWordMy = line.indexOf("my") + 1;
+
+        // when
+        final var result = service.hoverForLine(line, insideTheWordMy, 4);
+
+        // then
+        final var range = result.orElseThrow().getRange();
+        assertThat(range.getStart().getLine()).isEqualTo(4);
+        assertThat(range.getStart().getCharacter()).isEqualTo(line.indexOf("req~"));
+        assertThat(range.getEnd().getCharacter()).isEqualTo(line.indexOf("]"));
+    }
+
+    // [utest->req~hover-title-and-description~2]
     @Test
     void testGivenCursorNotOnAnyIdWhenHoveringThenNoHoverIsReturned() {
         // given
         service.updateIndex(OftWorkspaceIndex.empty());
 
         // when
-        final var result = service.hoverForLine("plain text", 0);
+        final var result = service.hoverForLine("plain text", 0, 0);
 
         // then
         assertThat(result).isEmpty();
     }
 
-    // [utest->req~hover-title-and-description~1]
+    // [utest->req~hover-title-and-description~2]
     @Test
     void testGivenCursorOnUnknownIdWhenHoveringThenNoHoverIsReturned() {
         // given
         service.updateIndex(OftWorkspaceIndex.empty());
 
         // when
-        final var result = service.hoverForLine("req~unknown~1", 0);
+        final var result = service.hoverForLine("req~unknown~1", 0, 0);
 
         // then
         assertThat(result).isEmpty();
