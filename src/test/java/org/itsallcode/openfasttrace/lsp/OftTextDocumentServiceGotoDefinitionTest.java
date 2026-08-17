@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 class OftTextDocumentServiceGotoDefinitionTest {
 
     private static final String SPEC_URI = "file:///workspace/spec.md";
-    private static final String IMPL_URI = "file:///workspace/impl.md";
 
     private OftTextDocumentService service;
 
@@ -23,7 +22,7 @@ class OftTextDocumentServiceGotoDefinitionTest {
         service = new OftTextDocumentService();
     }
 
-    // [utest->req~goto-definition-tag-to-spec~1]
+    // [utest->req~goto-definition-tag-to-spec~2]
     @Test
     void testGivenCursorOnCoverageTagInImplFileWhenGoingToDefinitionThenSpecItemLocationIsReturned() {
         // given
@@ -33,7 +32,7 @@ class OftTextDocumentServiceGotoDefinitionTest {
         service.updateIndex(new OftWorkspaceIndex(List.of(specItem, coverageTag)));
 
         // when
-        final var locations = service.definitionForLine("Covers: req~my-req~1", 9, IMPL_URI);
+        final var locations = service.definitionForLine("Covers: req~my-req~1", 9);
 
         // then
         assertThat(locations).hasSize(1);
@@ -51,7 +50,7 @@ class OftTextDocumentServiceGotoDefinitionTest {
         service.updateIndex(new OftWorkspaceIndex(List.of(specItem, tag1, tag2)));
 
         // when
-        final var locations = service.definitionForLine("`req~my-req~1`", 3, SPEC_URI);
+        final var locations = service.definitionForLine("`req~my-req~1`", 3);
 
         // then
         assertThat(locations).hasSize(2);
@@ -60,14 +59,32 @@ class OftTextDocumentServiceGotoDefinitionTest {
                 "file:///workspace/a.md", "file:///workspace/b.md");
     }
 
-    // [utest->req~goto-definition-tag-to-spec~1]
+    // [utest->req~goto-definition-tag-to-spec~2]
+    @Test
+    void testGivenCursorOnCoversEntryNamingAnItemOfTheSameFileWhenGoingToDefinitionThenTheItemIsReturned() {
+        // given
+        final var covered = specItemAt("req~my-req~1", "/workspace/spec.md", 1);
+        final var covering = specItemAt("dsn~my-design~1", "/workspace/spec.md", 4);
+        service.updateIndex(new OftWorkspaceIndex(List.of(covered, covering)));
+
+        // when
+        final var locations = service.definitionForLine("* req~my-req~1", 4);
+
+        // then
+        assertThat(locations).singleElement().satisfies(location -> {
+            assertThat(location.getUri()).isEqualTo(SPEC_URI);
+            assertThat(location.getRange().getStart().getLine()).isEqualTo(1);
+        });
+    }
+
+    // [utest->req~goto-definition-tag-to-spec~2]
     @Test
     void testGivenCursorOnUnknownIdWhenGoingToDefinitionThenNoLocationIsReturned() {
         // given
         service.updateIndex(OftWorkspaceIndex.empty());
 
         // when
-        final var locations = service.definitionForLine("req~unknown~1", 0, IMPL_URI);
+        final var locations = service.definitionForLine("req~unknown~1", 0);
 
         // then
         assertThat(locations).isEmpty();
