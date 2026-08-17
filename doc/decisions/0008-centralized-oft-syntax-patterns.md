@@ -36,6 +36,7 @@ Two coverage-tag patterns are kept deliberately distinct instead of unified. Hig
 * Good, because the duplication that had already made two patterns identical by accident can no longer happen. There is only one copy left to edit.
 * Good, because `OftSyntax` gives new code an obvious first place to look for how a piece of syntax is recognized. No more grepping for regex literals across packages.
 * Bad, because it introduces a shared class that every syntax-aware component now depends on. That slightly increases coupling between packages that were otherwise independent (`completion`, `highlighting`, `diagnostics`, `index`).
+* Bad, because the reach of the class ends at the server. Both clients decide on their own when to ask for completion and need the comment markers for it, so that list exists three times over: in `OftSyntax`, in `OftCompletionConfidence` and in the VS Code extension. A new marker has to be added in all three.
 
 ### Confirmation
 

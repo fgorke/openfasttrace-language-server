@@ -76,6 +76,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
 
   registerGenerateReportCommand(context);
+  registerCoverageTagSuggestions(context);
 
   try {
     await client.start();
@@ -99,6 +100,47 @@ function startupErrorMessage(javaPath: string, error: unknown): string {
 
 export function deactivate(): Thenable<void> | undefined {
   return client?.stop();
+}
+
+const CODE_COMMENT_MARKERS = ["//", "#", "--", ";", "/*", "<!--"];
+
+function registerCoverageTagSuggestions(context: vscode.ExtensionContext): void {
+  const listener = vscode.workspace.onDidChangeTextDocument(event => {
+    const lastChange = event.contentChanges[event.contentChanges.length - 1];
+    if (lastChange === undefined || lastChange.text.length === 0) {
+      return;
+    }
+    setTimeout(() => suggestInsideOpenTag(event.document), 0);
+  });
+  context.subscriptions.push(listener);
+}
+
+function suggestInsideOpenTag(document: vscode.TextDocument): void {
+  const editor = vscode.window.activeTextEditor;
+  if (editor === undefined || editor.document !== document) {
+    return;
+  }
+  const cursor = editor.selection.active;
+  const linePrefix = document.lineAt(cursor.line).text.slice(0, cursor.character);
+  if (isInOpenCoverageTag(linePrefix)) {
+    void vscode.commands.executeCommand("editor.action.triggerSuggest");
+  }
+}
+
+function isInOpenCoverageTag(linePrefix: string): boolean {
+  const bracketStart = linePrefix.lastIndexOf("[");
+  if (bracketStart < 0) {
+    return false;
+  }
+  if (!containsCodeCommentMarker(linePrefix.slice(0, bracketStart))) {
+    return false;
+  }
+  const afterBracket = linePrefix.slice(bracketStart);
+  return afterBracket.includes("->") && !afterBracket.includes("]");
+}
+
+function containsCodeCommentMarker(text: string): boolean {
+  return CODE_COMMENT_MARKERS.some(marker => text.includes(marker));
 }
 
 const GENERATE_TRACE_REPORT_COMMAND = "oft.generateTraceReport";

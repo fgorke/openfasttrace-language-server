@@ -161,9 +161,9 @@ Covers:
 Needs: impl, utest
 
 ## Suggest Coverage Tag Start in Comment
-req~suggest-coverage-tag-start-in-comment~2
+req~suggest-coverage-tag-start-in-comment~3
 
-When completion is invoked manually in a comment line without an open coverage tag, the server suggests a coverage tag skeleton, e.g. `[impl->...]`, for every artifact type the specification items of the workspace need.
+In a comment line without an open coverage tag, the server suggests a coverage tag skeleton, e.g. `[impl->...]`, for every artifact type the specification items of the workspace need. Both editors only ask for skeletons on Ctrl+Space, while an open tag keeps its automatic suggestions.
 
 Covers:
 * feat~code-completion~1

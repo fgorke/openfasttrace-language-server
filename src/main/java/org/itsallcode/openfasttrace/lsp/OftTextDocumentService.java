@@ -320,7 +320,7 @@ public class OftTextDocumentService implements TextDocumentService {
     // [impl->req~complete-specification-item-id-in-covers-section~1]
     // [impl->req~complete-specification-item-id-in-coverage-tag-target~1]
     // [impl->req~complete-closing-bracket-for-coverage-tag~1]
-    // [impl->req~suggest-coverage-tag-start-in-comment~2]
+    // [impl->req~suggest-coverage-tag-start-in-comment~3]
     // [impl->req~index-ignore-file~1]
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
@@ -328,7 +328,6 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        // TriggerCharacter requests come from typing, everything else counts as manual.
         final boolean suggestTagStart = params.getContext() == null
                 || params.getContext().getTriggerKind() != CompletionTriggerKind.TriggerCharacter;
         Logger.debug("completion: uri=" + uri + " line=" + line + " col=" + col);
@@ -336,13 +335,14 @@ public class OftTextDocumentService implements TextDocumentService {
             return CompletableFuture.completedFuture(Either.forLeft(List.of()));
         }
         return CompletableFuture.supplyAsync(() -> {
-            final List<CompletionItem> items = completionForPosition(readAllLines(uri), line, col, suggestTagStart);
+            final List<CompletionItem> items = completionForPosition(readAllLines(uri), line, col, suggestTagStart,
+                    uri);
             return Either.<List<CompletionItem>, CompletionList>forLeft(items);
         });
     }
 
     List<CompletionItem> completionForPosition(final List<String> lines, final int line, final int col,
-            final boolean suggestTagStart) {
+            final boolean suggestTagStart, final String uri) {
         final Optional<OftCompletionContext> context = OftCompletionContext.findAt(lines, line, col);
         if (context.isPresent()) {
             return OftCompletionSupport
@@ -351,8 +351,8 @@ public class OftTextDocumentService implements TextDocumentService {
                     .collect(Collectors.toList());
         }
         if (suggestTagStart && line >= 0 && line < lines.size()
-                && OftCompletionContext.isInsideCommentWithoutOpenTag(lines.get(line), col)) {
-            return tagStartSnippets(line, col);
+                && OftCompletionContext.isInsideCommentWithoutOpenTag(lines.get(line), col, uri)) {
+            return tagStartSnippets(lines.get(line), line, col);
         }
         return Collections.emptyList();
     }
@@ -370,22 +370,24 @@ public class OftTextDocumentService implements TextDocumentService {
         return completionItem;
     }
 
-    // [impl->req~suggest-coverage-tag-start-in-comment~2]
-    private List<CompletionItem> tagStartSnippets(final int line, final int col) {
+    // [impl->req~suggest-coverage-tag-start-in-comment~3]
+    private List<CompletionItem> tagStartSnippets(final String lineText, final int line, final int col) {
+        final String word = OftCompletionContext.wordBefore(lineText, col);
         final List<String> types = index.neededArtifactTypes();
         return IntStream.range(0, types.size())
-                .mapToObj(position -> toTagStartSnippet(types.get(position), position, line, col))
+                .mapToObj(position -> toTagStartSnippet(types.get(position), position, line, col, word))
                 .collect(Collectors.toList());
     }
 
     private CompletionItem toTagStartSnippet(final String artifactType, final int position,
-            final int line, final int col) {
+            final int line, final int col, final String word) {
         final var completionItem = new CompletionItem("[" + artifactType + "->...]");
         completionItem.setKind(CompletionItemKind.Snippet);
         completionItem.setDetail("OFT coverage tag");
         completionItem.setSortText(String.format("%02d_%s", position, artifactType));
+        completionItem.setFilterText(artifactType);
         completionItem.setInsertTextFormat(InsertTextFormat.Snippet);
-        final var range = new Range(new Position(line, col), new Position(line, col));
+        final var range = new Range(new Position(line, col - word.length()), new Position(line, col));
         completionItem.setTextEdit(Either.forLeft(new TextEdit(range, "[" + artifactType + "->$0]")));
         return completionItem;
     }
