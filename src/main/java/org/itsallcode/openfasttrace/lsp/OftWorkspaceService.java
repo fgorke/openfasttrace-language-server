@@ -29,7 +29,7 @@ import org.tinylog.Logger;
 
 public class OftWorkspaceService implements WorkspaceService {
 
-    // [impl->req~index-refresh-on-save~1]
+    // [impl->req~index-refresh-on-save~2]
     private static final long REINDEX_DEBOUNCE_MS = 300;
 
     private Runnable onFilesChangedCallback = null;
@@ -117,7 +117,7 @@ public class OftWorkspaceService implements WorkspaceService {
         Logger.debug("didChangeConfiguration");
     }
 
-    // [impl->req~index-refresh-on-save~1]
+    // [impl->req~index-refresh-on-save~2]
     @Override
     public synchronized void didChangeWatchedFiles(final DidChangeWatchedFilesParams params) {
         Logger.debug("didChangeWatchedFiles: " + params.getChanges().size() + " change(s)");

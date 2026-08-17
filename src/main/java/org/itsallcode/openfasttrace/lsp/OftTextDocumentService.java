@@ -497,7 +497,7 @@ public class OftTextDocumentService implements TextDocumentService {
                 () -> new SemanticTokens(OftSemanticTokensProvider.computeTokens(readAllLines(uri))));
     }
 
-    // [impl->req~index-refresh-on-save~1]
+    // [impl->req~index-refresh-on-save~2]
     @Override
     public void didSave(final DidSaveTextDocumentParams params) {
         final String uri = params.getTextDocument().getUri();

@@ -87,9 +87,11 @@ A file named `.oftignore` in the workspace root lists glob patterns, one per lin
 Needs: impl, utest, itest
 
 ## Index Refresh on File Save
-req~index-refresh-on-save~1
+req~index-refresh-on-save~2
 
 On `textDocument/didSave` or `workspace/didChangeWatchedFiles`, the server refreshes the index within 300 ms.
+
+Where the editor supports it, the server therefore registers a watcher for `**/.oftignore` and learns of the change that way. Where it does not, the file takes effect on the next save of another file.
 
 Needs: impl, utest
 

@@ -7,10 +7,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.CompletionOptions;
+import org.eclipse.lsp4j.DidChangeWatchedFilesRegistrationOptions;
 import org.eclipse.lsp4j.ExecuteCommandOptions;
+import org.eclipse.lsp4j.FileSystemWatcher;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.RegistrationParams;
 import org.eclipse.lsp4j.RenameOptions;
 import org.eclipse.lsp4j.SaveOptions;
 import org.eclipse.lsp4j.SemanticTokensLegend;
@@ -25,7 +29,9 @@ import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.itsallcode.openfasttrace.lsp.highlighting.OftSemanticTokensProvider;
+import org.itsallcode.openfasttrace.lsp.index.OftIgnore;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 import org.itsallcode.openfasttrace.lsp.index.WorkspaceIndexer;
 import org.tinylog.Logger;
@@ -36,9 +42,12 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     private final OftTextDocumentService textDocumentService;
     private final OftWorkspaceService workspaceService;
 
+    private static final String WATCH_IGNORE_FILE_ID = "oft-watch-ignore-file";
+
     private String rootUri;
     private volatile boolean shutdownReceived = false;
     private volatile boolean supportsProgress = false;
+    private volatile boolean supportsFileWatchers = false;
     private LanguageClient client;
 
     public OftLanguageServer() {
@@ -55,6 +64,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     public CompletableFuture<InitializeResult> initialize(final InitializeParams params) {
         this.rootUri = resolveRootUri(params);
         this.supportsProgress = announcesProgressSupport(params);
+        this.supportsFileWatchers = announcesFileWatcherSupport(params);
         Logger.info("initialize: rootUri=" + rootUri);
 
         final var syncOptions = new TextDocumentSyncOptions();
@@ -89,6 +99,14 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
                 && Boolean.TRUE.equals(params.getCapabilities().getWindow().getWorkDoneProgress());
     }
 
+    private static boolean announcesFileWatcherSupport(final InitializeParams params) {
+        return params.getCapabilities() != null
+                && params.getCapabilities().getWorkspace() != null
+                && params.getCapabilities().getWorkspace().getDidChangeWatchedFiles() != null
+                && Boolean.TRUE.equals(params.getCapabilities().getWorkspace()
+                        .getDidChangeWatchedFiles().getDynamicRegistration());
+    }
+
     private static String resolveRootUri(final InitializeParams params) {
         final List<WorkspaceFolder> folders = params.getWorkspaceFolders();
         if (folders != null && !folders.isEmpty()) {
@@ -111,7 +129,27 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         }
         textDocumentService.setOnSaveCallback(this::rebuildIndex);
         workspaceService.setOnFilesChangedCallback(this::rebuildIndex);
+        watchIgnoreFile();
         CompletableFuture.runAsync(this::buildInitialIndex);
+    }
+
+    // [impl->req~index-refresh-on-save~2]
+    private void watchIgnoreFile() {
+        if (client == null || !supportsFileWatchers) {
+            Logger.info("Client does not watch files, " + OftIgnore.FILE_NAME
+                    + " takes effect on the next save of another file");
+            return;
+        }
+        final var watcher = new FileSystemWatcher(Either.forLeft("**/" + OftIgnore.FILE_NAME));
+        final var registration = new Registration(WATCH_IGNORE_FILE_ID,
+                "workspace/didChangeWatchedFiles",
+                new DidChangeWatchedFilesRegistrationOptions(List.of(watcher)));
+        client.registerCapability(new RegistrationParams(List.of(registration)))
+                .exceptionally(exception -> {
+                    Logger.warn("Could not register a watcher for " + OftIgnore.FILE_NAME + ": "
+                            + exception.getMessage());
+                    return null;
+                });
     }
 
     private void buildInitialIndex() {

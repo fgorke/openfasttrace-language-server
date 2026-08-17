@@ -3,18 +3,28 @@ package org.itsallcode.openfasttrace.lsp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.DidChangeWatchedFilesCapabilities;
+import org.eclipse.lsp4j.DidChangeWatchedFilesRegistrationOptions;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.Registration;
+import org.eclipse.lsp4j.RegistrationParams;
 import org.eclipse.lsp4j.TextDocumentSyncOptions;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
 import org.eclipse.lsp4j.WorkspaceFolder;
+import org.eclipse.lsp4j.services.LanguageClient;
+import org.mockito.ArgumentCaptor;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 import org.itsallcode.openfasttrace.lsp.index.WorkspaceIndexer;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +113,50 @@ class OftLanguageServerTest {
 
         // then
         assertThat(result.getCapabilities().getTypeHierarchyProvider().getLeft()).isTrue();
+    }
+
+    // [utest->req~index-refresh-on-save~2]
+    @Test
+    void testGivenAClientThatWatchesFilesWhenInitializedThenTheIgnoreFileIsWatched(
+            @TempDir final Path root) throws Exception {
+        // given
+        final var client = mock(LanguageClient.class);
+        when(client.registerCapability(any())).thenReturn(CompletableFuture.completedFuture(null));
+        final var serverWithClient = startedServer(client, root, true);
+
+        // when
+        serverWithClient.initialized(new InitializedParams());
+
+        // then
+        final var captor = ArgumentCaptor.forClass(RegistrationParams.class);
+        verify(client).registerCapability(captor.capture());
+        final Registration registration = captor.getValue().getRegistrations().get(0);
+        assertThat(registration.getMethod()).isEqualTo("workspace/didChangeWatchedFiles");
+        final var options = (DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions();
+        assertThat(options.getWatchers()).singleElement()
+                .extracting(watcher -> watcher.getGlobPattern().getLeft())
+                .isEqualTo("**/.oftignore");
+    }
+
+    private static OftLanguageServer startedServer(final LanguageClient client, final Path root,
+            final boolean watchesFiles) throws Exception {
+        final var indexer = mock(WorkspaceIndexer.class);
+        when(indexer.buildIndex(any())).thenReturn(OftWorkspaceIndex.empty());
+        final var server = new OftLanguageServer(indexer);
+        server.connect(client);
+        final var params = new InitializeParams();
+        params.setRootUri(root.toUri().toString());
+        if (watchesFiles) {
+            final var watchedFiles = new DidChangeWatchedFilesCapabilities();
+            watchedFiles.setDynamicRegistration(true);
+            final var workspace = new WorkspaceClientCapabilities();
+            workspace.setDidChangeWatchedFiles(watchedFiles);
+            final var capabilities = new ClientCapabilities();
+            capabilities.setWorkspace(workspace);
+            params.setCapabilities(capabilities);
+        }
+        server.initialize(params).get();
+        return server;
     }
 
     @Test
