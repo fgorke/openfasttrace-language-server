@@ -323,7 +323,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return changes.values().stream().mapToInt(List::size).sum();
     }
 
-    // [impl->req~complete-specification-item-id-in-covers-section~1]
+    // [impl->req~complete-specification-item-id-in-covers-section~2]
     // [impl->req~complete-specification-item-id-in-coverage-tag-target~1]
     // [impl->req~complete-closing-bracket-for-coverage-tag~1]
     // [impl->req~suggest-coverage-tag-start-in-comment~3]
@@ -352,7 +352,9 @@ public class OftTextDocumentService implements TextDocumentService {
         final Optional<OftCompletionContext> context = OftCompletionContext.findAt(lines, line, col);
         if (context.isPresent()) {
             return OftCompletionSupport
-                    .findMatching(index, context.get().prefix(), context.get().coveringArtifactType()).stream()
+                    .findMatching(index, context.get().prefix(), context.get().coveringArtifactType(),
+                            context.get().enclosingItemId())
+                    .stream()
                     .map(item -> toCompletionItem(item, context.get(), line, col))
                     .collect(Collectors.toList());
         }

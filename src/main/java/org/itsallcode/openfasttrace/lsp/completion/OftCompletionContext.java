@@ -6,7 +6,8 @@ import java.util.regex.Matcher;
 
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
-public record OftCompletionContext(String prefix, boolean appendClosingBracket, String coveringArtifactType) {
+public record OftCompletionContext(String prefix, boolean appendClosingBracket,
+        String coveringArtifactType, String enclosingItemId) {
 
     public static Optional<OftCompletionContext> findAt(final List<String> lines, final int lineIndex,
             final int col) {
@@ -44,7 +45,7 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
             return Optional.empty();
         }
         return Optional.of(new OftCompletionContext(between.strip(), !hasClosingBracketAhead(line, col),
-                coveringArtifactTypeOf(line, bracketStart, arrowStart)));
+                coveringArtifactTypeOf(line, bracketStart, arrowStart), null));
     }
 
     private static String coveringArtifactTypeOf(final String line, final int bracketStart,
@@ -82,27 +83,28 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket, 
     private static Optional<OftCompletionContext> findInCoversSection(final List<String> lines,
             final int lineIndex, final int col) {
         boolean insideCoversSection = false;
+        String enclosingItemId = null;
         for (int i = 0; i <= lineIndex; i++) {
-            insideCoversSection = updateSectionState(lines.get(i), insideCoversSection);
+            final String line = lines.get(i);
+            if (line.isBlank()) {
+                continue;
+            }
+            final Matcher definition = OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(line);
+            if (definition.matches()) {
+                enclosingItemId = definition.group(1);
+                insideCoversSection = false;
+                continue;
+            }
+            final Matcher keyword = OftSyntax.SECTION_KEYWORD_LINE.matcher(line);
+            if (keyword.find()) {
+                insideCoversSection = "Covers".equals(keyword.group(1));
+            }
         }
         if (!insideCoversSection) {
             return Optional.empty();
         }
-        return Optional.of(new OftCompletionContext(prefixBefore(lines.get(lineIndex), col), false, null));
-    }
-
-    private static boolean updateSectionState(final String line, final boolean insideCoversSection) {
-        if (line.isBlank()) {
-            return insideCoversSection;
-        }
-        if (OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(line).matches()) {
-            return false;
-        }
-        final Matcher keyword = OftSyntax.SECTION_KEYWORD_LINE.matcher(line);
-        if (keyword.find()) {
-            return "Covers".equals(keyword.group(1));
-        }
-        return insideCoversSection;
+        return Optional.of(new OftCompletionContext(prefixBefore(lines.get(lineIndex), col), false,
+                null, enclosingItemId));
     }
 
     private static String prefixBefore(final String line, final int col) {

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 
-// [impl->req~complete-specification-item-id-in-coverage-tag-target~1, req~complete-specification-item-id-in-covers-section~1]
+// [impl->req~complete-specification-item-id-in-coverage-tag-target~1, req~complete-specification-item-id-in-covers-section~2]
 public final class OftCompletionSupport {
 
     private OftCompletionSupport() {
@@ -23,9 +23,10 @@ public final class OftCompletionSupport {
     }
 
     public static List<SpecificationItem> findMatching(final OftWorkspaceIndex index, final String prefix,
-            final String coveringArtifactType) {
+            final String coveringArtifactType, final String excludedId) {
         return index.allSpecItems().stream()
                 .filter(OftCompletionSupport::hasTitle)
+                .filter(item -> !item.getId().toString().equals(excludedId))
                 .filter(item -> coveringArtifactType == null
                         || item.needsCoverageByArtifactType(coveringArtifactType))
                 .filter(item -> matchKind(item, prefix) != MatchKind.NONE)

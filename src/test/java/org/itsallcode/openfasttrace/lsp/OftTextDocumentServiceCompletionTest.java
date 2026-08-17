@@ -23,7 +23,7 @@ class OftTextDocumentServiceCompletionTest {
         service = new OftTextDocumentService();
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenCursorInCoversSectionWhenCompletingThenMatchingSpecItemsAreSuggested() {
         // given

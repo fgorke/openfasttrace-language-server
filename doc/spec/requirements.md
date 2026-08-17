@@ -133,9 +133,9 @@ Covers:
 Needs: impl, utest
 
 ## Complete Specification Item ID in Covers Section
-req~complete-specification-item-id-in-covers-section~1
+req~complete-specification-item-id-in-covers-section~2
 
-When the cursor sits inside a `Covers:` section of a specification file, the server suggests specification item IDs that match the text already typed. It ranks them by match quality: full ID prefix first, then name prefix, then name substring, then artifact type prefix.
+When the cursor sits inside a `Covers:` section of a specification file, the server suggests specification item IDs that match the text already typed. It ranks them by match quality: full ID prefix first, then name prefix, then name substring, then artifact type prefix. An item cannot cover itself.
 
 Covers:
 * feat~code-completion~1
