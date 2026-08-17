@@ -60,6 +60,11 @@ The server provides these features to any connected editor:
 
 [doc/demo/](doc/demo/) holds a small example project that visits every feature above. Open `doc/demo/example` as the project, then follow the [walkthrough](doc/demo/README.md).
 
+### Survey
+
+This language server is the subject of a bachelor's thesis. Taking part is two steps: first work through the [demo walkthrough](doc/demo/README.md), then answer the [survey](https://studentische-umfragen.uni-hamburg.de/index.php/842417?lang=en) right afterwards. The survey builds on the walkthrough, so please do that one first. Answers are evaluated pseudonymously and used only for the thesis.
+
+
 ## Getting the Project
 
 ```bash

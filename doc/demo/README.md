@@ -4,6 +4,13 @@ This folder contains a small example project (`example/`) that shows every
 feature of the language server. Some defects in the example
 are intentional.
 
+## Survey
+
+This walkthrough is the first of two steps in a study for a bachelor's thesis.
+Work through it in an editor of your choice, then return to the
+[survey](https://studentische-umfragen.uni-hamburg.de/index.php/842417?lang=en)
+right afterwards. Answers are evaluated pseudonymously and used only for the thesis.
+
 ## Preparation
 
 1. Install the plugin or extension (see the [main README](https://github.com/fgorke/openfasttrace-language-server/blob/main/README.md#quickstart)).
@@ -140,3 +147,5 @@ one.
 ## Afterwards
 
 Discard your changes or reset the project to the original state.
+
+Then continue with the [survey](https://studentische-umfragen.uni-hamburg.de/index.php/842417?lang=en).
