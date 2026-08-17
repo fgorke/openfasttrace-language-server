@@ -39,7 +39,7 @@ class OftCompletionSupportTest {
         return builder.build();
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenPrefixMatchingFullIdWhenClassifyingMatchThenFullIdPrefixIsReturned() {
         // given
@@ -52,7 +52,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.FULL_ID_PREFIX);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenPrefixMatchingNameStartWhenClassifyingMatchThenNamePrefixIsReturned() {
         // given
@@ -65,7 +65,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.NAME_PREFIX);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenPrefixMatchingNameSubstringWhenClassifyingMatchThenNameSubstringIsReturned() {
         // given
@@ -78,7 +78,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.NAME_SUBSTRING);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenPrefixMatchingArtifactTypeWhenClassifyingMatchThenFullIdPrefixIsReturnedBecauseArtifactTypeTierIsUnreachable() {
         // given
@@ -91,7 +91,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.FULL_ID_PREFIX);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenPrefixMatchingNothingWhenClassifyingMatchThenNoneIsReturned() {
         // given
@@ -104,7 +104,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.NONE);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenUppercasePrefixWhenClassifyingMatchThenMatchingIsCaseInsensitive() {
         // given
@@ -117,7 +117,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.FULL_ID_PREFIX);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenEmptyPrefixWhenClassifyingMatchThenEverythingMatchesAsFullIdPrefix() {
         // given
@@ -130,7 +130,7 @@ class OftCompletionSupportTest {
         assertThat(matchKind).isEqualTo(MatchKind.FULL_ID_PREFIX);
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenItemsMatchingAtDifferentTiersWhenFindingMatchesThenFullIdPrefixRanksBeforeNamePrefix() {
         // given
@@ -139,11 +139,27 @@ class OftCompletionSupportTest {
                 item("login~login~1")));
 
         // when
-        final var result = OftCompletionSupport.findMatching(index, "login", null);
+        final var result = OftCompletionSupport.findMatching(index, "login", null, null);
 
         // then
         assertThat(result).extracting(matched -> matched.getId().toString())
                 .containsExactly("login~login~1", "dsn~login-flow~1");
+    }
+
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
+    @Test
+    void testGivenTheItemOwningTheSectionWhenFindingMatchesThenItIsExcluded() {
+        // given
+        final var index = new OftWorkspaceIndex(List.of(
+                item("req~login~1"),
+                item("req~login-flow~1")));
+
+        // when
+        final var result = OftCompletionSupport.findMatching(index, "log", null, "req~login~1");
+
+        // then
+        assertThat(result).extracting(matched -> matched.getId().toString())
+                .containsExactly("req~login-flow~1");
     }
 
     // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
@@ -155,7 +171,7 @@ class OftCompletionSupportTest {
                 itemWithoutTitle("impl~login-1501782393~0")));
 
         // when
-        final var result = OftCompletionSupport.findMatching(index, "log", null);
+        final var result = OftCompletionSupport.findMatching(index, "log", null, null);
 
         // then
         assertThat(result).extracting(matched -> matched.getId().toString())
@@ -173,14 +189,14 @@ class OftCompletionSupportTest {
                 itemNeeding("feat~login~1", "req")));
 
         // when
-        final var result = OftCompletionSupport.findMatching(index, "log", "impl");
+        final var result = OftCompletionSupport.findMatching(index, "log", "impl", null);
 
         // then
         assertThat(result).extracting(matched -> matched.getId().toString())
                 .containsExactlyInAnyOrder("req~login~1", "dsn~login-flow~1");
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenItemsMatchingAtDifferentTiersWhenBuildingSortTextThenBetterMatchSortsFirst() {
         // given

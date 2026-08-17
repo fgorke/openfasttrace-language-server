@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class OftCompletionContextTest {
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenCursorInCoversSectionWhenFindingContextThenTypedPrefixIsReturned() {
         // given
@@ -29,6 +29,48 @@ class OftCompletionContextTest {
         assertThat(result.get().prefix()).isEqualTo("dsn~auth-fl");
         assertThat(result.get().coveringArtifactType()).isNull();
         assertThat(result.get().appendClosingBracket()).isFalse();
+    }
+
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
+    @Test
+    void testGivenCursorInCoversSectionWhenFindingContextThenTheOwningItemIsReported() {
+        // given
+        final String lastLine = "  * req~";
+        final List<String> lines = List.of(
+                "# Login",
+                "`req~login~1`",
+                "",
+                "Covers:",
+                lastLine);
+
+        // when
+        final var result = OftCompletionContext.findAt(lines, 4, lastLine.length());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().enclosingItemId()).isEqualTo("req~login~1");
+    }
+
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
+    @Test
+    void testGivenSecondItemInAFileWhenFindingContextThenItsOwnIdIsReported() {
+        // given
+        final String lastLine = "  * req~";
+        final List<String> lines = List.of(
+                "`req~first~1`",
+                "",
+                "Needs: impl",
+                "",
+                "`req~second~1`",
+                "",
+                "Covers:",
+                lastLine);
+
+        // when
+        final var result = OftCompletionContext.findAt(lines, 7, lastLine.length());
+
+        // then
+        assertThat(result.orElseThrow().enclosingItemId()).isEqualTo("req~second~1");
     }
 
     // [utest->req~complete-specification-item-id-in-coverage-tag-target~1]
@@ -77,7 +119,7 @@ class OftCompletionContextTest {
         assertThat(result.get().prefix()).isEqualTo("req~log");
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenCoversSectionEndedByOtherKeywordWhenFindingContextThenNoContextIsReturned() {
         // given
@@ -96,7 +138,7 @@ class OftCompletionContextTest {
         assertThat(result).isEmpty();
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenCoversSectionEndedByBacktickedDefinitionWhenFindingContextThenNoContextIsReturned() {
         // given
@@ -114,7 +156,7 @@ class OftCompletionContextTest {
         assertThat(result).isEmpty();
     }
 
-    // [utest->req~complete-specification-item-id-in-covers-section~1]
+    // [utest->req~complete-specification-item-id-in-covers-section~2]
     @Test
     void testGivenBlankLinesInsideCoversSectionWhenFindingContextThenStillInsideSection() {
         // given
