@@ -43,7 +43,7 @@ class LocationConverterTest {
         assertThat(range.getEnd().getCharacter()).isEqualTo(line.indexOf(']') + 1);
     }
 
-    // [utest->req~goto-definition-tag-to-spec~1]
+    // [utest->req~goto-definition-tag-to-spec~2]
     @Test
     void testGivenBacktickedSpecItemLineWhenConvertingThenRangeIsTightenedToBareId() {
         // given

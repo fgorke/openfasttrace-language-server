@@ -1,9 +1,9 @@
 # Requirements
 
 ## Go to Definition: Coverage Tag to Spec Item
-req~goto-definition-tag-to-spec~1
+req~goto-definition-tag-to-spec~2
 
-When the user invokes Go to Definition with the cursor on a coverage tag, the server returns the location of the referenced specification item.
+When the user invokes Go to Definition with the cursor on a coverage tag, the server returns the location of the referenced specification item. The same holds for every other reference to an ID, and it holds no matter which file the item is declared in. 
 
 Covers:
 * feat~goto-definition~1

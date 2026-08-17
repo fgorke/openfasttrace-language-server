@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -158,7 +159,7 @@ public class OftTextDocumentService implements TextDocumentService {
                 new Position(line, span.endColumn()));
     }
 
-    // [impl->req~goto-definition-spec-to-tags~1, req~goto-definition-tag-to-spec~1]
+    // [impl->req~goto-definition-spec-to-tags~1, req~goto-definition-tag-to-spec~2]
     @Override
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(
             final DefinitionParams params) {
@@ -168,32 +169,32 @@ public class OftTextDocumentService implements TextDocumentService {
         Logger.debug("definition: uri=" + uri + " line=" + line + " col=" + col);
         return CompletableFuture.supplyAsync(() -> {
             final String lineText = readLine(uri, line);
-            final List<Location> locations = definitionForLine(lineText, col, uri);
+            final List<Location> locations = definitionForLine(lineText, col);
             return Either.<List<? extends Location>, List<? extends LocationLink>>forLeft(locations);
         });
     }
 
-    List<Location> definitionForLine(final String lineText, final int col,
-            final String currentFileUri) {
+    List<Location> definitionForLine(final String lineText, final int col) {
         return OftIdAtPosition.findAt(lineText, col)
-                .map(id -> {
-                    final Optional<SpecificationItem> specItem = index.findSpecItem(id);
-                    final boolean cursorIsInSpecFile = specItem
-                            .map(SpecificationItem::getLocation)
-                            .map(loc -> LocationConverter.toFileKey(loc.getPath())
-                                    .equals(LocationConverter.toFileKey(currentFileUri)))
-                            .orElse(false);
+                .map(id -> declaresItem(lineText, id) ? coveringTagsOf(id) : definitionOf(id))
+                .orElse(Collections.emptyList());
+    }
 
-                    if (cursorIsInSpecFile) {
-                        return index.findCoverageTags(id).stream()
-                                .map(this::tightLocation)
-                                .collect(Collectors.toList());
-                    }
-                    return specItem
-                            .map(this::tightLocation)
-                            .map(List::of)
-                            .orElse(Collections.emptyList());
-                })
+    private static boolean declaresItem(final String lineText, final SpecificationItemId id) {
+        final Matcher matcher = OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(lineText);
+        return matcher.matches() && id.equals(SpecificationItemId.parseId(matcher.group(1)));
+    }
+
+    private List<Location> coveringTagsOf(final SpecificationItemId id) {
+        return index.findCoverageTags(id).stream()
+                .map(this::tightLocation)
+                .collect(Collectors.toList());
+    }
+
+    private List<Location> definitionOf(final SpecificationItemId id) {
+        return index.findSpecItem(id)
+                .map(this::tightLocation)
+                .map(List::<Location>of)
                 .orElse(Collections.emptyList());
     }
 
