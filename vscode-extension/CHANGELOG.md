@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0
+
+* Trace defects carry a severity: a reference that cannot be resolved, an ID defined twice and a coverage cycle are errors, coverage that is still missing is a warning
+* Changes to a `.oftignore` file are picked up as soon as it is saved
+* Coverage tag skeletons are offered in code comments, while `#` and `--` count as markup in Markdown and reStructuredText
+* Hovering a specification item ID highlights the whole ID
+
 ## 0.5.0
 
 * Trace defects are reported for every file in the workspace, not only for the open ones
