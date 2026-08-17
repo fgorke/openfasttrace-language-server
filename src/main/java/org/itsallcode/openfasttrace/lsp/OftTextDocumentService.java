@@ -100,7 +100,7 @@ public class OftTextDocumentService implements TextDocumentService {
         this.onSaveCallback = callback;
     }
 
-    // [impl->req~diagnostic-trace-defects~2]
+    // [impl->req~diagnostic-trace-defects~3]
     void updateIndex(final OftWorkspaceIndex index) {
         this.index = index;
         publishWorkspaceDiagnostics();

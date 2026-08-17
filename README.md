@@ -45,7 +45,7 @@ The server provides these features to any connected editor:
 * **Go to definition.** A coverage tag jumps to the specification item in Markdown. A specification item ID jumps to all its covering tags.
 * **Find references.** Lists every coverage tag in the workspace that covers a specification item.
 * **Trace diagnostics.** Specification items that are missing required coverage, coverage tags pointing at items that do not exist, and duplicate definitions are reported at the position that caused them. Shown in the editor's problems view.
-* **Quick fix.** Coverage tags that reference an outdated revision get a warning with a quick fix that updates the version number to the current revision, either for that one tag or for every outdated reference to the item in the workspace.
+* **Quick fix.** Coverage tags that reference an outdated revision get an error with a quick fix that updates the version number to the current revision, either for that one tag or for every outdated reference to the item in the workspace.
 * **Syntax highlighting.** Specification item definitions, section keywords and coverage tags are reported as semantic tokens.
 * **Code completion.** Specification item IDs are suggested while typing a `Covers:` entry or a coverage tag target such as `[impl->`.
 * **Trace report.** A full OpenFastTrace report is rendered on request and opened in the editor, as HTML or plain text in several levels of detail.

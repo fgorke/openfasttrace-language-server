@@ -59,15 +59,19 @@ Search for the symbol `grind` (`Ctrl+Alt+Shift+N` / `Ctrl+T`).
 
 Open the problems view (`Alt+6` / `Ctrl+Shift+M`).
 
->**Expected:** seven entries from three files. Five are warnings, one per defect:
+>**Expected:** seven entries from three files, in three severities.
+>
+>Four **errors**, where something already written is wrong:
 >* the requirement `req~fill-level-warning~1` is **defined twice**, marked at both places
 >* the tag targeting `dsn~milk-frother~1` points at an item that **does not exist**
 >* the tag targeting `dsn~heat-water~1` references an **outdated revision**
->* the item `dsn~grind-beans~1` is missing its required **utest coverage**
 >
->The other two are information rather than warnings: `feat~brew-coffee~1` and
->`req~start-brewing~1` are fine in themselves, only the chain below them is
->broken. More information in the [OFT User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md#transitive-defects).
+>One **warning**, where the trace is only unfinished: the item
+>`dsn~grind-beans~1` is missing its required **utest coverage**.
+>
+>Two **informations**, which are not the marked item's doing at all:
+>`feat~brew-coffee~1` and `req~start-brewing~1` are fine in themselves, only the
+>chain below them is broken. More information in the [OFT User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md#transitive-defects).
 
 ### 7. Quick fix
 
@@ -75,7 +79,7 @@ In `src/CoffeeMaker.java`, go to the outdated tag
 `[impl->dsn~heat-water~1]` and invoke the quick fix (`Alt+Enter` / `Ctrl+.`).
 
 >**Expected:** the fix replaces the revision with `~2`. After saving, the
-warning disappears.
+error disappears.
 
 ### 8. Code lens
 

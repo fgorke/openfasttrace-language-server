@@ -24,7 +24,7 @@ class TraceDiagnosticsTest {
                 Files.readAllLines(file));
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenOutdatedTagWhenDiagnosingThenTheOrphanedLinkIsNotReportedAsWell()
             throws Exception {
@@ -43,7 +43,7 @@ class TraceDiagnosticsTest {
                 .asString().contains("Outdated");
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenBrokenChainWhenDiagnosingThenOnlyTheCausingItemIsAWarning() throws Exception {
         // given
@@ -70,7 +70,60 @@ class TraceDiagnosticsTest {
                 .hasSize(2);
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
+    @Test
+    void testGivenALinkToAMissingItemWhenDiagnosingThenItIsAnError() throws Exception {
+        // given
+        final Path source = workspace.resolve("Login.java");
+        Files.writeString(source, "// [impl->req~typo~1]\n");
+
+        // when
+        final List<Diagnostic> diagnostics = diagnose(source);
+
+        // then
+        assertThat(diagnostics).singleElement().satisfies(diagnostic -> {
+            assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Error);
+            assertThat(diagnostic.getMessage().getLeft()).contains("does not exist");
+        });
+    }
+
+    // [itest->req~diagnostic-trace-defects~3]
+    @Test
+    void testGivenCoverageTheTargetDoesNotAskForWhenDiagnosingThenItIsAWarning() throws Exception {
+        // given
+        Files.writeString(workspace.resolve("spec.md"),
+                "# Login\n\n`req~login~1`\n\nNeeds: dsn\n");
+        final Path source = workspace.resolve("Login.java");
+        Files.writeString(source, "// [impl->req~login~1]\n");
+
+        // when
+        final List<Diagnostic> diagnostics = diagnose(source);
+
+        // then
+        assertThat(diagnostics).singleElement().satisfies(diagnostic -> {
+            assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Warning);
+            assertThat(diagnostic.getMessage().getLeft()).contains("does not want");
+        });
+    }
+
+    // [itest->req~diagnostic-trace-defects~3]
+    @Test
+    void testGivenAMissingArtifactTypeWhenDiagnosingThenItIsAWarning() throws Exception {
+        // given
+        final Path spec = workspace.resolve("spec.md");
+        Files.writeString(spec, "# Login\n\n`req~login~1`\n\nNeeds: impl\n");
+
+        // when
+        final List<Diagnostic> diagnostics = diagnose(spec);
+
+        // then
+        assertThat(diagnostics).singleElement().satisfies(diagnostic -> {
+            assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Warning);
+            assertThat(diagnostic.getMessage().getLeft()).contains("Not covered by");
+        });
+    }
+
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenDuplicateDefinitionsWhenDiagnosingThenBothAreFlagged() throws Exception {
         // given
@@ -85,10 +138,12 @@ class TraceDiagnosticsTest {
         // then
         assertThat(diagnostics)
                 .filteredOn(diagnostic -> diagnostic.getMessage().getLeft().contains("more than once"))
-                .hasSize(2);
+                .hasSize(2)
+                .allSatisfy(diagnostic -> assertThat(diagnostic.getSeverity())
+                        .isEqualTo(DiagnosticSeverity.Error));
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenDefectOnALineNotPresentInTheBufferWhenDiagnosingThenNothingIsEmitted()
             throws Exception {

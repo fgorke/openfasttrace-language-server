@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.lsp4j.Diagnostic;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 
-// [impl->req~diagnostic-trace-defects~2]
+// [impl->req~diagnostic-trace-defects~3]
 public class DiagnosticsProvider {
 
     public List<Diagnostic> diagnoseFile(final String uri, final List<String> lines,

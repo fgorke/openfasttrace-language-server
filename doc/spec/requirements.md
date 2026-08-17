@@ -231,9 +231,11 @@ Covers:
 Needs: impl, utest
 
 ## Diagnostic for Trace Defects
-req~diagnostic-trace-defects~2
+req~diagnostic-trace-defects~3
 
 The server links the indexed specification items and reports every resulting defect as a diagnostic at the location of the item that caused it. Covered are links to items that do not exist, links to an ambiguous or unwanted target, specification items missing a required artifact type, duplicate definitions and coverage cycles. After every index rebuild the diagnostics are published for each affected file in the workspace.
+
+The severity says what it takes to get rid of the defect. An **error** means text that is already written is wrong, a **warning** means the trace is merely unfinished, an **information** only reports that something further down the chain is incomplete.
 
 Covers:
 * feat~trace-in-editor~1
