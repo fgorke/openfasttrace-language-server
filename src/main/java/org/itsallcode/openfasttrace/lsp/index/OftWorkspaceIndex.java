@@ -41,7 +41,7 @@ public final class OftWorkspaceIndex {
         this.ignore = ignore;
     }
 
-    // [impl->req~diagnostic-trace-defects~2]
+    // [impl->req~diagnostic-trace-defects~3]
     public static OftWorkspaceIndex ofLinkedItems(final List<LinkedSpecificationItem> linkedItems,
             final OftIgnore ignore) {
         return new OftWorkspaceIndex(
@@ -81,14 +81,14 @@ public final class OftWorkspaceIndex {
         return linkedItemsByFile.getOrDefault(LocationConverter.toFileKey(uriOrPath), List.of());
     }
 
-    // [impl->req~diagnostic-trace-defects~2]
+    // [impl->req~diagnostic-trace-defects~3]
     public List<LinkedSpecificationItem> defectsInFile(final String uriOrPath) {
         return linkedItemsInFile(uriOrPath).stream()
                 .filter(LinkedSpecificationItem::isDefect)
                 .toList();
     }
 
-    // [impl->req~diagnostic-trace-defects~2]
+    // [impl->req~diagnostic-trace-defects~3]
     public List<String> filesWithDefects() {
         return linkedItemsByFile.entrySet().stream()
                 .filter(entry -> entry.getValue().stream()

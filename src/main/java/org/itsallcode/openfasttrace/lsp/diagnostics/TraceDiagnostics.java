@@ -19,7 +19,7 @@ import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
-// [impl->req~diagnostic-trace-defects~2]
+// [impl->req~diagnostic-trace-defects~3]
 public final class TraceDiagnostics {
 
     private static final String SOURCE = "openfasttrace-lsp";
@@ -99,25 +99,21 @@ public final class TraceDiagnostics {
             final LinkStatus status, final SpecificationItemId targetId, final String line,
             final int lineIndex) {
         final Range range = rangeOfCoveredId(defect, targetId, line, lineIndex);
-        final Diagnostic diagnostic = switch (status) {
+        return switch (status) {
             case ORPHANED -> new Diagnostic(range,
                     "Covers '" + targetId + "', which does not exist.",
-                    DiagnosticSeverity.Warning, SOURCE);
+                    DiagnosticSeverity.Error, SOURCE);
             case OUTDATED -> revisionMismatchDiagnostic(range, targetId,
                     "Outdated reference: current revision of '");
             case PREDATED -> revisionMismatchDiagnostic(range, targetId,
                     "Reference to a revision that does not exist yet: current revision of '");
             case AMBIGUOUS -> new Diagnostic(range,
                     "Covers '" + targetId + "', which is defined more than once.",
-                    DiagnosticSeverity.Warning, SOURCE);
+                    DiagnosticSeverity.Error, SOURCE);
             default -> new Diagnostic(range,
                     "Covers '" + targetId + "', which does not want this coverage.",
                     DiagnosticSeverity.Warning, SOURCE);
         };
-        if (defect.isTransitiveDefect()) {
-            diagnostic.setSeverity(DiagnosticSeverity.Information);
-        }
-        return diagnostic;
     }
 
     // [impl->req~diagnostic-outdated-version~2]
@@ -126,7 +122,7 @@ public final class TraceDiagnostics {
         final Diagnostic diagnostic = new Diagnostic(range,
                 prefix + currentId.getArtifactType() + "~" + currentId.getName() + "' is "
                         + currentId.getRevision() + ".",
-                DiagnosticSeverity.Warning, SOURCE);
+                DiagnosticSeverity.Error, SOURCE);
         diagnostic.setData(currentId.toString());
         return diagnostic;
     }
@@ -148,7 +144,7 @@ public final class TraceDiagnostics {
         if (defect.getDeepCoverageStatus() == DeepCoverageStatus.CYCLE) {
             return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                     "Coverage of this item forms a cycle.",
-                    DiagnosticSeverity.Warning, SOURCE));
+                    DiagnosticSeverity.Error, SOURCE));
         }
         return Optional.empty();
     }
@@ -168,7 +164,7 @@ public final class TraceDiagnostics {
         }
         return Optional.of(new Diagnostic(rangeOfOwnId(defect, line, lineIndex),
                 "'" + defect.getId() + "' is defined more than once.",
-                DiagnosticSeverity.Warning, SOURCE));
+                DiagnosticSeverity.Error, SOURCE));
     }
 
     // [impl->req~precise-ranges-from-oft~1]

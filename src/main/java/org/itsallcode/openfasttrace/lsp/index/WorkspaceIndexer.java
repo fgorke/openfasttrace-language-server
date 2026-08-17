@@ -28,7 +28,7 @@ public class WorkspaceIndexer {
         this.runner = runner;
     }
 
-    // [impl->req~diagnostic-trace-defects~2]
+    // [impl->req~diagnostic-trace-defects~3]
     public OftWorkspaceIndex buildIndex(final Path workspaceRoot) {
         Logger.info("Indexing workspace: " + workspaceRoot);
         // [impl->req~index-ignore-file~1]

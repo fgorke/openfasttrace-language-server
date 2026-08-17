@@ -70,7 +70,7 @@ class OftTextDocumentServiceProjectDiagnosticsTest {
                 .toList();
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenDefectInAClosedFileWhenTheIndexIsUpdatedThenItsDiagnosticsArePublished()
             throws Exception {
@@ -85,7 +85,7 @@ class OftTextDocumentServiceProjectDiagnosticsTest {
                 .satisfies(params -> assertThat(params.getDiagnostics()).isNotEmpty());
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenAResolvedDefectWhenTheIndexIsUpdatedThenTheStaleDiagnosticsAreCleared()
             throws Exception {

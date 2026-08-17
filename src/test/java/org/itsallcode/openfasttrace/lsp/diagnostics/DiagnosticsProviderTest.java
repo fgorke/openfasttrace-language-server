@@ -38,7 +38,7 @@ class DiagnosticsProviderTest {
 
     // [itest->req~diagnostic-outdated-version~2]
     @Test
-    void testGivenTagWithOutdatedRevisionWhenDiagnosingThenWarningCarriesTheCurrentId()
+    void testGivenTagWithOutdatedRevisionWhenDiagnosingThenErrorCarriesTheCurrentId()
             throws Exception {
         // given
         Files.writeString(workspace.resolve("spec.md"),
@@ -51,7 +51,7 @@ class DiagnosticsProviderTest {
 
         // then
         assertThat(diagnostics).singleElement().satisfies(diagnostic -> {
-            assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Warning);
+            assertThat(diagnostic.getSeverity()).isEqualTo(DiagnosticSeverity.Error);
             assertThat(diagnostic.getMessage().getLeft()).contains("req~login").contains("3");
             assertThat(diagnostic.getData()).isEqualTo("req~login~3");
         });
@@ -77,7 +77,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenTagPointingAtMissingItemWhenDiagnosingThenTheTagIsFlagged() throws Exception {
         // given
@@ -99,7 +99,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenItemMissingRequiredCoverageWhenDiagnosingThenTheDefinitionIsFlagged()
             throws Exception {
@@ -117,7 +117,7 @@ class DiagnosticsProviderTest {
         });
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenFullyCoveredWorkspaceWhenDiagnosingThenNothingIsReported() throws Exception {
         // given
@@ -132,7 +132,7 @@ class DiagnosticsProviderTest {
         assertThat(diagnose(source, index)).isEmpty();
     }
 
-    // [itest->req~diagnostic-trace-defects~2]
+    // [itest->req~diagnostic-trace-defects~3]
     @Test
     void testGivenDefectsInAnotherFileWhenDiagnosingThenOnlyLocalOnesAreReported()
             throws Exception {
