@@ -73,6 +73,8 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      OVSX_PAT: ${{ secrets.OPEN_VSX_TOKEN }}
 
     steps:
       - name: Checkout
@@ -117,5 +119,16 @@ jobs:
         run: bash ./.github/workflows/github_release.sh
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Set up Node.js
+        if: ${{ env.OVSX_PAT != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Publish to Open VSX Registry
+        if: ${{ env.OVSX_PAT != '' }}
+        working-directory: vscode-extension
+        run: npx --yes ovsx publish *.vsix
 
 

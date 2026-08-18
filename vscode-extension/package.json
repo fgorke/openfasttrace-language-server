@@ -5,6 +5,13 @@
   "version": "0.6.0",
   "publisher": "felixgorke",
   "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fgorke/openfasttrace-language-server.git"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
   "engines": {
     "vscode": "^1.82.0"
   },
