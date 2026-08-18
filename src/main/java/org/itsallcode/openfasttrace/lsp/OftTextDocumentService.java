@@ -286,20 +286,37 @@ public class OftTextDocumentService implements TextDocumentService {
                 .collect(Collectors.toList()));
     }
 
-    // [impl->req~quickfix-updates-all-versions~1]
+    // [impl->req~quickfix-updates-all-versions~2]
     private Optional<CodeAction> updateAllReferencesAction(final Diagnostic diagnostic,
             final String currentUri) {
-        return QuickFixProvider.outdatedTargetOf(diagnostic)
-                .map(currentId -> revisionUpdates(currentId, currentUri))
-                .filter(changes -> countEdits(changes) > 1)
-                .map(changes -> {
-                    final var action = new CodeAction(
-                            "Update all " + countEdits(changes) + " references to the current revision");
-                    action.setKind(CodeActionKind.QuickFix);
-                    action.setDiagnostics(List.of(diagnostic));
-                    action.setEdit(new WorkspaceEdit(changes));
-                    return action;
-                });
+        final Optional<SpecificationItemId> onATag = QuickFixProvider.outdatedTargetOf(diagnostic);
+        final Optional<SpecificationItemId> target = onATag
+                .or(() -> declaredItemAt(diagnostic, currentUri));
+        if (target.isEmpty()) {
+            return Optional.empty();
+        }
+        final int worthwhileFrom = onATag.isPresent() ? 2 : 1;
+        final Map<String, List<TextEdit>> changes = revisionUpdates(target.get(), currentUri);
+        if (countEdits(changes) < worthwhileFrom) {
+            return Optional.empty();
+        }
+        final var action = new CodeAction(
+                "Update all " + countEdits(changes) + " references to " + target.get());
+        action.setKind(CodeActionKind.QuickFix);
+        action.setDiagnostics(List.of(diagnostic));
+        action.setEdit(new WorkspaceEdit(changes));
+        return Optional.of(action);
+    }
+
+    private Optional<SpecificationItemId> declaredItemAt(final Diagnostic diagnostic,
+            final String uri) {
+        final Position start = diagnostic.getRange().getStart();
+        final String lineText = readLine(uri, start.getLine());
+        if (!OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(lineText).matches()) {
+            return Optional.empty();
+        }
+        return OftIdAtPosition.findAt(lineText, start.getCharacter())
+                .filter(id -> index.findSpecItem(id).isPresent());
     }
 
     private Map<String, List<TextEdit>> revisionUpdates(final SpecificationItemId currentId,

@@ -57,7 +57,7 @@ public class QuickFixProvider {
         }
     }
 
-    // [impl->req~quickfix-updates-all-versions~1]
+    // [impl->req~quickfix-updates-all-versions~2]
     public static List<TextEdit> revisionUpdatesInLine(final String line, final int lineIndex,
             final SpecificationItemId currentId) {
         final List<TextEdit> edits = new ArrayList<>();

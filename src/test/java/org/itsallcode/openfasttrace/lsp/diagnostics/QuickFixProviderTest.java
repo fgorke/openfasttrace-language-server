@@ -65,7 +65,7 @@ class QuickFixProviderTest {
         assertThat(actions.get(0).getTitle()).contains("req~my-req~3");
     }
 
-    // [utest->req~quickfix-updates-all-versions~1]
+    // [utest->req~quickfix-updates-all-versions~2]
     @Test
     void testGivenLineWithAnOutdatedTagWhenCollectingUpdatesThenOnlyTheRevisionIsReplaced() {
         // given
@@ -84,7 +84,7 @@ class QuickFixProviderTest {
         });
     }
 
-    // [utest->req~quickfix-updates-all-versions~1]
+    // [utest->req~quickfix-updates-all-versions~2]
     @Test
     void testGivenSeveralOutdatedIdsInOneLineWhenCollectingUpdatesThenEachOneIsEdited() {
         // given
@@ -100,7 +100,7 @@ class QuickFixProviderTest {
     }
 
 
-    // [utest->req~quickfix-updates-all-versions~1]
+    // [utest->req~quickfix-updates-all-versions~2]
     @Test
     void testGivenADiagnosticWithoutDataWhenAskingForTheOutdatedTargetThenNothingIsReturned() {
         // given

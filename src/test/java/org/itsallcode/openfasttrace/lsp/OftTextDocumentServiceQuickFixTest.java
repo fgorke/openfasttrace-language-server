@@ -57,7 +57,7 @@ class OftTextDocumentServiceQuickFixTest {
         return new WorkspaceIndexer().buildIndex(workspace);
     }
 
-    // [itest->req~quickfix-updates-all-versions~1]
+    // [itest->req~quickfix-updates-all-versions~2]
     @Test
     void testGivenSeveralOutdatedReferencesWhenAskingForActionsThenOneUpdatesThemAll()
             throws Exception {
@@ -75,7 +75,7 @@ class OftTextDocumentServiceQuickFixTest {
                 .allSatisfy(edit -> assertThat(edit.getNewText()).isEqualTo("3"));
     }
 
-    // [itest->req~quickfix-updates-all-versions~1]
+    // [itest->req~quickfix-updates-all-versions~2]
     @Test
     void testGivenOneOutdatedReferenceWhenAskingForActionsThenNoBulkActionIsOffered()
             throws Exception {
@@ -91,5 +91,39 @@ class OftTextDocumentServiceQuickFixTest {
         // then
         assertThat(actions).hasSize(1);
         assertThat(actions.get(0).getTitle()).isEqualTo("Update to req~login~3");
+    }
+
+    // [itest->req~quickfix-updates-all-versions~2]
+    @Test
+    void testGivenTheRaisedItemWhenAskingForActionsThenAllReferencesCanBeUpdatedFromThere()
+            throws Exception {
+        // given
+        final Path spec = workspace.resolve("spec.md");
+        final String uri = spec.toUri().toString();
+        final Diagnostic uncovered = diagnosticsOf(spec).stream()
+                .filter(diagnostic -> diagnostic.getMessage().getLeft().contains("Not covered by"))
+                .findFirst().orElseThrow();
+
+        // when
+        final List<CodeAction> actions = actionsFor(uri, uncovered);
+
+        // then
+        assertThat(actions).singleElement().satisfies(action -> {
+            assertThat(action.getTitle()).isEqualTo("Update all 3 references to req~login~3");
+            assertThat(action.getEdit().getChanges().values().stream().flatMap(List::stream))
+                    .allSatisfy(edit -> assertThat(edit.getNewText()).isEqualTo("3"));
+        });
+    }
+
+    private List<Diagnostic> diagnosticsOf(final Path file) throws Exception {
+        return new org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider()
+                .diagnoseFile(file.toUri().toString(), Files.readAllLines(file), indexOfService());
+    }
+
+    private List<CodeAction> actionsFor(final String uri, final Diagnostic diagnostic)
+            throws Exception {
+        final var params = new CodeActionParams(new TextDocumentIdentifier(uri),
+                diagnostic.getRange(), new CodeActionContext(List.of(diagnostic)));
+        return service.codeAction(params).get().stream().map(either -> either.getRight()).toList();
     }
 }
