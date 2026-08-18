@@ -28,6 +28,8 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
+            <li>0.7: outdated references updated from the specification item itself, and
+                go to definition from a Covers entry leads to the item</li>
             <li>0.6: trace defects carry a severity, .oftignore applied as soon as it is saved,
                 and tag suggestions limited to code comments</li>
             <li>0.5: trace defects of the whole project, quick fix for all outdated references
