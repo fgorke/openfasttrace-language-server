@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0
+
+* Every outdated reference to a specification item can be updated from the item itself
+* Go to definition on a `Covers:` entry leads to the item it names
+* An item is left out of the suggestions for its own `Covers:` section
+* The extension is available from the Open VSX Registry
+
 ## 0.6.0
 
 * Trace defects carry a severity: a reference that cannot be resolved, an ID defined twice and a coverage cycle are errors, coverage that is still missing is a warning
