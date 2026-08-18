@@ -61,9 +61,9 @@ Covers:
 Needs: impl, utest
 
 ## Quick Fix Updates All Outdated References
-req~quickfix-updates-all-versions~1
+req~quickfix-updates-all-versions~2
 
-When more than one reference to the same specification item is outdated, the diagnostic comes with a second code action that updates all of them across the workspace.
+A code action lifts every outdated reference to a specification item to its current revision across the workspace. It is offered at both ends: on a coverage tag and on the spec item itself.
 
 Covers:
 * feat~quickfix-outdated-version~1
