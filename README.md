@@ -6,7 +6,7 @@
 
 The OpenFastTrace Language Server brings OFT support into code editors through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP). One server process understands OFT specification items and coverage tags. Any LSP-capable editor can connect to it. This repository ships two clients that do exactly that: an IntelliJ IDEA plugin and a VS Code extension.
 
-You can learn more about requirement tracing and the OFT format in the [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md).
+You can learn more about requirement tracing and the OFT format in the [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md).
 
 ## Quickstart
 

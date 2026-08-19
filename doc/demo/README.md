@@ -78,7 +78,7 @@ Open the problems view (`Alt+6` / `Ctrl+Shift+M`).
 >
 >Two **informations**, which are not the marked item's doing at all:
 >`feat~brew-coffee~1` and `req~start-brewing~1` are fine in themselves, only the
->chain below them is broken. More information in the [OFT User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md#transitive-defects).
+>chain below them is broken. More information in the [OFT User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md#transitive-defects).
 
 ### 7. Quick fix
 
