@@ -10,16 +10,24 @@ import org.itsallcode.openfasttrace.api.report.ReportVerbosity;
 // [impl->req~trace-report-on-request~1]
 public enum TraceReportPreset {
 
-    HTML("html", "html", ReportVerbosity.ALL,
+    HTML("html", Format.HTML, ReportVerbosity.ALL,
             "HTML report"),
-    PLAIN_ALL("plain-all", "plain", ReportVerbosity.ALL,
+    PLAIN_ALL("plain-all", Format.PLAIN, ReportVerbosity.ALL,
             "Plain text, every item"),
-    PLAIN_FAILURES("plain-failures", "plain", ReportVerbosity.FAILURE_DETAILS,
+    PLAIN_FAILURES("plain-failures", Format.PLAIN, ReportVerbosity.FAILURE_DETAILS,
             "Plain text, defects only"),
-    PLAIN_DIRECT_FAILURES("plain-direct-failures", "plain", ReportVerbosity.DIRECT_FAILURE_DETAILS,
+    PLAIN_DIRECT_FAILURES("plain-direct-failures", Format.PLAIN, ReportVerbosity.DIRECT_FAILURE_DETAILS,
             "Plain text, defects only, without those inherited from covered items"),
-    PLAIN_SUMMARY("plain-summary", "plain", ReportVerbosity.SUMMARY,
+    PLAIN_SUMMARY("plain-summary", Format.PLAIN, ReportVerbosity.SUMMARY,
             "Plain text, one line summary");
+
+    private static final class Format {
+        private static final String HTML = "html";
+        private static final String PLAIN = "plain";
+
+        private Format() {
+        }
+    }
 
     private final String id;
     private final String outputFormat;

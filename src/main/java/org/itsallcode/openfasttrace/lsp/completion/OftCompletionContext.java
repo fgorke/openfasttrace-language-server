@@ -86,18 +86,15 @@ public record OftCompletionContext(String prefix, boolean appendClosingBracket,
         String enclosingItemId = null;
         for (int i = 0; i <= lineIndex; i++) {
             final String line = lines.get(i);
-            if (line.isBlank()) {
-                continue;
-            }
-            final Matcher definition = OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(line);
-            if (definition.matches()) {
-                enclosingItemId = definition.group(1);
-                insideCoversSection = false;
-                continue;
-            }
-            final Matcher keyword = OftSyntax.SECTION_KEYWORD_LINE.matcher(line);
-            if (keyword.find()) {
-                insideCoversSection = "Covers".equals(keyword.group(1));
+            if (!line.isBlank()) {
+                final Matcher definition = OftSyntax.SPECIFICATION_ITEM_DEFINITION_LINE.matcher(line);
+                final Matcher keyword = OftSyntax.SECTION_KEYWORD_LINE.matcher(line);
+                if (definition.matches()) {
+                    enclosingItemId = definition.group(1);
+                    insideCoversSection = false;
+                } else if (keyword.find()) {
+                    insideCoversSection = "Covers".equals(keyword.group(1));
+                }
             }
         }
         if (!insideCoversSection) {

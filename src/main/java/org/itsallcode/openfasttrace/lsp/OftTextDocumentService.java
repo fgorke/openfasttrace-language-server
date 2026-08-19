@@ -129,13 +129,17 @@ public class OftTextDocumentService implements TextDocumentService {
         this.client = client;
     }
 
+    private static String at(final String request, final String uri, final int line, final int col) {
+        return request + ": uri=" + uri + " line=" + line + " col=" + col;
+    }
+
     // [impl->req~hover-title-and-description~2]
     @Override
     public CompletableFuture<Hover> hover(final HoverParams params) {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("hover: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("hover", uri, line, col));
         return CompletableFuture.supplyAsync(() -> {
             final String lineText = readLine(uri, line);
             return hoverForLine(lineText, col, line).orElse(null);
@@ -166,7 +170,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("definition: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("definition", uri, line, col));
         return CompletableFuture.supplyAsync(() -> {
             final String lineText = readLine(uri, line);
             final List<Location> locations = definitionForLine(lineText, col);
@@ -214,7 +218,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("prepareTypeHierarchy: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("prepareTypeHierarchy", uri, line, col));
         return CompletableFuture.supplyAsync(
                 () -> OftTypeHierarchyProvider.prepareAt(readLine(uri, line), col, index));
     }
@@ -240,7 +244,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("references: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("references", uri, line, col));
         return CompletableFuture.supplyAsync(() -> {
             final String lineText = readLine(uri, line);
             return referencesForLine(lineText, col);
@@ -353,7 +357,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final int col = params.getPosition().getCharacter();
         final boolean suggestTagStart = params.getContext() == null
                 || params.getContext().getTriggerKind() != CompletionTriggerKind.TriggerCharacter;
-        Logger.debug("completion: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("completion", uri, line, col));
         if (index.isExcludedFile(uri)) {
             return CompletableFuture.completedFuture(Either.forLeft(List.of()));
         }
@@ -424,7 +428,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("prepareRename: uri=" + uri + " line=" + line + " col=" + col);
+        Logger.debug(at("prepareRename", uri, line, col));
         return CompletableFuture.supplyAsync(() -> prepareRenameAt(readLine(uri, line), line, col)
                 .map(Either3::<Range, PrepareRenameResult, PrepareRenameDefaultBehavior>forSecond)
                 .orElse(null));
@@ -443,8 +447,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final String uri = params.getTextDocument().getUri();
         final int line = params.getPosition().getLine();
         final int col = params.getPosition().getCharacter();
-        Logger.debug("rename: uri=" + uri + " line=" + line + " col=" + col
-                + " newName=" + params.getNewName());
+        Logger.debug(at("rename", uri, line, col) + " newName=" + params.getNewName());
         try {
             return CompletableFuture
                     .completedFuture(renameEdits(uri, line, col, params.getNewName()));

@@ -3,6 +3,7 @@
 # OpenFastTrace Language Server
 
 [![CI](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml/badge.svg)](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=fgorke_openfasttrace-language-server&metric=alert_status)](https://sonarcloud.io/summary/overall?id=fgorke_openfasttrace-language-server)
 [![Open VSX](https://img.shields.io/open-vsx/v/felixgorke/openfasttrace-lsp?label=Open%20VSX)](https://open-vsx.org/extension/felixgorke/openfasttrace-lsp)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 
