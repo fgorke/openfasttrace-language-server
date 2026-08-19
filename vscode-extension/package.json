@@ -3,7 +3,7 @@
   "displayName": "OpenFastTrace Language Server",
   "description": "Integrates the OpenFastTrace (OFT) language server into VS Code via the Language Server Protocol.",
   "version": "0.7.0",
-  "publisher": "felixgorke",
+  "publisher": "fgorke",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
