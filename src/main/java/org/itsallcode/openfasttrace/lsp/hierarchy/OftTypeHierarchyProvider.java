@@ -126,9 +126,7 @@ public final class OftTypeHierarchyProvider {
     }
 
     private static Optional<SpecificationItemId> idOf(final TypeHierarchyItem item) {
-        final Object data = item.getData();
-        final String id = data instanceof JsonPrimitive primitive ? primitive.getAsString()
-                : data instanceof String string ? string : null;
+        final String id = idTextOf(item.getData());
         if (id == null) {
             return Optional.empty();
         }
@@ -137,6 +135,16 @@ public final class OftTypeHierarchyProvider {
         } catch (final RuntimeException exception) {
             return Optional.empty();
         }
+    }
+
+    private static String idTextOf(final Object data) {
+        if (data instanceof JsonPrimitive primitive) {
+            return primitive.getAsString();
+        }
+        if (data instanceof String string) {
+            return string;
+        }
+        return null;
     }
 
     private static Optional<SpecificationItem> resolve(final SpecificationItemId id,

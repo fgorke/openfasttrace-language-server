@@ -31,10 +31,12 @@ class OftTextDocumentServiceProjectDiagnosticsTest {
 
         @Override
         public void telemetryEvent(final Object object) {
+            // this test only looks at published diagnostics
         }
 
         @Override
         public void showMessage(final MessageParams messageParams) {
+            // this test only looks at published diagnostics
         }
 
         @Override
@@ -45,6 +47,7 @@ class OftTextDocumentServiceProjectDiagnosticsTest {
 
         @Override
         public void logMessage(final MessageParams message) {
+            // this test only looks at published diagnostics
         }
     }
 

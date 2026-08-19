@@ -43,26 +43,25 @@ public final class LocationConverter {
             final String lineText) {
         final String uri = pathToUri(oftLocation.getPath());
         final int line = Math.max(0, oftLocation.getLine() - 1);
-        final int[] span = highlightSpan(lineText);
-        final int startCol = span == null ? 0 : span[0];
-        final int endCol = span == null ? Integer.MAX_VALUE : span[1];
-        return new org.eclipse.lsp4j.Location(uri,
-                new Range(new Position(line, startCol), new Position(line, endCol)));
+        return new org.eclipse.lsp4j.Location(uri, highlightRange(lineText, line));
     }
 
-    private static int[] highlightSpan(final String lineText) {
-        if (lineText == null || lineText.isEmpty()) {
-            return null;
+    private static Range highlightRange(final String lineText, final int line) {
+        if (lineText != null && !lineText.isEmpty()) {
+            final Matcher tag = OftSyntax.COVERAGE_TAG_LOOSE.matcher(lineText);
+            if (tag.find()) {
+                return rangeIn(line, tag.start(), tag.end());
+            }
+            final Matcher id = OftSyntax.SPECIFICATION_ITEM_ID.matcher(lineText);
+            if (id.find()) {
+                return rangeIn(line, id.start(), id.end());
+            }
         }
-        final Matcher tag = OftSyntax.COVERAGE_TAG_LOOSE.matcher(lineText);
-        if (tag.find()) {
-            return new int[] { tag.start(), tag.end() };
-        }
-        final Matcher id = OftSyntax.SPECIFICATION_ITEM_ID.matcher(lineText);
-        if (id.find()) {
-            return new int[] { id.start(), id.end() };
-        }
-        return null;
+        return rangeIn(line, 0, Integer.MAX_VALUE);
+    }
+
+    private static Range rangeIn(final int line, final int startColumn, final int endColumn) {
+        return new Range(new Position(line, startColumn), new Position(line, endColumn));
     }
 
     public static String pathToUri(final String path) {

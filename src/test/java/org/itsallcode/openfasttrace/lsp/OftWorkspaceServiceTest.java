@@ -38,10 +38,12 @@ class OftWorkspaceServiceTest {
         // given
         final OftWorkspaceService service = new OftWorkspaceService();
         final AtomicInteger callbackCount = new AtomicInteger();
-        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch firstCall = new CountDownLatch(1);
+        final CountDownLatch secondCall = new CountDownLatch(2);
         service.setOnFilesChangedCallback(() -> {
             callbackCount.incrementAndGet();
-            latch.countDown();
+            firstCall.countDown();
+            secondCall.countDown();
         });
 
         // when
@@ -50,8 +52,8 @@ class OftWorkspaceServiceTest {
         }
 
         // then
-        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
-        Thread.sleep(200);
+        assertThat(firstCall.await(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(secondCall.await(200, TimeUnit.MILLISECONDS)).isFalse();
         assertThat(callbackCount.get()).isEqualTo(1);
     }
 

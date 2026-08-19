@@ -101,19 +101,23 @@ public final class TraceDiagnostics {
         final Range range = rangeOfCoveredId(defect, targetId, line, lineIndex);
         return switch (status) {
             case ORPHANED -> new Diagnostic(range,
-                    "Covers '" + targetId + "', which does not exist.",
+                    covers(targetId, "does not exist."),
                     DiagnosticSeverity.Error, SOURCE);
             case OUTDATED -> revisionMismatchDiagnostic(range, targetId,
                     "Outdated reference: current revision of '");
             case PREDATED -> revisionMismatchDiagnostic(range, targetId,
                     "Reference to a revision that does not exist yet: current revision of '");
             case AMBIGUOUS -> new Diagnostic(range,
-                    "Covers '" + targetId + "', which is defined more than once.",
+                    covers(targetId, "is defined more than once."),
                     DiagnosticSeverity.Error, SOURCE);
             default -> new Diagnostic(range,
-                    "Covers '" + targetId + "', which does not want this coverage.",
+                    covers(targetId, "does not want this coverage."),
                     DiagnosticSeverity.Warning, SOURCE);
         };
+    }
+
+    private static String covers(final SpecificationItemId targetId, final String whatIsWrong) {
+        return "Covers '" + targetId + "', which " + whatIsWrong;
     }
 
     // [impl->req~diagnostic-outdated-version~2]
