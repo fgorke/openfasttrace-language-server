@@ -1,180 +1,162 @@
+<div align="center">
+
 # OpenFastTrace Language Server
 
-## What is OpenFastTrace Language Server?
+[![CI](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml/badge.svg)](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml)
+[![Open VSX](https://img.shields.io/open-vsx/v/felixgorke/openfasttrace-lsp?label=Open%20VSX)](https://open-vsx.org/extension/felixgorke/openfasttrace-lsp)
+[![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 
-[OpenFastTrace](https://github.com/itsallcode/openfasttrace) (short OFT) is a requirement tracing suite. It keeps track of whether you actually implemented everything you planned to in your specifications.
+[Feature guide](doc/user-guide/README.md) · [Demo walkthrough](doc/demo/README.md) · [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/)
 
-The OpenFastTrace Language Server brings OFT support into code editors through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP). One server process understands OFT specification items and coverage tags. Any LSP-capable editor can connect to it. This repository ships two clients that do exactly that: an IntelliJ IDEA plugin and a VS Code extension.
+![The language server at work](doc/user-guide/images/hero.png)
 
-You can learn more about requirement tracing and the OFT format in the [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md).
+</div>
 
-## Quickstart
+## What it does
 
-The easiest way to get started with the OpenFastTrace Language Server is to install a pre-built client from the releases.
+[OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) is a requirement
+tracing suite. It keeps track of whether you actually implemented everything you
+planned to in your specifications.
+
+This project brings that into the editor through the
+[Language Server Protocol](https://microsoft.github.io/language-server-protocol/).
+One server process understands OFT specification items and coverage tags, and any
+LSP-capable editor can connect to it. Two clients ship here: an **IntelliJ IDEA
+plugin** and a **VS Code extension**.
+
+New to the OFT format? The [OFT user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md)
+explains items, coverage and artifact types.
+
+## Features
+
+| Feature                                                             | What it gives you                                                |
+|---------------------------------------------------------------------|------------------------------------------------------------------|
+| [Syntax highlighting](doc/user-guide/README.md#syntax-highlighting) | Item IDs, section keywords and coverage tags in their own colors |
+| [Hover documentation](doc/user-guide/README.md#hover-documentation) | Title and description of the item an ID refers to                |
+| [Go to definition](doc/user-guide/README.md#go-to-definition)       | From a tag to the item, from an item to everything covering it   |
+| [Find references](doc/user-guide/README.md#find-references)         | Every coverage tag in the workspace that covers an item          |
+| [Symbol search](doc/user-guide/README.md#symbol-search)             | Items through the editor's workspace symbol search               |
+| [Trace diagnostics](doc/user-guide/README.md#trace-diagnostics)     | Defects of every file, by severity, in the problems view         |
+| [Quick fix](doc/user-guide/README.md#quick-fix)                     | Outdated references lifted to the current revision, one or all   |
+| [Coverage code lens](doc/user-guide/README.md#coverage-code-lens)   | What an item still needs, shown above its ID                     |
+| [Coverage hierarchy](doc/user-guide/README.md#coverage-hierarchy)   | The full chain from feature down to the tags in source           |
+| ️[Code completion](doc/user-guide/README.md#code-completion)        | Item IDs in `Covers:` and tags, plus tag skeletons               |
+| [Rename](doc/user-guide/README.md#rename)                           | An item and every reference to it, in one step                   |
+| [Trace report](doc/user-guide/README.md#trace-report)               | The full OFT report as HTML or plain text                        |
+| [Ignore file](doc/user-guide/README.md#ignore-file)                 | Glob patterns in `.oftignore` keep paths out of the trace        |
+
+The [feature guide](doc/user-guide/README.md) shows each of them with a screenshot
+and the shortcut for both editors.
+
+## Install
+
+Both clients start the server automatically when a supported file is opened. No
+configuration needed.
 
 ### IntelliJ IDEA
 
-1. Download the latest plugin ZIP from the [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
-2. Open IntelliJ IDEA Ultimate.
-3. Go to **Settings → Plugins**.
-4. Click the gear icon and select **Install Plugin from Disk**.
-5. Select the downloaded ZIP file.
-6. Restart IntelliJ IDEA when prompted.
+Requires IntelliJ IDEA **Ultimate** 2026.1 or later.
+
+1. Download the plugin ZIP from the [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
+2. **Settings → Plugins → ⚙ → Install Plugin from Disk…**, pick the ZIP.
+3. Restart when prompted.
 
 ### VS Code
 
-1. Download the `.vsix` for your platform from the [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page. Each one carries its own Java runtime, so the file name ends in the platform, for example `-win32-x64` or `-darwin-arm64`.
-2. Run `code --install-extension <downloaded-file>.vsix`, or open the Extensions view, click the `...` menu and choose **Install from VSIX...**.
+Requires VS Code 1.82 or later.
 
-Both clients start the OpenFastTrace Language Server automatically when a supported file is opened. No additional configuration is required.
+Install from the [Open VSX Registry](https://open-vsx.org/extension/felixgorke/openfasttrace-lsp),
+or from a downloaded package:
 
-For building a client yourself or running the language server standalone, see the development instructions below.
+1. Download the `.vsix` for your platform from the [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
+2. Open the Extensions view, click the `···` menu and choose **Install from VSIX…**, pick the file.
 
-## Project Information
+Each package carries its own Java runtime, so the file name ends in the platform,
+for example `-win32-x64` or `-darwin-arm64`.
 
-* Bachelor thesis project, work in progress
-* Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.9.0
-* License: [GPL-3.0-or-later](LICENSE)
-* Requirements: [doc/spec/](doc/spec/), architecture decisions: [doc/decisions/](doc/decisions/)
+## Try it
 
-## Using the Language Server
+[doc/demo/](doc/demo/) holds a small coffee maker project that visits every feature
+in order. Open `doc/demo/example` as the project and follow the
+[demo walkthrough](doc/demo/README.md). A few defects in it are intentional, so the
+diagnostics, the quick fix and the report have something to show.
 
-The server provides these features to any connected editor:
+## Survey
 
-* **Hover documentation.** Hovering over a coverage tag shows the referenced specification item's title and description.
-* **Go to definition.** A coverage tag jumps to the specification item in Markdown. A specification item ID jumps to all its covering tags.
-* **Find references.** Lists every coverage tag in the workspace that covers a specification item.
-* **Trace diagnostics.** Specification items that are missing required coverage, coverage tags pointing at items that do not exist, and duplicate definitions are reported at the position that caused them. Shown in the editor's problems view.
-* **Quick fix.** Coverage tags that reference an outdated revision get an error with a quick fix that updates the version number to the current revision, either for that one tag or for every outdated reference to the item in the workspace.
-* **Syntax highlighting.** Specification item definitions, section keywords and coverage tags are reported as semantic tokens.
-* **Code completion.** Specification item IDs are suggested while typing a `Covers:` entry or a coverage tag target such as `[impl->`.
-* **Trace report.** A full OpenFastTrace report is rendered on request and opened in the editor, as HTML or plain text in several levels of detail.
-* **Coverage code lens.** A short summary above each specification item names the artifact types it still needs and how many items cover it.
-* **Coverage hierarchy.** The full coverage chain is shown as a type hierarchy, always starting at the top: downwards the items covering an item, ending at the coverage tags in the source code. It is opened on a specification item ID.
-* **Symbol search.** Specification items are found through the editor's workspace symbol search.
-* **Rename.** Renaming a specification item updates its definition together with every coverage tag and `Covers:` entry in the workspace.
-* **Tag skeletons.** Invoking completion manually in comments offers a skeleton such as `[impl->...]` for every artifact type the workspace needs, including project specific ones.
-* **Ignore file.** Glob patterns in a `.oftignore` file in the workspace root exclude files from all OFT features. Build output (`target`, `build`, `out`, `dist`, `node_modules`) and hidden paths are excluded by default, at every depth.
+This language server is the subject of a bachelor's thesis. Taking part is two
+steps: first work through the [demo walkthrough](doc/demo/README.md), then answer
+the [survey](https://studentische-umfragen.uni-hamburg.de/index.php/842417?lang=en)
+right afterwards. The survey builds on the walkthrough, so please do that one
+first. Answers are evaluated pseudonymously and used only for the thesis.
 
-### Demo walkthrough
+## Project information
 
-[doc/demo/](doc/demo/) holds a small example project that visits every feature above. Open `doc/demo/example` as the project, then follow the [walkthrough](doc/demo/README.md).
+| Topic         | Details                                                                              |
+|---------------|--------------------------------------------------------------------------------------|
+| Status        | Bachelor thesis project, work in progress                                            |
+| Built on      | Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.9.0 |
+| License       | [GPL-3.0-or-later](LICENSE)                                                          |
+| Specification | [requirements](doc/spec/requirements.md) · [features](doc/spec/features.md)          |
+| Decisions     | [architecture decision records](doc/decisions/)                                      |
 
-### Survey
+## Building from source
 
-This language server is the subject of a bachelor's thesis. Taking part is two steps: first work through the [demo walkthrough](doc/demo/README.md), then answer the [survey](https://studentische-umfragen.uni-hamburg.de/index.php/842417?lang=en) right afterwards. The survey builds on the walkthrough, so please do that one first. Answers are evaluated pseudonymously and used only for the thesis.
+<details>
+<summary>Server, plugin and extension</summary>
 
+### Prerequisites
 
-## Getting the Project
+* Java 17 or later, Maven 3.6 or later
+* Node.js and npm for the VS Code extension
+* Gradle comes as a wrapper in `intellij-plugin/`
+
+### Server
 
 ```bash
 git clone https://github.com/fgorke/openfasttrace-language-server.git
-```
-
-## Installation
-
-### Runtime Dependencies
-
-* For the IntelliJ plugin: IntelliJ IDEA Ultimate 2026.1 or later.
-* For the VS Code extension: VS Code 1.82 or later.
-* For the standalone server: Java 17 or later
-
-### Build Dependencies
-
-* Maven 3.6 or later for the server
-* Gradle is bundled as a wrapper in `intellij-plugin/`
-* Node.js and npm for the VS Code extension in `vscode-extension/`
-
-## Building
-
-Build the server and run all tests:
-
-```bash
+cd openfasttrace-language-server
 mvn verify
 ```
 
-The build produces a standalone fat JAR at `target/openfasttrace-language-server-*-standalone.jar`.
-
-## Running
-
-### Standalone
+The build produces a standalone fat JAR at
+`target/openfasttrace-language-server-*-standalone.jar`. It speaks LSP over stdio,
+so any editor with an LSP client can launch it directly:
 
 ```bash
 java -jar target/openfasttrace-language-server-*-standalone.jar
 ```
 
-The server speaks LSP over stdio. Any editor with an LSP client can launch it this way.
-
-### IntelliJ IDEA Plugin (Development)
-
-The `intellij-plugin/` module wraps the server for IntelliJ IDEA Ultimate.
-
-Run a sandbox IDE with the plugin during development:
+### IntelliJ plugin
 
 ```bash
 mvn package
 cd intellij-plugin
-./gradlew runIde
+./gradlew runIde        # sandbox IDE with the plugin
+./gradlew buildPlugin   # installable ZIP in build/distributions/
 ```
 
-Build an installable plugin ZIP:
-
-```bash
-mvn package
-cd intellij-plugin
-./gradlew buildPlugin
-```
-
-The ZIP lands in `intellij-plugin/build/distributions/`.
-
-### VS Code Extension (Development)
-
-The `vscode-extension/` module wraps the server for VS Code.
-
-Run an Extension Development Host during development:
+### VS Code extension
 
 ```bash
 mvn package
 cd vscode-extension
 npm install
-npm run watch
+npm run watch     # then press F5 in VS Code to launch an extension host
+npm run package   # .vsix for the current platform
 ```
 
-Then press F5 in VS Code (with `vscode-extension/` open as the workspace) to launch it.
+`jlink` only builds a runtime for the platform it runs on, so a package built here
+carries a runtime for this machine only. The releases are built per platform in CI.
 
-Build an installable package with a Java runtime bundled for the current machine:
+</details>
 
-```bash
-mvn package
-cd vscode-extension
-npm install
-npm run package
-```
-
-The `.vsix` lands in `vscode-extension/` and its name ends in the platform, for example `-win32-x64`.
-
-`jlink` only builds a runtime for the platform it runs on.
-
-## Requirement Tracing
-
-This project traces its own requirements with OpenFastTrace. Features live in [doc/spec/features.md](doc/spec/features.md), requirements in [doc/spec/requirements.md](doc/spec/requirements.md). The testing approach is documented in [ADR-0009](doc/decisions/0009-testing-strategy.md).
-
-## Related Projects
+## Related projects
 
 * [OpenFastTrace](https://github.com/itsallcode/openfasttrace): the requirement tracing suite this server builds on
 * [OpenFastTrace IntelliJ Plugin](https://github.com/itsallcode/openfasttrace-intellij-plugin): the native PSI-based IntelliJ integration by the itsallcode team
-* [LSP4J](https://github.com/eclipse-lsp4j/lsp4j): the Java implementation of the Language Server Protocol used here
-
-## Development
-
-Tests follow a Given-When-Then structure and are split into unit and integration tests. See [ADR-0009](doc/decisions/0009-testing-strategy.md) for the full testing strategy.
-
-```bash
-mvn test
-```
+* [LSP4J](https://github.com/eclipse-lsp4j/lsp4j): the Java binding for the Language Server Protocol
 
 ## License
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-See [LICENSE](LICENSE) for the full text. OpenFastTrace is licensed under GPL-3.0-or-later. This project links OFT on the classpath, so it is GPL-3.0-or-later as well (see [ADR-0005](doc/decisions/0005-license.md)).
+[GPL-3.0-or-later](LICENSE). OpenFastTrace is licensed under GPL-3.0 without a
+classpath exception and this project links against it, so the license propagates.
