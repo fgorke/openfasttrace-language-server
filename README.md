@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml/badge.svg)](https://github.com/fgorke/openfasttrace-language-server/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=fgorke_openfasttrace-language-server&metric=alert_status)](https://sonarcloud.io/summary/overall?id=fgorke_openfasttrace-language-server)
-[![Open VSX](https://img.shields.io/open-vsx/v/felixgorke/openfasttrace-lsp?label=Open%20VSX)](https://open-vsx.org/extension/felixgorke/openfasttrace-lsp)
+[![Open VSX](https://img.shields.io/open-vsx/v/fgorke/openfasttrace-lsp?label=Open%20VSX)](https://open-vsx.org/extension/fgorke/openfasttrace-lsp)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 
 [Feature guide](doc/user-guide/README.md) · [Demo walkthrough](doc/demo/README.md) · [Releases](https://github.com/fgorke/openfasttrace-language-server/releases/)
@@ -66,7 +66,7 @@ Requires IntelliJ IDEA **Ultimate** 2026.1 or later.
 
 Requires VS Code 1.82 or later.
 
-Install from the [Open VSX Registry](https://open-vsx.org/extension/felixgorke/openfasttrace-lsp),
+Install from the [Open VSX Registry](https://open-vsx.org/extension/fgorke/openfasttrace-lsp),
 or from a downloaded package:
 
 1. Download the `.vsix` for your platform from the [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.

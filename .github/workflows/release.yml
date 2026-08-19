@@ -129,6 +129,10 @@ jobs:
       - name: Publish to Open VSX Registry
         if: ${{ env.OVSX_PAT != '' }}
         working-directory: vscode-extension
-        run: npx --yes ovsx publish *.vsix
+        run: |
+          for package in *.vsix; do
+            echo "Publishing $package"
+            npx --yes ovsx publish "$package"
+          done
 
 
