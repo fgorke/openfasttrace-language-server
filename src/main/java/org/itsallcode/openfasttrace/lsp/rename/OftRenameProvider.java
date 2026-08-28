@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
-import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
 // [impl->req~rename-name-part-only~1]
@@ -17,9 +15,6 @@ public final class OftRenameProvider {
 
     private static final int NAME_GROUP = 2;
     private static final int ARTIFACT_TYPE_GROUP = 1;
-
-    private static final Pattern ITEM_NAME =
-            Pattern.compile("^" + SpecificationItemId.ITEM_NAME_PATTERN + "$");
 
     private OftRenameProvider() {
     }
@@ -55,7 +50,7 @@ public final class OftRenameProvider {
     }
 
     public static boolean isValidItemName(final String name) {
-        return ITEM_NAME.matcher(name).matches();
+        return OftSyntax.isValidItemName(name);
     }
 
     // [impl->req~rename-specification-item~1]

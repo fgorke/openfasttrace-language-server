@@ -4,7 +4,10 @@ date: 2026-08-06
 decision-makers: Felix Gorke
 ---
 
-# Trace Results in the Editor as Diagnostics
+# Show Trace Results as Diagnostics
+`adr~show-trace-results-as-diagnostics~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 

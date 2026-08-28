@@ -21,6 +21,7 @@ import javax.swing.Icon
 private val LOG = logger<OftProblemsReporter>()
 
 @Service(Service.Level.PROJECT)
+// [impl->adr~report-project-wide-trace-problems-in-intellij~1]
 internal class OftProblemsReporter(override val project: Project) : ProblemsProvider {
 
     private val reportedProblems = ConcurrentHashMap<String, Set<FileProblem>>()

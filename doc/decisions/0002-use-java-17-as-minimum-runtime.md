@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# Java Version: 17 LTS
+# Use Java 17 as Minimum Runtime
 
 ## Context and Problem Statement
 

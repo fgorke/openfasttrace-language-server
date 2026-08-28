@@ -6,12 +6,16 @@ import java.util.regex.Pattern;
 
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 
+// [impl->adr~centralize-oft-syntax-patterns-in-one-class~1]
 public final class OftSyntax {
 
     public static final Pattern SPECIFICATION_ITEM_ID = SpecificationItemId.ID_PATTERN;
 
     public static final Pattern SPECIFICATION_ITEM_DEFINITION_LINE = Pattern.compile(
             "^`?(" + SPECIFICATION_ITEM_ID.pattern() + ")`?.*$");
+
+    private static final Pattern ITEM_NAME =
+            Pattern.compile("^" + SpecificationItemId.ITEM_NAME_PATTERN + "$");
 
     public static final Pattern SECTION_KEYWORD_LINE = Pattern.compile(
             "^\\s*(Needs|Covers|Depends|Status|Description|Rationale|Comment|Tags):");
@@ -57,6 +61,15 @@ public final class OftSyntax {
     private static final List<String> MARKDOWN_EXTENSIONS = List.of(".md", ".markdown");
 
     private static final List<String> RESTRUCTURED_TEXT_EXTENSIONS = List.of(".rst");
+
+    public static boolean isValidItemName(final String name) {
+        return ITEM_NAME.matcher(name).matches();
+    }
+
+    public static boolean isMarkdown(final String uriOrPath) {
+        return uriOrPath != null
+                && endsWithAny(uriOrPath.toLowerCase(Locale.ROOT), MARKDOWN_EXTENSIONS);
+    }
 
     public static List<String> commentStartersFor(final String uriOrPath) {
         return styleFor(uriOrPath).starters();

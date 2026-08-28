@@ -75,6 +75,7 @@ import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.codelens.OftCodeLensProvider;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionContext;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionSupport;
+import org.itsallcode.openfasttrace.lsp.decisions.AdrItemIdAction;
 import org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider;
 import org.itsallcode.openfasttrace.lsp.diagnostics.QuickFixProvider;
 import org.itsallcode.openfasttrace.lsp.hierarchy.OftTypeHierarchyProvider;
@@ -281,13 +282,30 @@ public class OftTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(
             final CodeActionParams params) {
         final String uri = params.getTextDocument().getUri();
-        return CompletableFuture.supplyAsync(() -> params.getContext().getDiagnostics().stream()
-                .filter(d -> "openfasttrace-lsp".equals(d.getSource()))
-                .flatMap(d -> Stream.concat(
-                        quickFixProvider.quickFixesForDiagnostic(d, uri).stream(),
-                        updateAllReferencesAction(d, uri).stream()))
+        return CompletableFuture.supplyAsync(() -> Stream.concat(
+                params.getContext().getDiagnostics().stream()
+                        .filter(d -> "openfasttrace-lsp".equals(d.getSource()))
+                        .flatMap(d -> Stream.concat(
+                                quickFixProvider.quickFixesForDiagnostic(d, uri).stream(),
+                                updateAllReferencesAction(d, uri).stream())),
+                generateAdrItemIdAction(uri, params.getRange()).stream())
                 .map(action -> Either.<Command, CodeAction>forRight(action))
                 .collect(Collectors.toList()));
+    }
+
+    // [impl->req~generate-specification-item-id-for-adr~1]
+    private Optional<CodeAction> generateAdrItemIdAction(final String uri, final Range range) {
+        final int line = range.getStart().getLine();
+        final Optional<TextEdit> edit =
+                AdrItemIdAction.idEditFor(uri, readAllLines(uri), line);
+        if (edit.isEmpty()) {
+            return Optional.empty();
+        }
+        final var action = new CodeAction(
+                "Trace this decision as " + AdrItemIdAction.idTextFor(uri).orElseThrow());
+        action.setKind(CodeActionKind.Refactor);
+        action.setEdit(new WorkspaceEdit(Map.of(uri, List.of(edit.get()))));
+        return Optional.of(action);
     }
 
     // [impl->req~quickfix-updates-all-versions~2]

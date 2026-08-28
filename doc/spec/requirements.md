@@ -276,6 +276,7 @@ Covers:
 * feat~goto-definition~1
 
 Needs: impl, itest
+
 ## Supported Files from OFT
 req~supported-files-from-oft~1
 
@@ -295,3 +296,13 @@ Covers:
 * feat~trace-report-on-request~1
 
 Needs: impl, utest, itest
+
+## Generate a Specification Item ID for an Architecture Decision
+req~generate-specification-item-id-for-adr~1
+
+With the cursor on the title of a Markdown architecture decision record, the server offers a code action that inserts a specification item ID below the title. The artifact type is `adr` and the name is the file name without its leading number and extension, so `0001-cache-the-workspace-index-on-disk.md` yields `` `adr~cache-the-workspace-index-on-disk~1` ``.
+
+Covers:
+* feat~trace-architecture-decisions~1
+
+Needs: impl, utest

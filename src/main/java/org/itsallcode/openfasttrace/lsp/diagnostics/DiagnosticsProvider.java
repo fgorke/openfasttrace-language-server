@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 
 // [impl->req~diagnostic-trace-defects~3]
+// [impl->adr~show-trace-results-as-diagnostics~1]
 public class DiagnosticsProvider {
 
     public List<Diagnostic> diagnoseFile(final String uri, final List<String> lines,

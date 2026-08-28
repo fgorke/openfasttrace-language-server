@@ -21,6 +21,7 @@ The [demo walkthrough](../demo/README.md) does exactly that.
 | [Rename](#rename)                           | An item and every reference at once               |
 | [Trace report](#trace-report)               | The full OpenFastTrace report in the editor       |
 | [Ignore file](#ignore-file)                 | Keep paths out of the trace                       |
+| [Trace decisions](#trace-decisions)         | Give an ADR an ID and trace it like a requirement |
 
 ---
 
@@ -197,3 +198,24 @@ are excluded by default, at every depth, so the file is only needed for anything
 beyond that.
 
 Changes take effect as soon as the file is saved.
+
+## Trace decisions
+
+An [architecture decision record](https://adr.github.io/) is a decision written in
+Markdown that code is supposed to carry out, which is what a specification item is.
+Put the cursor on the title of a record in a `decisions` or `adr` directory and the
+code action inserts an ID built from the file name:
+
+```markdown
+# Cache the Workspace Index on Disk
+`adr~cache-the-workspace-index-on-disk~1`
+
+Needs: impl
+```
+
+From there `// [impl->adr~cache-the-workspace-index-on-disk~1]` links the code to
+the decision, and every feature above works with it.
+
+| IntelliJ IDEA | VS Code |
+|---|---|
+| `Alt+Enter` | `Ctrl+.` |

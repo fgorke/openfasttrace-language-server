@@ -4,7 +4,7 @@ date: 2026-07-05
 decision-makers: Felix Gorke
 ---
 
-# Testing Strategy: Given-When-Then, Unit and Integration, Traced with OFT
+# Write Given-When-Then Tests Traced with OFT
 
 ## Context and Problem Statement
 

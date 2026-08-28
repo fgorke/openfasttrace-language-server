@@ -1,6 +1,7 @@
 // Builds a minimal platform-specific Java runtime with jlink and places it in runtime/, so the extension
 // can run the language server without a JDK installed on the machine.
 
+// [impl->adr~bundle-java-runtimes-instead-of-a-native-image~1]
 const { execFileSync, spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");

@@ -83,3 +83,10 @@ feat~trace-report-on-request~1
 The user can generate a trace report from the editor. The report is rendered by OpenFastTrace itself, as HTML or as plain text in several levels of detail.
 
 Needs: req
+
+## Trace Architecture Decisions
+feat~trace-architecture-decisions~1
+
+Architecture decision records are traced like any other specification, so the editor shows which decisions the code carries out and which are still only written down.
+
+Needs: req

@@ -14,6 +14,7 @@ import org.itsallcode.openfasttrace.api.core.SourceRange;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.lsp.OftSyntax;
 
+// [impl->adr~use-a-dedicated-converter-for-uris-and-positions~1]
 public final class LocationConverter {
 
     private LocationConverter() {
@@ -76,15 +77,21 @@ public final class LocationConverter {
 
     private static final boolean CASE_INSENSITIVE_PATHS = File.separatorChar == '\\';
 
+    public static Optional<Path> toPath(final String uriOrPath) {
+        try {
+            return Optional.of(uriOrPath.startsWith("file:")
+                    ? Path.of(URI.create(uriOrPath))
+                    : Path.of(uriOrPath));
+        } catch (final RuntimeException exception) {
+            return Optional.empty();
+        }
+    }
+
     // [impl->req~index-on-startup~3]
     public static String toFileKey(final String uriOrPath) {
-        final Path path;
-        try {
-            path = uriOrPath.startsWith("file:") ? Path.of(URI.create(uriOrPath)) : Path.of(uriOrPath);
-        } catch (final RuntimeException exception) {
-            return uriOrPath;
-        }
-        final String key = path.toAbsolutePath().normalize().toString();
-        return CASE_INSENSITIVE_PATHS ? key.toLowerCase(Locale.ROOT) : key;
+        return toPath(uriOrPath)
+                .map(path -> path.toAbsolutePath().normalize().toString())
+                .map(key -> CASE_INSENSITIVE_PATHS ? key.toLowerCase(Locale.ROOT) : key)
+                .orElse(uriOrPath);
     }
 }

@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# OFT Dependency Strategy: Individual Modules, Pinned to 4.9.0
+# Use Individual OFT Modules Pinned to One Version
 
 ## Context and Problem Statement
 
