@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -193,7 +192,7 @@ public class OftTextDocumentService implements TextDocumentService {
     private List<Location> coveringTagsOf(final SpecificationItemId id) {
         return index.findCoverageTags(id).stream()
                 .map(this::tightLocation)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Location> definitionOf(final SpecificationItemId id) {
@@ -256,7 +255,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return OftIdAtPosition.findAt(lineText, col)
                 .map(id -> index.findCoverageTags(id).stream()
                         .map(this::tightLocation)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .orElse(Collections.emptyList());
     }
 
@@ -290,7 +289,7 @@ public class OftTextDocumentService implements TextDocumentService {
                                 updateAllReferencesAction(d, uri).stream())),
                 generateAdrItemIdAction(uri, params.getRange()).stream())
                 .map(action -> Either.<Command, CodeAction>forRight(action))
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     // [impl->req~generate-specification-item-id-for-adr~1]
@@ -395,7 +394,7 @@ public class OftTextDocumentService implements TextDocumentService {
                             context.get().enclosingItemId())
                     .stream()
                     .map(item -> toCompletionItem(item, context.get(), line, col))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         if (suggestTagStart && line >= 0 && line < lines.size()
                 && OftCompletionContext.isInsideCommentWithoutOpenTag(lines.get(line), col, uri)) {
@@ -423,7 +422,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final List<String> types = index.neededArtifactTypes();
         return IntStream.range(0, types.size())
                 .mapToObj(position -> toTagStartSnippet(types.get(position), position, line, col, word))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private CompletionItem toTagStartSnippet(final String artifactType, final int position,
