@@ -4,7 +4,10 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# URI and Position Mapping Between LSP and OFT
+# Use a Dedicated Converter for URIs and Positions
+`adr~use-a-dedicated-converter-for-uris-and-positions~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 

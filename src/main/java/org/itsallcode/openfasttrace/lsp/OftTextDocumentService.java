@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -75,6 +74,7 @@ import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.codelens.OftCodeLensProvider;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionContext;
 import org.itsallcode.openfasttrace.lsp.completion.OftCompletionSupport;
+import org.itsallcode.openfasttrace.lsp.decisions.AdrItemIdAction;
 import org.itsallcode.openfasttrace.lsp.diagnostics.DiagnosticsProvider;
 import org.itsallcode.openfasttrace.lsp.diagnostics.QuickFixProvider;
 import org.itsallcode.openfasttrace.lsp.hierarchy.OftTypeHierarchyProvider;
@@ -192,7 +192,7 @@ public class OftTextDocumentService implements TextDocumentService {
     private List<Location> coveringTagsOf(final SpecificationItemId id) {
         return index.findCoverageTags(id).stream()
                 .map(this::tightLocation)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Location> definitionOf(final SpecificationItemId id) {
@@ -255,7 +255,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return OftIdAtPosition.findAt(lineText, col)
                 .map(id -> index.findCoverageTags(id).stream()
                         .map(this::tightLocation)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .orElse(Collections.emptyList());
     }
 
@@ -281,13 +281,30 @@ public class OftTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(
             final CodeActionParams params) {
         final String uri = params.getTextDocument().getUri();
-        return CompletableFuture.supplyAsync(() -> params.getContext().getDiagnostics().stream()
-                .filter(d -> "openfasttrace-lsp".equals(d.getSource()))
-                .flatMap(d -> Stream.concat(
-                        quickFixProvider.quickFixesForDiagnostic(d, uri).stream(),
-                        updateAllReferencesAction(d, uri).stream()))
+        return CompletableFuture.supplyAsync(() -> Stream.concat(
+                params.getContext().getDiagnostics().stream()
+                        .filter(d -> "openfasttrace-lsp".equals(d.getSource()))
+                        .flatMap(d -> Stream.concat(
+                                quickFixProvider.quickFixesForDiagnostic(d, uri).stream(),
+                                updateAllReferencesAction(d, uri).stream())),
+                generateAdrItemIdAction(uri, params.getRange()).stream())
                 .map(action -> Either.<Command, CodeAction>forRight(action))
-                .collect(Collectors.toList()));
+                .toList());
+    }
+
+    // [impl->req~generate-specification-item-id-for-adr~1]
+    private Optional<CodeAction> generateAdrItemIdAction(final String uri, final Range range) {
+        final int line = range.getStart().getLine();
+        final Optional<TextEdit> edit =
+                AdrItemIdAction.idEditFor(uri, readAllLines(uri), line);
+        if (edit.isEmpty()) {
+            return Optional.empty();
+        }
+        final var action = new CodeAction(
+                "Trace this decision as " + AdrItemIdAction.idTextFor(uri).orElseThrow());
+        action.setKind(CodeActionKind.Refactor);
+        action.setEdit(new WorkspaceEdit(Map.of(uri, List.of(edit.get()))));
+        return Optional.of(action);
     }
 
     // [impl->req~quickfix-updates-all-versions~2]
@@ -377,7 +394,7 @@ public class OftTextDocumentService implements TextDocumentService {
                             context.get().enclosingItemId())
                     .stream()
                     .map(item -> toCompletionItem(item, context.get(), line, col))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         if (suggestTagStart && line >= 0 && line < lines.size()
                 && OftCompletionContext.isInsideCommentWithoutOpenTag(lines.get(line), col, uri)) {
@@ -405,7 +422,7 @@ public class OftTextDocumentService implements TextDocumentService {
         final List<String> types = index.neededArtifactTypes();
         return IntStream.range(0, types.size())
                 .mapToObj(position -> toTagStartSnippet(types.get(position), position, line, col, word))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private CompletionItem toTagStartSnippet(final String artifactType, final int position,

@@ -4,7 +4,10 @@ date: 2026-08-11
 decision-makers: Felix Gorke
 ---
 
-# Project-Wide Trace Problems in IntelliJ
+# Report Project-Wide Trace Problems in IntelliJ
+`adr~report-project-wide-trace-problems-in-intellij~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 

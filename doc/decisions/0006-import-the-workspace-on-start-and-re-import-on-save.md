@@ -4,7 +4,10 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# Workspace Indexing Strategy: Full Import on Start, File-Level Re-Import on Save
+# Import the Workspace on Start and Re-Import on Save
+`adr~import-the-workspace-on-start-and-re-import-on-save~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 

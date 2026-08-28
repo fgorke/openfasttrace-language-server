@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# Build Tool: Maven
+# Use Maven as Build Tool
 
 ## Context and Problem Statement
 

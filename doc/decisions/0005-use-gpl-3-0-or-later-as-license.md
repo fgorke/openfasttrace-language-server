@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# License: GPL-3.0-or-later
+# Use GPL-3.0-or-later as License
 
 ## Context and Problem Statement
 

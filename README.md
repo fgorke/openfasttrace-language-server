@@ -41,10 +41,11 @@ explains items, coverage and artifact types.
 | [Quick fix](doc/user-guide/README.md#quick-fix)                     | Outdated references lifted to the current revision, one or all   |
 | [Coverage code lens](doc/user-guide/README.md#coverage-code-lens)   | What an item still needs, shown above its ID                     |
 | [Coverage hierarchy](doc/user-guide/README.md#coverage-hierarchy)   | The full chain from feature down to the tags in source           |
-| ️[Code completion](doc/user-guide/README.md#code-completion)        | Item IDs in `Covers:` and tags, plus tag skeletons               |
+| [Code completion](doc/user-guide/README.md#code-completion)         | Item IDs in `Covers:` and tags, plus tag skeletons               |
 | [Rename](doc/user-guide/README.md#rename)                           | An item and every reference to it, in one step                   |
 | [Trace report](doc/user-guide/README.md#trace-report)               | The full OFT report as HTML or plain text                        |
 | [Ignore file](doc/user-guide/README.md#ignore-file)                 | Glob patterns in `.oftignore` keep paths out of the trace        |
+| [Trace decisions](doc/user-guide/README.md#trace-decisions)         | An architecture decision record traced like any other item       |
 
 The [feature guide](doc/user-guide/README.md) shows each of them with a screenshot
 and the shortcut for both editors.

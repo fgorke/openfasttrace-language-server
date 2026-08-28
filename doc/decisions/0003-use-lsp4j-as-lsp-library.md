@@ -4,7 +4,7 @@ date: 2026-05-13
 decision-makers: Felix Gorke
 ---
 
-# LSP Library: LSP4J 1.0.0
+# Use LSP4J as LSP Library
 
 ## Context and Problem Statement
 

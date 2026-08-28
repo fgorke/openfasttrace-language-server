@@ -4,7 +4,10 @@ date: 2026-07-03
 decision-makers: Felix Gorke
 ---
 
-# Centralized OFT Syntax Patterns
+# Centralize OFT Syntax Patterns in One Class
+`adr~centralize-oft-syntax-patterns-in-one-class~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 

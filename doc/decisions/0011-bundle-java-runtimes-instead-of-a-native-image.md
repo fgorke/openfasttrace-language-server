@@ -4,7 +4,10 @@ date: 2026-08-07
 decision-makers: Felix Gorke
 ---
 
-# Bundled Java Runtimes Instead of a Native Image
+# Bundle Java Runtimes Instead of a Native Image
+`adr~bundle-java-runtimes-instead-of-a-native-image~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 
