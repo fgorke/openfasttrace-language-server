@@ -28,6 +28,9 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
+            <li>0.8: architecture decision records written as MADR traced like requirements,
+                the index refreshed when files change outside the editor, and
+                IntelliJ 2026.1.4 is now required</li>
             <li>0.7: outdated references updated from the specification item itself, and
                 go to definition from a Covers entry leads to the item</li>
             <li>0.6: trace defects carry a severity, .oftignore applied as soon as it is saved,
