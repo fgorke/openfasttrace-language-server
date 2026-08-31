@@ -55,9 +55,10 @@ and the shortcut for both editors.
 Both clients start the server automatically when a supported file is opened. No
 configuration needed.
 
-### IntelliJ IDEA
+### JetBrains IDEs
 
-Requires IntelliJ IDEA **Ultimate** 2026.1 or later.
+Requires a JetBrains IDE **2026.1.4** or later with LSP support. Should work in all of them, only
+tested in IDEA Ultimate.
 
 1. Download the plugin ZIP from the [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
 2. **Settings → Plugins → ⚙ → Install Plugin from Disk…**, pick the ZIP.
