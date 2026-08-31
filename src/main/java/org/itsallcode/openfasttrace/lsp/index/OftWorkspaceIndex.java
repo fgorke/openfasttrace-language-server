@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.lsp.index;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,6 +53,18 @@ public final class OftWorkspaceIndex {
     // [impl->req~index-ignore-file~1]
     public boolean isExcludedFile(final String uriOrPath) {
         return ignore.isExcluded(uriOrPath);
+    }
+
+    // [impl->req~index-refresh-on-file-change~1]
+    public boolean isIndexedFile(final String uriOrPath) {
+        return LocationConverter.toPath(uriOrPath)
+                .filter(path -> isIndexedFile(ignore, path))
+                .isPresent();
+    }
+
+    // [impl->req~index-on-startup~3]
+    public static boolean isIndexedFile(final OftIgnore ignore, final Path file) {
+        return !ignore.isExcluded(file) && OftSupportedFiles.isSupported(file);
     }
 
     private static Map<String, List<LinkedSpecificationItem>> groupByFile(

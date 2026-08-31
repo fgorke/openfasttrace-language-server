@@ -3,7 +3,6 @@ package org.itsallcode.openfasttrace.lsp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -115,9 +114,9 @@ class OftLanguageServerTest {
         assertThat(result.getCapabilities().getTypeHierarchyProvider().getLeft()).isTrue();
     }
 
-    // [utest->req~index-refresh-on-save~2]
+    // [utest->req~index-refresh-on-file-change~1]
     @Test
-    void testGivenAClientThatWatchesFilesWhenInitializedThenTheIgnoreFileIsWatched(
+    void testGivenAClientThatWatchesFilesWhenInitializedThenTheWholeWorkspaceIsWatched(
             @TempDir final Path root) throws Exception {
         // given
         final var client = mock(LanguageClient.class);
@@ -135,7 +134,7 @@ class OftLanguageServerTest {
         final var options = (DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions();
         assertThat(options.getWatchers()).singleElement()
                 .extracting(watcher -> watcher.getGlobPattern().getLeft())
-                .isEqualTo("**/.oftignore");
+                .isEqualTo("**/*");
     }
 
     private static OftLanguageServer startedServer(final LanguageClient client, final Path root,

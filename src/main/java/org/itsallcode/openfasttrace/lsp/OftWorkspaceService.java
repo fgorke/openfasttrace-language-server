@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.lsp;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
+import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.WorkspaceSymbol;
 import org.eclipse.lsp4j.WorkspaceSymbolParams;
@@ -21,6 +23,7 @@ import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.lsp.index.LocationConverter;
+import org.itsallcode.openfasttrace.lsp.index.OftIgnore;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 import org.itsallcode.openfasttrace.lsp.report.TraceReportGenerator;
 import org.itsallcode.openfasttrace.lsp.report.TraceReportPreset;
@@ -29,7 +32,7 @@ import org.tinylog.Logger;
 
 public class OftWorkspaceService implements WorkspaceService {
 
-    // [impl->req~index-refresh-on-save~2]
+    // [impl->req~index-refresh-on-file-change~1]
     private static final long REINDEX_DEBOUNCE_MS = 300;
 
     private Runnable onFilesChangedCallback = null;
@@ -117,11 +120,11 @@ public class OftWorkspaceService implements WorkspaceService {
         Logger.debug("didChangeConfiguration");
     }
 
-    // [impl->req~index-refresh-on-save~2]
+    // [impl->req~index-refresh-on-file-change~1]
     @Override
     public synchronized void didChangeWatchedFiles(final DidChangeWatchedFilesParams params) {
         Logger.debug("didChangeWatchedFiles: " + params.getChanges().size() + " change(s)");
-        if (onFilesChangedCallback == null) {
+        if (onFilesChangedCallback == null || !touchesIndexedFile(params)) {
             return;
         }
         if (pendingReindex != null) {
@@ -129,5 +132,19 @@ public class OftWorkspaceService implements WorkspaceService {
         }
         pendingReindex = debounceExecutor.schedule(
                 onFilesChangedCallback, REINDEX_DEBOUNCE_MS, TimeUnit.MILLISECONDS);
+    }
+
+    // [impl->req~index-refresh-on-file-change~1]
+    private boolean touchesIndexedFile(final DidChangeWatchedFilesParams params) {
+        return params.getChanges().stream()
+                .map(FileEvent::getUri)
+                .filter(Objects::nonNull)
+                .anyMatch(uri -> isIgnoreFile(uri) || index.isIndexedFile(uri));
+    }
+
+    private static boolean isIgnoreFile(final String uri) {
+        return LocationConverter.toPath(uri)
+                .map(path -> OftIgnore.FILE_NAME.equals(String.valueOf(path.getFileName())))
+                .orElse(false);
     }
 }

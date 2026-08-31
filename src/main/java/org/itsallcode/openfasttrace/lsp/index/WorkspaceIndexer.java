@@ -15,7 +15,7 @@ import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.core.OftRunner;
 import org.tinylog.Logger;
 
-// [impl->req~index-refresh-on-save~2, req~index-on-startup~3]
+// [impl->req~index-refresh-on-file-change~1, req~index-on-startup~3]
 // [impl->adr~import-the-workspace-on-start-and-re-import-on-save~1]
 public class WorkspaceIndexer {
 
@@ -60,7 +60,7 @@ public class WorkspaceIndexer {
 
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
-                    if (!ignore.isExcluded(file) && OftSupportedFiles.isSupported(file)) {
+                    if (OftWorkspaceIndex.isIndexedFile(ignore, file)) {
                         files.add(file);
                     }
                     return FileVisitResult.CONTINUE;
