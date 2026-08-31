@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.0
+
+* Architecture decision records written as [MADR](https://github.com/adr/madr) can now be traced like requirements
+* The workspace index is refreshed when files change outside the editor
+
 ## 0.7.0
 
 * Every outdated reference to a specification item can be updated from the item itself
