@@ -31,7 +31,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.itsallcode.openfasttrace.lsp.highlighting.OftSemanticTokensProvider;
-import org.itsallcode.openfasttrace.lsp.index.OftIgnore;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
 import org.itsallcode.openfasttrace.lsp.index.WorkspaceIndexer;
 import org.tinylog.Logger;
@@ -42,7 +41,7 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     private final OftTextDocumentService textDocumentService;
     private final OftWorkspaceService workspaceService;
 
-    private static final String WATCH_IGNORE_FILE_ID = "oft-watch-ignore-file";
+    private static final String WATCH_WORKSPACE_ID = "oft-watch-workspace";
 
     private String rootUri;
     private volatile boolean shutdownReceived = false;
@@ -129,24 +128,24 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
         }
         textDocumentService.setOnSaveCallback(this::rebuildIndex);
         workspaceService.setOnFilesChangedCallback(this::rebuildIndex);
-        watchIgnoreFile();
+        watchWorkspaceFiles();
         CompletableFuture.runAsync(this::buildInitialIndex);
     }
 
-    // [impl->req~index-refresh-on-save~2]
-    private void watchIgnoreFile() {
+    // [impl->req~index-refresh-on-file-change~1]
+    private void watchWorkspaceFiles() {
         if (client == null || !supportsFileWatchers) {
-            Logger.info("Client does not watch files, " + OftIgnore.FILE_NAME
-                    + " takes effect on the next save of another file");
+            Logger.info("Client does not watch files, a change outside the editor"
+                    + " takes effect on the next save");
             return;
         }
-        final var watcher = new FileSystemWatcher(Either.forLeft("**/" + OftIgnore.FILE_NAME));
-        final var registration = new Registration(WATCH_IGNORE_FILE_ID,
+        final var watcher = new FileSystemWatcher(Either.forLeft("**/*"));
+        final var registration = new Registration(WATCH_WORKSPACE_ID,
                 "workspace/didChangeWatchedFiles",
                 new DidChangeWatchedFilesRegistrationOptions(List.of(watcher)));
         client.registerCapability(new RegistrationParams(List.of(registration)))
                 .exceptionally(exception -> {
-                    Logger.warn("Could not register a watcher for " + OftIgnore.FILE_NAME + ": "
+                    Logger.warn("Could not register a workspace file watcher: "
                             + exception.getMessage());
                     return null;
                 });

@@ -86,19 +86,19 @@ A file named `.oftignore` in the workspace root lists glob patterns, one per lin
 
 Needs: impl, utest, itest
 
-## Index Refresh on File Save
-req~index-refresh-on-save~2
+## Index Refresh on File Change
+req~index-refresh-on-file-change~1
 
-On `textDocument/didSave` or `workspace/didChangeWatchedFiles`, the server refreshes the index within 300 ms.
+On `textDocument/didSave` or `workspace/didChangeWatchedFiles`, the server refreshes the index within 300 ms. Several changes arriving together are answered by a single refresh.
 
-Where the editor supports it, the server therefore registers a watcher for `**/.oftignore` and learns of the change that way. Where it does not, the file takes effect on the next save of another file.
+Files changed outside the editor also trigger a reindex.
 
 Needs: impl, utest
 
 ## Live Document Buffer
 req~live-document-buffer~1
 
-The server keeps the current in-memory text of every open document. It updates that text on `textDocument/didOpen` and `textDocument/didChange`. Requests that work on document text read from this buffer while the document is open. Those requests are hover, go to definition, find references, semantic tokens and completion. When the document is not open, they fall back to the file on disk. This buffer is separate from the OFT workspace index, which is only rebuilt on save (`req~index-refresh-on-save~1`).
+The server keeps the current in-memory text of every open document. It updates that text on `textDocument/didOpen` and `textDocument/didChange`. Requests that work on document text read from this buffer while the document is open. Those requests are hover, go to definition, find references, semantic tokens and completion. When the document is not open, they fall back to the file on disk. This buffer is separate from the OFT workspace index, which is only rebuilt on save (`req~index-refresh-on-file-change~1`).
 
 Needs: impl, utest, itest
 
