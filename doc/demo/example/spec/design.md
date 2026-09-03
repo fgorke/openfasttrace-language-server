@@ -15,7 +15,8 @@ Needs: impl, utest
 
 A control loop keeps the heater within the target temperature range.
 
-Comment: This item is at revision 2, one coverage tag still references revision 1.
+Comment:
+This item is at revision 2, one coverage tag still references revision 1.
 
 Covers:
 * `req~water-temperature~2`
@@ -37,4 +38,5 @@ Needs: impl, utest
 
 The machine counts finished brew cycles. 
 
-Comment: During the walkthrough you add the  missing `Covers:` entry right below this line using code completion.
+Comment:
+During the walkthrough you add the  missing `Covers:` entry right below this line using code completion.
