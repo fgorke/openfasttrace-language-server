@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.index.OftWorkspaceIndex;
@@ -23,7 +24,7 @@ class OftTextDocumentServiceTest {
         service = new OftTextDocumentService();
     }
 
-    // [utest->req~hover-title-and-description~2]
+    // [utest->req~hover-specification-item~1]
     @Test
     void testGivenCursorOnCoverageTagWhenHoveringThenSpecItemTitleAndDescriptionAreReturned() {
         // given
@@ -46,7 +47,59 @@ class OftTextDocumentServiceTest {
                 .contains("This is the description.");
     }
 
-    // [utest->req~hover-title-and-description~2]
+    // [utest->req~hover-specification-item~1]
+    @Test
+    void testGivenItemWithSectionsWhenBuildingTheHoverThenEachSectionKeywordIsEmphasised() {
+        // given
+        final var specItem = SpecificationItem.builder()
+                .id(SpecificationItemId.parseId("req~my-req~1"))
+                .title("My Requirement")
+                .description("A description.")
+                .rationale("A reason.")
+                .comment("A remark.")
+                .addCoveredId(SpecificationItemId.parseId("feat~my-feat~1"))
+                .addDependOnId(SpecificationItemId.parseId("req~other~1"))
+                .addTag("safety")
+                .status(ItemStatus.DRAFT)
+                .build();
+
+        // when
+        final String markdown = OftTextDocumentService.hoverMarkdown(specItem);
+
+        // then
+        assertThat(markdown)
+                .contains("**My Requirement**")
+                .contains("A description.")
+                .contains("**Status:** draft")
+                .contains("**Rationale:** A reason.")
+                .contains("**Comment:** A remark.")
+                .contains("**Depends:** req~other~1")
+                .contains("**Tags:** safety")
+                .doesNotContain("Covers");
+    }
+
+    // [utest->req~hover-specification-item~1]
+    @Test
+    void testGivenItemWithoutSectionsWhenBuildingTheHoverThenOnlyTitleAndDescriptionAppear() {
+        // given
+        final var specItem = SpecificationItem.builder()
+                .id(SpecificationItemId.parseId("req~my-req~1"))
+                .title("My Requirement")
+                .description("A description.")
+                .addNeedsArtifactType("impl")
+                .build();
+
+        // when
+        final String markdown = OftTextDocumentService.hoverMarkdown(specItem);
+
+        // then
+        assertThat(markdown)
+                .isEqualTo("**My Requirement**\n\nA description.")
+                .doesNotContain("Needs")
+                .doesNotContain("Status");
+    }
+
+    // [utest->req~hover-specification-item~1]
     @Test
     void testGivenCursorOnIdWithSeparatorsWhenHoveringThenTheRangeSpansTheWholeId() {
         // given
@@ -69,7 +122,7 @@ class OftTextDocumentServiceTest {
         assertThat(range.getEnd().getCharacter()).isEqualTo(line.indexOf("]"));
     }
 
-    // [utest->req~hover-title-and-description~2]
+    // [utest->req~hover-specification-item~1]
     @Test
     void testGivenCursorNotOnAnyIdWhenHoveringThenNoHoverIsReturned() {
         // given
@@ -82,7 +135,7 @@ class OftTextDocumentServiceTest {
         assertThat(result).isEmpty();
     }
 
-    // [utest->req~hover-title-and-description~2]
+    // [utest->req~hover-specification-item~1]
     @Test
     void testGivenCursorOnUnknownIdWhenHoveringThenNoHoverIsReturned() {
         // given
