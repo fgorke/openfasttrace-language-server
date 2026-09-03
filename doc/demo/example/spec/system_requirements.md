@@ -23,7 +23,18 @@ run the water through the filter.
 Covers:
 * `feat~brew-coffee~1`
 
-Needs: dsn
+Needs: dsn, req
+
+### Grind Before Brewing
+`req~grind-before-brew~1`
+
+The beans are ground immediately before the water is heated, never earlier.
+
+Comment:
+A requirement covering another requirement.
+
+Covers:
+* `req~start-brewing~1`
 
 ### Water Temperature
 `req~water-temperature~2`
@@ -46,7 +57,8 @@ Covers:
 ### Fill Level Warning
 `req~fill-level-warning~1`
 
-Comment: Intentional duplicate definition of the item above.
+Comment:
+Intentional duplicate definition of the item above.
 
 Covers:
 * `feat~brew-coffee~1`

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -69,6 +70,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.lsp.codelens.OftCodeLensProvider;
@@ -133,7 +135,7 @@ public class OftTextDocumentService implements TextDocumentService {
         return request + ": uri=" + uri + " line=" + line + " col=" + col;
     }
 
-    // [impl->req~hover-title-and-description~2]
+    // [impl->req~hover-specification-item~1]
     @Override
     public CompletableFuture<Hover> hover(final HoverParams params) {
         final String uri = params.getTextDocument().getUri();
@@ -153,9 +155,39 @@ public class OftTextDocumentService implements TextDocumentService {
     }
 
     private Hover toHover(final SpecificationItem item, final Range range) {
-        final String markdown = "**" + item.getTitle() + "**\n\n" + item.getDescription();
-        final var content = new MarkupContent(MarkupKind.MARKDOWN, markdown);
+        final var content = new MarkupContent(MarkupKind.MARKDOWN, hoverMarkdown(item));
         return new Hover(content, range);
+    }
+
+    // [impl->req~hover-specification-item~1]
+    static String hoverMarkdown(final SpecificationItem item) {
+        final var markdown = new StringBuilder("**").append(item.getTitle()).append("**");
+        appendParagraph(markdown, item.getDescription());
+        if (item.getStatus() != ItemStatus.APPROVED) {
+            appendSection(markdown, "Status", item.getStatus().toString());
+        }
+        appendSection(markdown, "Rationale", item.getRationale());
+        appendSection(markdown, "Comment", item.getComment());
+        appendSection(markdown, "Depends", joinIds(item.getDependOnIds()));
+        appendSection(markdown, "Tags", String.join(", ", item.getTags()));
+        return markdown.toString();
+    }
+
+    private static void appendSection(final StringBuilder markdown, final String keyword,
+            final String text) {
+        if (text != null && !text.isBlank()) {
+            appendParagraph(markdown, "**" + keyword + ":** " + text.strip());
+        }
+    }
+
+    private static void appendParagraph(final StringBuilder markdown, final String text) {
+        if (text != null && !text.isBlank()) {
+            markdown.append("\n\n").append(text.strip());
+        }
+    }
+
+    private static String joinIds(final List<SpecificationItemId> ids) {
+        return ids.stream().map(SpecificationItemId::toString).collect(Collectors.joining(", "));
     }
 
     private static Range rangeOf(final OftIdAtPosition.IdSpan span, final int line) {
