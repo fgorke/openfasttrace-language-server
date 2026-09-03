@@ -36,7 +36,7 @@ req~hover-specification-item~1
 When the user hovers over a coverage tag, the server returns a Markdown response describing the specification item.
 
 Covers:
-* feat~hover-documentation~1
+* feat~hover-documentation~2
 
 Needs: impl, utest
 

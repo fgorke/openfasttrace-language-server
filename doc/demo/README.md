@@ -35,9 +35,14 @@ are colored.
 ### 2. Hover
 
 In `src/CoffeeMaker.java`, hover over the target of the first coverage tag,
-which is `dsn~brew-cycle~1`.
+which is the implementation of `dsn~brew-cycle~1`.
 
 > **Expected:** title and description of the design item appear as a tooltip.
+
+Now hover over `dsn~heat-water~2` two tags further down.
+
+> **Expected:** below the description the tooltip also shows the item's
+**Comment**, the section the specification carries for it.
 
 ### 3. Go to definition
 

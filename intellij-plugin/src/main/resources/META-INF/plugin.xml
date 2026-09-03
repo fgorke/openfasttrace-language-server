@@ -7,7 +7,7 @@
         (OFT) language server into the IDE via the built-in LSP client. The server understands
         OFT specification items and coverage tags and provides:
         <ul>
-            <li><b>Hover documentation</b>: title and description of the referenced specification item</li>
+            <li><b>Hover documentation</b>: shows what the referenced specification item says</li>
             <li><b>Go to definition</b>: from a coverage tag to the specification item and from an item to all its covering tags</li>
             <li><b>Find references</b>: all coverage tags in the workspace that cover a specification item</li>
             <li><b>Trace diagnostics</b>: uncovered specification items, links to items that do not exist and duplicate definitions, reported for every file in the project and listed under <i>Project Errors</i></li>
@@ -21,6 +21,9 @@
             <li><b>Code completion</b>: specification item IDs in <code>Covers:</code> sections and coverage tag targets</li>
             <li><b>Tag skeletons</b>: pressing Ctrl+Space in a comment offers a skeleton such as
                 <code>[impl-&gt;...]</code> for every artifact type the workspace needs, including project specific ones</li>
+            <li><b>Trace decisions</b>: an architecture decision record written as
+                <a href="https://github.com/adr/madr">MADR</a> can carry a specification item ID
+                and is then traced like a requirement</li>
             <li><b>Ignore file</b>: glob patterns in a <code>.oftignore</code> file in the project root
                 exclude files from all OFT features, on top of the build output and hidden paths
                 that are excluded by default</li>

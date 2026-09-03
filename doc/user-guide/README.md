@@ -9,7 +9,7 @@ The [demo walkthrough](../demo/README.md) does exactly that.
 | Feature                                     | Description                                       | 
 |---------------------------------------------|---------------------------------------------------|
 | [Syntax highlighting](#syntax-highlighting) | IDs, keywords and tags get their own colors       |
-| [Hover documentation](#hover-documentation) | Title and description of the referenced item      |
+| [Hover documentation](#hover-documentation) | What the referenced item says, section by section |
 | [Go to definition](#go-to-definition)       | Between a tag and the item, in both directions    |
 | [Find references](#find-references)         | Every tag covering an item                        |
 | [Symbol search](#symbol-search)             | Find items by ID or title                         |
@@ -39,9 +39,19 @@ own name (`[impl~login~2->...]`) and needed coverage (`[dsn->req~login~1>>impl,u
 
 ## Hover documentation
 
-Pointing at a specification item ID shows the title and description of the item
-it refers to, wherever the ID appears: in a coverage tag, in a `Covers:` list or
-on the declaration itself.
+Pointing at a specification item ID shows what the item it refers to says,
+wherever the ID appears: in a coverage tag, in a `Covers:` list or on the
+declaration itself.
+
+Title and description come first. Below them the tooltip repeats the sections
+the item carries, each behind its keyword: `Rationale:`, `Comment:`, `Depends:`
+and `Tags:`, and `Status:` where it is not `approved`. A section the item does
+not carry is left out.
+
+`Needs:` and `Covers:` are missing on purpose. Both say where the item sits in
+the trace, which the [code lens](#coverage-code-lens) and
+[go to definition](#go-to-definition) answer against the current trace instead
+of repeating what the item declares.
 
 ![Hover documentation](images/hover.png)
 
