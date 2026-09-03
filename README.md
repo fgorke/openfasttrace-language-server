@@ -33,7 +33,7 @@ explains items, coverage and artifact types.
 | Feature                                                             | What it gives you                                                |
 |---------------------------------------------------------------------|------------------------------------------------------------------|
 | [Syntax highlighting](doc/user-guide/README.md#syntax-highlighting) | Item IDs, section keywords and coverage tags in their own colors |
-| [Hover documentation](doc/user-guide/README.md#hover-documentation) | Title and description of the item an ID refers to                |
+| [Hover documentation](doc/user-guide/README.md#hover-documentation) | What the item an ID refers to says, section by section           |
 | [Go to definition](doc/user-guide/README.md#go-to-definition)       | From a tag to the item, from an item to everything covering it   |
 | [Find references](doc/user-guide/README.md#find-references)         | Every coverage tag in the workspace that covers an item          |
 | [Symbol search](doc/user-guide/README.md#symbol-search)             | Items through the editor's workspace symbol search               |

@@ -15,9 +15,9 @@ The language server lists all coverage tags in the workspace that cover a given 
 Needs: req
 
 ## Hover Documentation
-feat~hover-documentation~1
+feat~hover-documentation~2
 
-The language server shows a hover tooltip over a coverage tag. The tooltip contains the specification item's title and description.
+The language server shows a hover tooltip over a coverage tag. The tooltip describes the specification item the tag refers to.
 
 Needs: req
 
