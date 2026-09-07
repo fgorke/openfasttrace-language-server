@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.lsp;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -68,7 +69,6 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
 
         final var syncOptions = new TextDocumentSyncOptions();
         syncOptions.setOpenClose(true);
-        // [impl->req~live-document-buffer~1]
         syncOptions.setChange(TextDocumentSyncKind.Full);
         syncOptions.setSave(new SaveOptions(false));
 
@@ -162,11 +162,15 @@ public class OftLanguageServer implements LanguageServer, LanguageClientAware {
     }
 
     private void rebuildIndex() {
+        rebuildIndex(textDocumentService.openDocuments());
+    }
+
+    private void rebuildIndex(final Map<Path, String> openDocuments) {
         if (rootUri == null) {
             return;
         }
         final Path workspaceRoot = Path.of(URI.create(rootUri));
-        final OftWorkspaceIndex index = indexer.buildIndex(workspaceRoot);
+        final OftWorkspaceIndex index = indexer.buildIndex(workspaceRoot, openDocuments);
         textDocumentService.updateIndex(index);
         workspaceService.updateIndex(index);
         Logger.info("Workspace index ready: " + index.specItemCount() + " item(s)");

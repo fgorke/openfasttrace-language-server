@@ -25,7 +25,9 @@ Chosen option: **full import on server start, then file-level re-import on `didS
 
 A `didChange` (keystroke-level) event does **not** trigger a re-import. Only saves do.
 
-This decision covers only the **OFT workspace index**: spec items and coverage links across the whole project. That is what `Oft.importItems()` rebuilds. It is genuinely expensive to redo on every keystroke. It does **not** mean the server ignores unsaved edits. The current text of every open document is still tracked in memory. It is updated on every `didChange` (`req~live-document-buffer~1`). So requests that only need the text of the file being edited see live content. That covers hover, definition, semantic tokens and especially completion, which almost always runs on text the user has not saved yet. Only cross-file concerns that depend on the *index* lag behind until the next save. An example is whether a given ID still exists workspace-wide.
+This decision covers only the **OFT workspace index**: spec items and coverage links across the whole project. That is what `Oft.importItems()` rebuilds. It is genuinely expensive to redo on every keystroke. It does **not** mean the server ignores unsaved edits. The current text of every open document is still tracked in memory. It is updated on every `didChange` (`req~live-document-buffer~2`). So requests that only need the text of the file being edited see live content. That covers hover, definition, semantic tokens and especially completion, which almost always runs on text the user has not saved yet. Only cross-file concerns that depend on the *index* lag behind until the next save. An example is whether a given ID still exists workspace-wide.
+
+The rebuild itself reads open documents from that buffer rather than from disk (`req~index-reads-open-documents~1`). This decision fixes **when** the index is rebuilt, not which version of a file it is built from. Reading disk for a file the editor holds open would produce a state that exists nowhere, mixing saved and unsaved files.
 
 **Excluding build output** Handing the workspace root straight to `Oft.importItems()` also indexed build output. The indexer now does its own file walk. It prunes hidden paths and the common build output names `target`, `build`, `out`, `dist` and `node_modules` at every depth, then hands the surviving files to OFT. Files without a matching importer are skipped by OFT itself, so passing single files is safe. A `.oftignore` file in the workspace root adds further glob patterns.
 
@@ -39,7 +41,7 @@ This decision covers only the **OFT workspace index**: spec items and coverage l
 * Good, because a large workspace no longer freezes the editor while it is indexed. The price is that requests before the first import finishes are answered from an empty index.
 * Good, because separating "live document text" from "workspace index" keeps the expensive part save-gated while the cheap part stays live. Completion would be unusable if it only saw saved content.
 * Neutral, because the *index* lags behind unsaved edits. A newly typed spec item ID does not resolve workspace-wide until saved. That matches most build-tool-backed language servers.
-* Bad, because a large workspace re-imports everything on every save, not just the changed file. Worth revisiting if profiling later shows this is too slow.
+* Neutral, because a rebuild covers the whole workspace. It no longer re-parses all of it: only changed files are imported, see [ADR 0014](0014-import-only-changed-files-when-rebuilding-the-index.md).
 * Bad, because the debounce adds up to 300 ms of deliberate delay before the index catches up.
 
 ### Confirmation
@@ -48,4 +50,4 @@ Integration tests verify that after a file save, the next definition request ret
 
 ## More Information
 
-A possible follow-up is file-scoped re-import: re-parse only the saved file and merge it into the existing index. That needs a better understanding of OFT's import pipeline than we have now.
+File-scoped re-import was the follow-up named here and is decided in [ADR 0014](0014-import-only-changed-files-when-rebuilding-the-index.md).
