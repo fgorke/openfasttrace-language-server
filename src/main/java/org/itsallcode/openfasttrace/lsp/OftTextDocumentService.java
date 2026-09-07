@@ -122,6 +122,14 @@ public class OftTextDocumentService implements TextDocumentService {
                 .forEach(workspaceDiagnosticUris::add);
     }
 
+    // [impl->req~index-reads-open-documents~1]
+    Map<Path, String> openDocuments() {
+        final Map<Path, String> documents = new LinkedHashMap<>();
+        openDocumentBuffers.forEach((uri, lines) -> LocationConverter.toPath(uri)
+                .ifPresent(file -> documents.put(file, String.join("\n", lines))));
+        return documents;
+    }
+
     private boolean isOpenFile(final String uri) {
         final String key = LocationConverter.toFileKey(uri);
         return openUris.stream().anyMatch(open -> LocationConverter.toFileKey(open).equals(key));
@@ -604,7 +612,7 @@ public class OftTextDocumentService implements TextDocumentService {
         publishDiagnostics(uri);
     }
 
-    // [impl->req~live-document-buffer~1]
+    // [impl->req~live-document-buffer~2]
     @Override
     public void didChange(final DidChangeTextDocumentParams params) {
         final String uri = params.getTextDocument().getUri();

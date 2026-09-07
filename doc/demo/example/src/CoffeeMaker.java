@@ -15,7 +15,8 @@ public class CoffeeMaker {
     private void heatWater() {
     }
 
-    // Intentional defect: this tag references revision 1, the design item is at revision 2.
+    // Intentional defect: this tag references revision 1, the design item is at
+    // revision 2.
     // [impl->dsn~heat-water~1]
     private void keepWarm() {
     }

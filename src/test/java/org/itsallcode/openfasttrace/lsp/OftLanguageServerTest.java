@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.lsp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -47,7 +48,7 @@ class OftLanguageServerTest {
             @TempDir final Path fromFolders, @TempDir final Path fromRootUri) throws Exception {
         // given
         final var indexer = mock(WorkspaceIndexer.class);
-        when(indexer.buildIndex(any())).thenReturn(OftWorkspaceIndex.empty());
+        when(indexer.buildIndex(any(), any())).thenReturn(OftWorkspaceIndex.empty());
         final var serverWithIndexer = new OftLanguageServer(indexer);
         final var params = new InitializeParams();
         params.setWorkspaceFolders(
@@ -59,7 +60,7 @@ class OftLanguageServerTest {
         serverWithIndexer.initialized(new InitializedParams());
 
         // then
-        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(fromFolders);
+        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(eq(fromFolders), any());
     }
 
     // [utest->req~index-on-startup~3]
@@ -68,7 +69,7 @@ class OftLanguageServerTest {
             throws Exception {
         // given
         final var indexer = mock(WorkspaceIndexer.class);
-        when(indexer.buildIndex(any())).thenReturn(OftWorkspaceIndex.empty());
+        when(indexer.buildIndex(any(), any())).thenReturn(OftWorkspaceIndex.empty());
         final var serverWithIndexer = new OftLanguageServer(indexer);
         final var params = new InitializeParams();
         setDeprecatedRootUri(params, root);
@@ -78,7 +79,7 @@ class OftLanguageServerTest {
         serverWithIndexer.initialized(new InitializedParams());
 
         // then
-        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(root);
+        verify(indexer, timeout(INDEX_TIMEOUT_MS)).buildIndex(eq(root), any());
     }
 
     private static void setDeprecatedRootUri(final InitializeParams params, final Path root) {
@@ -140,7 +141,7 @@ class OftLanguageServerTest {
     private static OftLanguageServer startedServer(final LanguageClient client, final Path root,
             final boolean watchesFiles) throws Exception {
         final var indexer = mock(WorkspaceIndexer.class);
-        when(indexer.buildIndex(any())).thenReturn(OftWorkspaceIndex.empty());
+        when(indexer.buildIndex(any(), any())).thenReturn(OftWorkspaceIndex.empty());
         final var server = new OftLanguageServer(indexer);
         server.connect(client);
         final var params = new InitializeParams();

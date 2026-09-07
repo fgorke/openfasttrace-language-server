@@ -96,11 +96,25 @@ Files changed outside the editor also trigger a reindex.
 Needs: impl, utest
 
 ## Live Document Buffer
-req~live-document-buffer~1
+req~live-document-buffer~2
 
-The server keeps the current in-memory text of every open document. It updates that text on `textDocument/didOpen` and `textDocument/didChange`. Requests that work on document text read from this buffer while the document is open. Those requests are hover, go to definition, find references, semantic tokens and completion. When the document is not open, they fall back to the file on disk. This buffer is separate from the OFT workspace index, which is only rebuilt on save (`req~index-refresh-on-file-change~1`).
+The server keeps the current in-memory text of every open document. It updates that text on `textDocument/didOpen` and `textDocument/didChange`. Requests that work on document text read from this buffer while the document is open. Those requests are hover, go to definition, find references, semantic tokens and completion. When the document is not open, they fall back to the file on disk.
 
 Needs: impl, utest, itest
+
+## Index Reads Open Documents
+req~index-reads-open-documents~1
+
+When the index is rebuilt, a file the editor holds open is read from the document buffer rather than from disk. Every other file is read from disk as before.
+
+Needs: impl, itest
+
+## Index Imports Only Changed Files
+req~index-imports-changed-files-only~1
+
+A rebuild imports only the files that changed since the last one and takes the items of every other file from what that run produced. A file counts as unchanged when its size and its modification time are the ones it had then. A file the editor holds open is always imported again, because its text is not the one on disk, and it is not cached either.
+
+Needs: impl, itest
 
 ## Highlight Specification Item Definitions
 req~highlight-specification-item~1

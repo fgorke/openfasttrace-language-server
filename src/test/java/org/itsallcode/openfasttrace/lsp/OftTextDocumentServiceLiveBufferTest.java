@@ -40,7 +40,7 @@ class OftTextDocumentServiceLiveBufferTest {
                         .build())));
     }
 
-    // [utest->req~live-document-buffer~1]
+    // [utest->req~live-document-buffer~2]
     @Test
     void testGivenUnsavedOpenedContentWhenCompletingThenBufferContentIsUsed() throws Exception {
         // given
@@ -57,7 +57,7 @@ class OftTextDocumentServiceLiveBufferTest {
         assertThat(items).extracting(CompletionItem::getLabel).containsExactly("req~my-req~1");
     }
 
-    // [utest->req~live-document-buffer~1]
+    // [utest->req~live-document-buffer~2]
     @Test
     void testGivenBufferReplacedByDidChangeWhenCompletingThenNewContentIsUsed() throws Exception {
         // given
@@ -77,7 +77,7 @@ class OftTextDocumentServiceLiveBufferTest {
         assertThat(items).extracting(CompletionItem::getLabel).containsExactly("req~my-req~1");
     }
 
-    // [itest->req~live-document-buffer~1]
+    // [itest->req~live-document-buffer~2]
     @Test
     void testGivenClosedDocumentWhenHoveringThenContentFallsBackToDisk(@TempDir final Path tempDir)
             throws Exception {
@@ -97,7 +97,7 @@ class OftTextDocumentServiceLiveBufferTest {
         assertThat(hover.getContents().getRight().getValue()).contains("My Requirement");
     }
 
-    // [utest->req~live-document-buffer~1]
+    // [utest->req~live-document-buffer~2]
     @Test
     void testGivenBufferedContentWithTrailingNewlineWhenReadingLinesThenLineNumberingMatchesDisk()
             throws Exception {
