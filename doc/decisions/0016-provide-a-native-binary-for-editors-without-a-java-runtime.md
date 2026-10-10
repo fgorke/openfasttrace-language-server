@@ -44,3 +44,5 @@ CI builds the binary on all five platforms and runs [`native_smoke_test.sh`](../
 ## More Information
 
 The binaries are released as `openfasttrace-language-server-<version>-<platform>`, with the same platform names as the VS Code packages.
+
+GraalVM Community for macOS on Intel ended with JDK 25.0.1, so `darwin-x64` is built with that release while the other platforms take the latest 25.x. The build therefore avoids anything newer releases introduced: the GraalVM metadata repository is switched off in the `native` profile, and the metadata the server needs is registered by `NativeImageSupport` or listed in `META-INF/native-image/`.

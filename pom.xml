@@ -248,9 +248,16 @@
                             <imageName>openfasttrace-language-server</imageName>
                             <mainClass>org.itsallcode.openfasttrace.lsp.ServerLauncher</mainClass>
                             <fallback>false</fallback>
-                            <!-- Metadata for Gson, which LSP4J serializes with -->
+                            <!--
+                                The GraalVM metadata repository stays off. Gson is the only dependency it has
+                                entries for, and those are array types and annotation proxies the server does
+                                not need: the smoke test passes without them, as the types Gson reaches
+                                reflectively are LSP4J's, registered by NativeImageSupport. The repository
+                                also adds a download, and its current schema is rejected by GraalVM 25.0.1,
+                                the last release for macOS on Intel.
+                            -->
                             <metadataRepository>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                             </metadataRepository>
                         </configuration>
                     </plugin>
