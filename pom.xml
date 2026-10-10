@@ -31,11 +31,11 @@
 
         <!-- Dependency versions -->
         <lsp4j.version>1.0.0</lsp4j.version>
-        <openfasttrace.version>4.9.0</openfasttrace.version>
-        <tinylog.version>2.7.0</tinylog.version>
-        <junit.version>6.1.1</junit.version>
+        <openfasttrace.version>4.10.0</openfasttrace.version>
+        <tinylog.version>2.8.1</tinylog.version>
+        <junit.version>6.1.3</junit.version>
         <assertj.version>3.27.7</assertj.version>
-        <mockito.version>5.23.0</mockito.version>
+        <mockito.version>5.24.0</mockito.version>
 
         <!-- Plugin versions -->
         <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
