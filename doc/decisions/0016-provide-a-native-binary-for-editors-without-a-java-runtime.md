@@ -35,7 +35,7 @@ A jlink bundle would have been five archives of 24 MB each that still need an un
 * Good, because the binary runs on any x86-64 or AArch64 machine, not only on CPUs as new as the build machine (`-march=compatibility`).
 * Bad, because the release carries five more artifacts and each takes minutes to build.
 * Bad, because a reflection gap shows only at run time. The smoke test in CI exists for that.
-* Neutral, because the IntelliJ plugin and the VS Code extension keep the approach of ADR 0011. The VS Code extension could switch to the binary later and shrink from 24 MB to the size of the binary.
+* Neutral, because the IntelliJ plugin keeps the approach of ADR 0011. The VS Code extension switched to the binary in [ADR 0017](0017-ship-the-native-binary-in-the-vs-code-extension.md).
 
 ### Confirmation
 
