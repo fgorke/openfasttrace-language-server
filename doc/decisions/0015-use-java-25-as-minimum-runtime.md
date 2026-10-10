@@ -11,7 +11,7 @@ Needs: impl
 
 ## Context and Problem Statement
 
-[ADR 0002](0002-use-java-17-as-minimum-runtime.md) chose Java 17 so that anyone with a current JDK could run the server. Since [ADR 0011](0011-bundle-java-runtimes-instead-of-a-native-image.md) no client depends on a JDK on the machine: the IntelliJ plugin runs the server on the runtime of the IDE, the VS Code extension bundles one, and the native binary of [ADR 0016](0016-provide-a-native-binary-for-editors-without-a-java-runtime.md) needs none at all. The minimum runtime therefore constrains only the build and the IDE runtime, and Java 25 is the current LTS release.
+[ADR 0002](0002-use-java-17-as-minimum-runtime.md) chose Java 17 so that anyone with a current JDK could run the server. Since [ADR 0011](0011-bundle-java-runtimes-instead-of-a-native-image.md) no client depends on a JDK on the machine: the IntelliJ plugin runs the server on the runtime of the IDE, the VS Code extension bundles one, and the native binary of [ADR 0016](0016-provide-a-native-binary-for-editors-without-a-java-runtime.md) needs none at all. The minimum runtime therefore constrains only the build and the IDE runtime, and Java 25 is the current LTS release ([whichjdk.com](https://whichjdk.com/) gives an overview of the release cadence, support windows and distributions).
 
 ## Decision Drivers
 
