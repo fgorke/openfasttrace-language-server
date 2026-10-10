@@ -150,7 +150,7 @@ jobs:
 
       - name: Smoke test the binary against the demo project
         shell: bash
-        run: bash ./.github/workflows/native_smoke_test.sh doc/demo/example target/openfasttrace-language-server
+        run: ./.github/workflows/native_smoke_test.sh doc/demo/example target/openfasttrace-language-server
 
       - name: Name the binary after version and platform
         shell: bash
