@@ -23,7 +23,8 @@
     </licenses>
 
     <properties>
-        <java.version>17</java.version>
+        <!-- [impl->adr~use-java-25-as-minimum-runtime~1] -->
+        <java.version>25</java.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -37,10 +38,12 @@
         <mockito.version>5.23.0</mockito.version>
 
         <!-- Plugin versions -->
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+        <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
+        <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+        <native-maven-plugin.version>1.1.14</native-maven-plugin.version>
+        <graalvm.version>25.4.4.1.1</graalvm.version>
     </properties>
 
     <dependencies>
@@ -110,6 +113,17 @@
             <groupId>org.itsallcode.openfasttrace</groupId>
             <artifactId>openfasttrace-reporter-plaintext</artifactId>
             <version>${openfasttrace.version}</version>
+        </dependency>
+
+        <!--
+            GraalVM Native Image API for NativeImageSupport. Only needed while the native binary is
+            built, so it stays out of the standalone JAR.
+        -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>nativeimage</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -205,4 +219,43 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+            Native binary for editors without a Java runtime, see ADR 0016. Needs GraalVM as JAVA_HOME:
+            mvn -Pnative -DskipTests package
+            Build options and reflection metadata live in src/main/resources/META-INF/native-image/.
+        -->
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>openfasttrace-language-server</imageName>
+                            <mainClass>org.itsallcode.openfasttrace.lsp.ServerLauncher</mainClass>
+                            <fallback>false</fallback>
+                            <!-- Metadata for Gson, which LSP4J serializes with -->
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

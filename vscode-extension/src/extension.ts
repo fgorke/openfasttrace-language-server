@@ -91,7 +91,7 @@ function startupErrorMessage(javaPath: string, error: unknown): string {
   if (usesPathJava && isMissingExecutable) {
     return (
       "OpenFastTrace: no Java found. This build of the extension does not bundle a Java " +
-      "runtime, so it needs Java 17 or later on the PATH, or a path configured in " +
+      "runtime, so it needs Java 25 or later on the PATH, or a path configured in " +
       "'oft.java.path'. Installing the platform-specific build of this extension avoids that."
     );
   }

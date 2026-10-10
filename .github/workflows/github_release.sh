@@ -67,7 +67,16 @@ if [[ ${#vscode_extensions[@]} -eq 0 ]]; then
     exit 1
 fi
 
-echo "Calculate sha256sum for plugin archive, server JAR and VS Code extension"
+# One native binary per platform, for editors without a Java runtime (ADR 0016).
+mapfile -t native_binaries < <(find "$base_dir/target/native" -maxdepth 1 -type f \
+    -name "openfasttrace-language-server-${project_version}-*" ! -name '*.sha256' 2>/dev/null | sort)
+readonly native_binaries
+if [[ ${#native_binaries[@]} -eq 0 ]]; then
+    echo "Could not find any native binary in $base_dir/target/native" >&2
+    exit 1
+fi
+
+echo "Calculate sha256sum for plugin archive, server JAR, VS Code extensions and native binaries"
 
 # checksum for plugin
 file_dir="$(dirname "$artifact_path")"
@@ -99,6 +108,18 @@ for extension in "${vscode_extensions[@]}"; do
 done
 readonly vscode_upload_files
 
+# checksums for every native binary
+native_upload_files=()
+for binary in "${native_binaries[@]}"; do
+    native_dir="$(dirname "$binary")"
+    native_name="$(basename "$binary")"
+    cd "$native_dir"
+    sha256sum "$native_name" > "${native_name}.sha256"
+    cd "$base_dir"
+    native_upload_files+=("$binary" "$native_dir/${native_name}.sha256")
+done
+readonly native_upload_files
+
 readonly title="Release $project_version"
 readonly tag="$project_version"
 echo "Creating release:"
@@ -111,10 +132,12 @@ echo "Server JAR   : $server_jar"
 echo "Server sha256: $checksum_server_path"
 echo "VS Code ext. : ${#vscode_extensions[@]} package(s)"
 printf '  %s\n' "${vscode_extensions[@]}"
+echo "Native binary: ${#native_binaries[@]} file(s)"
+printf '  %s\n' "${native_binaries[@]}"
 
 release_url=$(gh release create --latest --title "$title" --notes-file "$changes_file" --target main "$tag" \
     "$artifact_path" "$checksum_plugin_path" "$server_jar" "$checksum_server_path" \
-    "${vscode_upload_files[@]}")
+    "${vscode_upload_files[@]}" "${native_upload_files[@]}")
 readonly release_url
 echo "Release URL: $release_url"
 

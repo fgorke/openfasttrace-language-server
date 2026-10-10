@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [ADR-0015](0015-use-java-25-as-minimum-runtime.md)
 date: 2026-05-13
 decision-makers: Felix Gorke
 ---
