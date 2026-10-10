@@ -77,6 +77,35 @@ or from a downloaded package:
 Each package carries its own Java runtime, so the file name ends in the platform,
 for example `-win32-x64` or `-darwin-arm64`.
 
+### Vim, Neovim and other editors
+
+The [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page also
+carries the server as a native binary that needs no Java installation:
+`openfasttrace-language-server-<version>-<platform>` for the same five platforms, with `.exe`
+on Windows. Download it, make it executable, and put it on the `PATH` as
+`openfasttrace-language-server`. It speaks LSP over stdio, so any LSP client can launch it.
+
+For [vim-lsp](https://github.com/prabirshrestha/vim-lsp):
+
+```vim
+if executable('openfasttrace-language-server')
+  augroup lsp_openfasttrace
+    autocmd!
+    autocmd User lsp_setup call lsp#register_server({
+        \ 'name': 'openfasttrace',
+        \ 'cmd': {server_info->['openfasttrace-language-server']},
+        \ 'allowlist': ['markdown', 'rst', 'java', 'kotlin', 'python', 'c', 'cpp', 'rust', 'go'],
+        \ })
+  augroup END
+endif
+```
+
+Add the file types your project traces to `allowlist`. The server indexes the whole workspace
+regardless, the list only decides in which buffers Vim talks to it.
+
+On a platform without a released binary, the standalone JAR from the same page runs with
+Java 25 or later: `java -jar openfasttrace-language-server-<version>-standalone.jar`.
+
 ## Try it
 
 [doc/demo/](doc/demo/) holds a small coffee maker project that visits every feature
@@ -97,7 +126,7 @@ first. Answers are evaluated pseudonymously and used only for the thesis.
 | Topic         | Details                                                                              |
 |---------------|--------------------------------------------------------------------------------------|
 | Status        | Bachelor thesis project, work in progress                                            |
-| Built on      | Java 17, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.9.0 |
+| Built on      | Java 25, [LSP4J](https://github.com/eclipse-lsp4j/lsp4j) 1.0.0 (LSP 3.18), OFT 4.9.0 |
 | License       | [GPL-3.0-or-later](LICENSE)                                                          |
 | Specification | [requirements](doc/spec/requirements.md) · [features](doc/spec/features.md)          |
 | Decisions     | [architecture decision records](doc/decisions/)                                      |
@@ -105,11 +134,12 @@ first. Answers are evaluated pseudonymously and used only for the thesis.
 ## Building from source
 
 <details>
-<summary>Server, plugin and extension</summary>
+<summary>Server, native binary, plugin and extension</summary>
 
 ### Prerequisites
 
-* Java 17 or later, Maven 3.6 or later
+* JDK 25 or later, Maven 3.6 or later
+* [GraalVM](https://www.graalvm.org/) for JDK 25 to build the native binary
 * Node.js and npm for the VS Code extension
 * Gradle comes as a wrapper in `intellij-plugin/`
 
@@ -128,6 +158,20 @@ so any editor with an LSP client can launch it directly:
 ```bash
 java -jar target/openfasttrace-language-server-*-standalone.jar
 ```
+
+### Native binary
+
+```bash
+JAVA_HOME=/path/to/graalvm mvn -Pnative -DskipTests package
+.github/workflows/native_smoke_test.sh doc/demo/example target/openfasttrace-language-server
+```
+
+The first command needs GraalVM as the JDK and takes a few minutes. It produces
+`target/openfasttrace-language-server` (`.exe` on Windows), a single file that runs
+without Java. The second command drives one LSP session against it and fails if an answer
+is missing, which is how a forgotten reflection registration shows up. Build options and the
+metadata live in `src/main/resources/META-INF/native-image/`, so
+`native-image -jar target/openfasttrace-language-server-*-standalone.jar` works as well.
 
 ### IntelliJ plugin
 

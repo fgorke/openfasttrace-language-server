@@ -23,7 +23,8 @@
     </licenses>
 
     <properties>
-        <java.version>17</java.version>
+        <!-- [impl->adr~use-java-25-as-minimum-runtime~1] -->
+        <java.version>25</java.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -41,6 +42,8 @@
         <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
         <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+        <native-maven-plugin.version>1.1.14</native-maven-plugin.version>
+        <graalvm.version>25.4.4.1.1</graalvm.version>
     </properties>
 
     <dependencies>
@@ -110,6 +113,17 @@
             <groupId>org.itsallcode.openfasttrace</groupId>
             <artifactId>openfasttrace-reporter-plaintext</artifactId>
             <version>${openfasttrace.version}</version>
+        </dependency>
+
+        <!--
+            GraalVM Native Image API for NativeImageSupport. Only needed while the native binary is
+            built, so it stays out of the standalone JAR.
+        -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>nativeimage</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -205,4 +219,50 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+            Native binary for editors without a Java runtime, see ADR 0016. Needs GraalVM as JAVA_HOME:
+            mvn -Pnative -DskipTests package
+            Build options and reflection metadata live in src/main/resources/META-INF/native-image/.
+        -->
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>openfasttrace-language-server</imageName>
+                            <mainClass>org.itsallcode.openfasttrace.lsp.ServerLauncher</mainClass>
+                            <fallback>false</fallback>
+                            <!--
+                                The GraalVM metadata repository stays off. Gson is the only dependency it has
+                                entries for, and those are array types and annotation proxies the server does
+                                not need: the smoke test passes without them, as the types Gson reaches
+                                reflectively are LSP4J's, registered by NativeImageSupport. The repository
+                                also adds a download, and its current schema is rejected by GraalVM 25.0.1,
+                                the last release for macOS on Intel.
+                            -->
+                            <metadataRepository>
+                                <enabled>false</enabled>
+                            </metadataRepository>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

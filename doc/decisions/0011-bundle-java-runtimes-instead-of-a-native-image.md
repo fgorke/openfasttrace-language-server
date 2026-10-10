@@ -41,3 +41,7 @@ Downloading on first start keeps the package small, but adds a download and a ca
 ### Confirmation
 
 The extension prefers a configured `oft.java.path`, then the bundled runtime, then the `PATH`.
+
+## More Information
+
+[ADR 0016](0016-provide-a-native-binary-for-editors-without-a-java-runtime.md) revisits the GraalVM option for editors that bring no runtime of their own. This decision stays in force for the IntelliJ plugin and the VS Code extension.

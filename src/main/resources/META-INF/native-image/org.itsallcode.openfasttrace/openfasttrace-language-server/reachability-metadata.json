@@ -1,0 +1,11 @@
+{
+  "comment": "Resources the server and OpenFastTrace read at run time. Reflection is registered by NativeImageSupport.",
+  "resources": [
+    { "glob": "tinylog.properties" },
+    { "glob": "META-INF/services/org.tinylog.*" },
+    { "glob": "version.properties" },
+    { "glob": "usage.txt" },
+    { "glob": "css/*" },
+    { "glob": "openfasttrace_logo*" }
+  ]
+}
