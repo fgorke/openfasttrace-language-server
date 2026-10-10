@@ -30,13 +30,13 @@
     "watch": "tsc -watch -p ./"
   },
   "dependencies": {
-    "vscode-languageclient": "^9.0.1"
+    "vscode-languageclient": "^10.1.2"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@types/vscode": "^1.82.0",
-    "@vscode/vsce": "^3.2.1",
-    "typescript": "^5.5.4"
+    "@types/node": "^26.6.4",
+    "@types/vscode": "^1.140.0",
+    "@vscode/vsce": "^4.0.0",
+    "typescript": "^7.0.2"
   },
   "contributes": {
     "configuration": {
