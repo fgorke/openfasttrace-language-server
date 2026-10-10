@@ -74,8 +74,8 @@ or from a downloaded package:
 1. Download the `.vsix` for your platform from the [releases](https://github.com/fgorke/openfasttrace-language-server/releases/) page.
 2. Open the Extensions view, click the `···` menu and choose **Install from VSIX…**, pick the file.
 
-Each package carries its own Java runtime, so the file name ends in the platform,
-for example `-win32-x64` or `-darwin-arm64`.
+Each package carries the language server as a native binary for its platform, so the file
+name ends in the platform, for example `-win32-x64` or `-darwin-arm64`. No Java is needed.
 
 ### Vim, Neovim and other editors
 
@@ -185,15 +185,17 @@ cd intellij-plugin
 ### VS Code extension
 
 ```bash
-mvn package
+mvn -Pnative -DskipTests package   # native binary and JAR; `mvn package` for the JAR alone
 cd vscode-extension
 npm install
 npm run watch     # then press F5 in VS Code to launch an extension host
-npm run package   # .vsix for the current platform
+npm run package   # .vsix for the current platform, with the native binary
 ```
 
-`jlink` only builds a runtime for the platform it runs on, so a package built here
-carries a runtime for this machine only. The releases are built per platform in CI.
+The package carries the native binary from `target/`, which Native Image builds for this
+machine only. A package for another platform needs that platform's binary dropped into
+`vscode-extension/server/`, which is what CI does with its build artifacts:
+`npm run package -- linux-arm64`. Without a binary, F5 runs the JAR with `java` from the `PATH`.
 
 </details>
 

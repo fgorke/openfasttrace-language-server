@@ -1,6 +1,12 @@
-// Builds a VSIX for the platform this runs on, with the Java runtime bundled.
+// Builds a platform-specific VSIX that carries the language server as a native binary.
+//
+// Usage: node scripts/package.js [target]   (target defaults to this machine)
+//
+// The binary comes from scripts/copy-server-binary.js. The server JAR is bundled as well, as the
+// fallback for a configured `oft.java.path`.
 
-const { execFileSync, spawnSync } = require("child_process");
+const { spawnSync } = require("child_process");
+const fs = require("fs");
 const path = require("path");
 
 const SUPPORTED_TARGETS = [
@@ -41,18 +47,14 @@ const target = process.argv[2] ?? currentTarget();
 if (!SUPPORTED_TARGETS.includes(target)) {
   console.error(
     `Unsupported target '${target}'. Supported: ${SUPPORTED_TARGETS.join(", ")}.\n` +
-      "Run 'npx vsce package' without a runtime to build a package that needs Java on the PATH."
+      "Run 'npx vsce package' to build a package without a native binary that needs Java on the PATH."
   );
   process.exit(1);
 }
 
-if (target !== currentTarget()) {
-  console.error(
-    `Cannot build for '${target}' on a ${currentTarget()} machine.`
-  );
-  process.exit(1);
-}
+// Left over from builds before the native binary replaced the bundled Java runtime.
+fs.rmSync(path.join(__dirname, "..", "runtime"), { recursive: true, force: true });
 
 console.log(`Building VS Code extension for ${target}`);
-run([path.join(__dirname, "build-runtime.js")]);
+run([path.join(__dirname, "copy-server-binary.js"), target]);
 run([vsceEntryPoint(), "package", "--target", target]);

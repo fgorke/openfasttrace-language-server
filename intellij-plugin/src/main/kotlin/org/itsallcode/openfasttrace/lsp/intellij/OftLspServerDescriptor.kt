@@ -67,6 +67,7 @@ internal class OftLspServerDescriptor(project: Project) :
         return GeneralCommandLine(java, "-jar", jarPath)
     }
 
+    // [impl->adr~bundle-java-runtimes-instead-of-a-native-image~1]
     private fun javaExecutable(): String {
         val launcher = Path.of(System.getProperty("java.home"), "bin",
             if (SystemInfo.isWindows) "java.exe" else "java")

@@ -24,7 +24,7 @@
     "precompile": "npm run copy-server-jar",
     "prewatch": "npm run copy-server-jar",
     "copy-server-jar": "node scripts/copy-server-jar.js",
-    "build-runtime": "node scripts/build-runtime.js",
+    "copy-server-binary": "node scripts/copy-server-binary.js",
     "package": "node scripts/package.js",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./"
@@ -44,8 +44,8 @@
       "properties": {
         "oft.java.path": {
           "type": "string",
-          "default": "java",
-          "description": "Path to the java executable used to run the language server. Defaults to 'java' on PATH."
+          "default": "",
+          "description": "Path to a java executable. When set, the extension runs the language server JAR with it instead of the bundled native binary. Leave empty to use the bundled binary, or 'java' from the PATH in a build without one."
         }
       }
     },

@@ -40,24 +40,33 @@ const SUPPORTED_EXTENSIONS = [
 ];
 
 const BUNDLED_JAR_NAME = "openfasttrace-language-server.jar";
+const BUNDLED_BINARY_NAME =
+  process.platform === "win32" ? "openfasttrace-language-server.exe" : "openfasttrace-language-server";
+const BUNDLED_SERVER_MARKER = "oft-server.json";
+
+/** How the language server process is started. */
+interface ServerLaunch {
+  command: string;
+  args: string[];
+  /** Where the command came from, for the error message when it does not start. */
+  source: "bundled-binary" | "configured-java" | "path-java";
+}
 
 let client: LanguageClient | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const jarPath = resolveServerJar(context);
-  if (jarPath === undefined) {
+  const launch = resolveServerLaunch(context);
+  if (launch === undefined) {
     vscode.window.showErrorMessage(
-      "OpenFastTrace: no server JAR found. Run 'mvn package' in the project root " +
-        "and recompile this extension."
+      "OpenFastTrace: this extension carries no language server. Run 'mvn -Pnative package' " +
+        "(native binary) or 'mvn package' (JAR) in the project root and recompile the extension."
     );
     return;
   }
 
-  const javaPath = resolveJavaExecutable(context);
-
   const serverOptions: ServerOptions = {
-    command: javaPath,
-    args: ["-jar", jarPath],
+    command: launch.command,
+    args: launch.args,
     transport: TransportKind.stdio,
   };
 
@@ -81,21 +90,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   try {
     await client.start();
   } catch (error) {
-    vscode.window.showErrorMessage(startupErrorMessage(javaPath, error));
+    vscode.window.showErrorMessage(startupErrorMessage(launch, error));
   }
 }
 
-function startupErrorMessage(javaPath: string, error: unknown): string {
-  const usesPathJava = javaPath === "java";
+function startupErrorMessage(launch: ServerLaunch, error: unknown): string {
   const isMissingExecutable = String(error).includes("ENOENT");
-  if (usesPathJava && isMissingExecutable) {
+  if (launch.source === "path-java" && isMissingExecutable) {
     return (
-      "OpenFastTrace: no Java found. This build of the extension does not bundle a Java " +
-      "runtime, so it needs Java 25 or later on the PATH, or a path configured in " +
-      "'oft.java.path'. Installing the platform-specific build of this extension avoids that."
+      "OpenFastTrace: no Java found. This build of the extension bundles no native language " +
+      "server for this platform, so it needs Java 25 or later on the PATH, or a path configured " +
+      "in 'oft.java.path'. The platform-specific builds of this extension need no Java."
     );
   }
-  return `OpenFastTrace: failed to start language server using '${javaPath}': ${error}`;
+  return `OpenFastTrace: failed to start language server using '${launch.command}': ${error}`;
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -214,43 +222,61 @@ function showRenderedReport(uri: vscode.Uri): void {
   panel.webview.html = fs.readFileSync(uri.fsPath, "utf8");
 }
 
+/**
+ * Picks how to start the server, in this order:
+ * 1. the JAR with the Java configured in `oft.java.path`, when both exist,
+ * 2. the native binary bundled with the platform-specific package,
+ * 3. the JAR with `java` from the PATH, for a package built without a binary.
+ */
+// [impl->adr~ship-the-native-binary-in-the-vs-code-extension~1]
+function resolveServerLaunch(context: vscode.ExtensionContext): ServerLaunch | undefined {
+  const jarPath = resolveServerJar(context);
+  const configuredJava = configuredJavaExecutable();
+  if (configuredJava !== undefined && jarPath !== undefined) {
+    return { command: configuredJava, args: ["-jar", jarPath], source: "configured-java" };
+  }
+  if (configuredJava !== undefined) {
+    console.warn("'oft.java.path' is set but this extension carries no server JAR, using the bundled binary.");
+  }
+
+  const binary = bundledServerBinary(context);
+  if (binary !== undefined) {
+    return { command: binary, args: [], source: "bundled-binary" };
+  }
+
+  if (jarPath !== undefined) {
+    return { command: "java", args: ["-jar", jarPath], source: "path-java" };
+  }
+  return undefined;
+}
+
 function resolveServerJar(context: vscode.ExtensionContext): string | undefined {
   const bundledJar = path.join(context.extensionPath, "server", BUNDLED_JAR_NAME);
   return fs.existsSync(bundledJar) ? bundledJar : undefined;
 }
 
-function resolveJavaExecutable(context: vscode.ExtensionContext): string {
+function configuredJavaExecutable(): string | undefined {
   const setting = vscode.workspace.getConfiguration("oft").inspect<string>("java.path");
   const configured =
     setting?.workspaceFolderValue ?? setting?.workspaceValue ?? setting?.globalValue;
   if (configured !== undefined && configured.trim() !== "") {
     return configured;
   }
-
-  const bundled = bundledJavaExecutable(context);
-  if (bundled !== undefined) {
-    return bundled;
-  }
-
-  return "java";
+  return undefined;
 }
 
-function bundledJavaExecutable(context: vscode.ExtensionContext): string | undefined {
-  const runtimeDir = path.join(context.extensionPath, "runtime");
-  const launcher = path.join(
-    runtimeDir,
-    "bin",
-    process.platform === "win32" ? "java.exe" : "java"
-  );
-  if (!fs.existsSync(launcher)) {
+function bundledServerBinary(context: vscode.ExtensionContext): string | undefined {
+  const serverDir = path.join(context.extensionPath, "server");
+  const binary = path.join(serverDir, BUNDLED_BINARY_NAME);
+  if (!fs.existsSync(binary)) {
     return undefined;
   }
-  if (!matchesCurrentPlatform(runtimeDir)) {
-    console.warn("Bundled Java runtime was built for a different platform, ignoring it.");
+  if (!matchesCurrentPlatform(serverDir)) {
+    console.warn("Bundled language server was built for a different platform, ignoring it.");
     return undefined;
   }
-  ensureExecutable(launcher);
-  return launcher;
+  ensureExecutable(binary);
+  return binary;
 }
 
 function ensureExecutable(file: string): void {
@@ -263,13 +289,13 @@ function ensureExecutable(file: string): void {
     try {
       fs.chmodSync(file, 0o755);
     } catch (error) {
-      console.warn(`Could not make the bundled Java runtime executable: ${error}`);
+      console.warn(`Could not make the bundled language server executable: ${error}`);
     }
   }
 }
 
-function matchesCurrentPlatform(runtimeDir: string): boolean {
-  const markerFile = path.join(runtimeDir, "oft-runtime.json");
+function matchesCurrentPlatform(serverDir: string): boolean {
+  const markerFile = path.join(serverDir, BUNDLED_SERVER_MARKER);
   if (!fs.existsSync(markerFile)) {
     return true;
   }

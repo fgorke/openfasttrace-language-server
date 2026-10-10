@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [ADR-0017](0017-ship-the-native-binary-in-the-vs-code-extension.md) for the VS Code extension, in force for the IntelliJ plugin
 date: 2026-08-07
 decision-makers: Felix Gorke
 ---
@@ -44,4 +44,4 @@ The extension prefers a configured `oft.java.path`, then the bundled runtime, th
 
 ## More Information
 
-[ADR 0016](0016-provide-a-native-binary-for-editors-without-a-java-runtime.md) revisits the GraalVM option for editors that bring no runtime of their own. This decision stays in force for the IntelliJ plugin and the VS Code extension.
+[ADR 0016](0016-provide-a-native-binary-for-editors-without-a-java-runtime.md) revisits the GraalVM option for editors that bring no runtime of their own, and [ADR 0017](0017-ship-the-native-binary-in-the-vs-code-extension.md) moves the VS Code extension onto that binary. This decision stays in force for the IntelliJ plugin.

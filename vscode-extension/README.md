@@ -22,10 +22,10 @@ The server starts automatically when a supported file is opened. No configuratio
 
 ## Requirements
 
-Every released package bundles a Java runtime, so nothing else needs to be installed. Packages exist for `win32-x64`, `linux-x64`, `linux-arm64`, `darwin-x64` and `darwin-arm64`.
+Every released package carries the language server as a native binary, so nothing else needs to be installed. Packages exist for `win32-x64`, `linux-x64`, `linux-arm64`, `darwin-x64` and `darwin-arm64`.
 
-On a platform outside that list, the extension falls back to Java 25 or later on the `PATH`. Setting `oft.java.path` always takes precedence over the bundled runtime.
+On a platform outside that list, the extension runs the server JAR with Java 25 or later from the `PATH`. Setting `oft.java.path` always runs the JAR with that Java instead of the bundled binary.
 
 ## Settings
 
-* `oft.java.path`: path to the `java` executable used to run the language server. Defaults to `java` on `PATH`.
+* `oft.java.path`: path to a `java` executable. When set, the language server JAR runs with it instead of the bundled native binary. Empty by default.
